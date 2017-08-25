@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="jifen:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="jifen.war">
+      <element id="artifact" artifact-name="jifen:war exploded" />
+    </root>
+  </artifact>
+</component>
