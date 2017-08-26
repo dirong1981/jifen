@@ -66,7 +66,7 @@
             <dt><i class="Hui-iconfont">&#xe616;</i> 商品管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
             <dd>
                 <ul>
-                    <li><a href="item2/page1.jsp"target="right-main" title="资讯管理">商品列表</a></li>
+                    <li><a href="item2/page1"target="right-main" title="资讯管理">商品列表</a></li>
                 </ul>
             </dd>
         </dl>

@@ -32,7 +32,7 @@
 </head>
 <body>
 <article class="cl pd-20">
-    <form method="post" class="form form-horizontal" id="form-add-class" enctype='application/json'>
+    <form method="post" class="form form-horizontal" id="form-add-class" enctype='multipart/form-data'>
 
 
         <div class="row cl">
@@ -69,15 +69,16 @@
             <label class="form-label col-xs-4 col-sm-3">图片：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <span class="btn-upload form-group">
-                    <input class="input-text upload-url" type="text" name="upload" id="upload" readonly nullmsg="请添加附件！" style="width:200px">
+                    <input class="input-text upload-url" type="text" name="uploadfile" id="uploadfile" readonly nullmsg="请添加附件！" style="width:200px">
                     <a href="javascript:void();" class="btn btn-primary radius upload-btn">
                         <i class="Hui-iconfont">&#xe642;</i>
                         浏览文件
                     </a>
-                    <input type="file" multiple name="cLogo-2" id="cLogo" class="input-file">
+                    <input type="file" multiple name="file-2" class="input-file">
 				</span>
             </div>
         </div>
+
 
 
         <!--状态-->
@@ -122,15 +123,14 @@
 <script type="text/javascript">
 
 
-
-
     //获取class列表并更新option
     $(function(){
+
         $.ajax({
             type:"get",
             contentType :  "application/json; charset=utf-8",// 必须
             //data: JSON.stringify({'name':"王五","password":"1234"}),//转换为json对象
-            url:"parentClassAjax",
+            url:"/admin/item1/parentClassAjax",
             dataType: "json",//必须
             async:  false,
             success:function(data){
@@ -139,6 +139,7 @@
                     {
                         jQuery('#cParentId').append('<option value="' + content.cId + '">' + content.cName + '</option>');
                     });
+                    $("#cParentId").val('${sessionScope.parent_id}');
                 }
             }
         });
@@ -149,7 +150,7 @@
     function add_class_ajax() {
 
         var option = {
-            url : 'add/',
+            url : '/admin/item1/add/',
             type : 'post',
             dataType : 'json',
             //contentType :  "application/json; charset=utf-8",// 必须
@@ -166,7 +167,7 @@
 
                 }
                 if(data.errorCode == "500"){
-                    layer.alert('登陆失败，请重试！', {icon: 5});
+                    layer.alert('添加失败，请重试！', {icon: 5});
                 }
             },
             error: function(data) {

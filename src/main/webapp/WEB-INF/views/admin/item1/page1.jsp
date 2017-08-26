@@ -49,7 +49,7 @@
         </div>
         <div class="cl pd-5 bg-1 bk-gray mt-20">
             <span class="l">
-                <a href="javascript:;" onclick="member_add('添加类别','/admin/item1/add','600','400')"
+                <a href="javascript:;" onclick="class_add('添加类别','/admin/item1/add','600','400')"
                    class="btn btn-primary radius">
                     <i class="Hui-iconfont">&#xe600;</i>
                     添加类别
@@ -102,8 +102,8 @@
     //        });
     //    });
 
-    /*用户-添加*/
-    function member_add(title, url, w, h) {
+    /*分类-添加*/
+    function class_add(title, url, w, h) {
         //layer_show(title, url, w, h);
 
         if (title == null || title == '') {
@@ -138,44 +138,108 @@
 
     }
 
-
-    /*用户-查看*/
-    function member_show(title, url, id, w, h) {
-        layer_show(title, url, w, h);
-    }
-
-    /*用户-停用*/
-    function member_stop(obj, id) {
+    /*分类-停用*/
+    function class_stop(obj, id) {
         layer.confirm('确认要停用吗？', function (index) {
-            $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="member_start(this,id)" href="javascript:;" title="启用"><i class="Hui-iconfont">&#xe6e1;</i></a>');
+            jQuery($(obj).parents("tr").find(".td-manage a")[0]).after(' <a style="text-decoration:none" onClick="class_start(this,\''+id+'\')" href="javascript:;" title="启用" class="btn btn-success-outline radius"><i class="Hui-iconfont">&#xe631;</i>启用</a>');
+            //$(obj).html('<a style="text-decoration:none" onClick="class_start(this,\''+id+'\')" href="javascript:;" title="启用" class="btn btn-success radius"><i class="Hui-iconfont">&#xe631;</i>通过审核</a>');
             $(obj).parents("tr").find(".td-status").html('<span class="label label-defaunt radius">已停用</span>');
             $(obj).remove();
-            layer.msg('已停用!', {icon: 5, time: 1000});
+            $.ajax({
+                type:"get",
+                contentType :  "application/json; charset=utf-8",// 必须
+                //data: JSON.stringify({'name':"王五","password":"1234"}),//转换为json对象
+                url:"/admin/item1/stopClassAjax/"+id,
+                dataType: "json",//必须
+                async:  false,
+                success:function(data){
+                    if(data.errorCode == '200'){
+                        layer.msg('已停用!', {icon: 5, time: 1000});
+                    }
+                }
+            });
+
         });
     }
 
-    /*用户-启用*/
-    function member_start(obj, id) {
+    /*分类-启用*/
+    function class_start(obj, id) {
         layer.confirm('确认要启用吗？', function (index) {
-            $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="member_stop(this,id)" href="javascript:;" title="停用"><i class="Hui-iconfont">&#xe631;</i></a>');
+            jQuery($(obj).parents("tr").find(".td-manage a")[0]).after(' <a style="text-decoration:none" onClick="class_stop(this,\''+id+'\')" href="javascript:;" title="停用" class="btn btn-success radius"><i class="Hui-iconfont">&#xe631;</i>停用</a>');
             $(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">已启用</span>');
             $(obj).remove();
-            layer.msg('已启用!', {icon: 6, time: 1000});
+            $.ajax({
+                type:"get",
+                contentType :  "application/json; charset=utf-8",// 必须
+                //data: JSON.stringify({'name':"王五","password":"1234"}),//转换为json对象
+                url:"/admin/item1/startClassAjax/"+id,
+                dataType: "json",//必须
+                async:  false,
+                success:function(data){
+                    if(data.errorCode == '200'){
+                        layer.msg('已启用!', {icon: 6, time: 1000});
+                    }
+                }
+            });
+
         });
     }
 
-    /*用户-编辑*/
-    function member_edit(title, url, id, w, h) {
-        layer_show(title, url, w, h);
+    /*分类-编辑*/
+    function class_edit(title, url, w, h) {
+        if (title == null || title == '') {
+            title = false;
+        }
+        ;
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        ;
+        if (w == null || w == '') {
+            w = 800;
+        }
+        ;
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        ;
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shade: 0.4,
+            title: title,
+            content: url,
+            end: function () {
+                reload();
+            }
+        });
     }
 
-    /*密码-修改*/
-    function change_password(title, url, id, w, h) {
-        layer_show(title, url, w, h);
+    /*排序-修改*/
+    function update_sort(obj,id) {
+        //发送删除请求ajax
+        $.ajax({
+            type: "get",
+            //contentType: "application/json; charset=utf-8",// 必须
+            //data: JSON.stringify({"c_id":""+id+""}),//转换为json对象
+            url: "item1/updateSortAjax/" + id + "/" + $(obj).val(),
+            //dataType: "json",//必须
+            async: false,
+            success: function (data) {
+                if (data.errorCode == '200') {
+                    layer.msg('修改成功!', {icon: 1, time: 1000});
+                }
+                if (data.errorCode == "500") {
+                    layer.msg('修改失败，请重试!', {icon: 4, time: 1000});
+                }
+            }
+        });
     }
 
-    /*用户-删除*/
-    function member_del(obj, id) {
+    /*删除*/
+    function table_del(obj, id) {
         layer.confirm('确认要删除吗？', function (index) {
 
             //发送删除请求ajax
@@ -204,97 +268,89 @@
         location.reload();
     }
 
-    //获取父类型ajax请求
+    //获取分类ajax请求，生成列表
+    var parentNum = 0;
+    var sonNum = 0;
     $(function () {
         var html = '';
+        var state = '';
+        var state_action = '';
         $.ajax({
             type: "get",
             contentType: "application/json; charset=utf-8",// 必须
             //data: JSON.stringify({'name':"王五","password":"1234"}),//转换为json对象
-            url: "item1/parentClassAjax",
+            url: "item1/allClassAjax",
             dataType: "json",//必须
             async: false,
             success: function (data) {
                 if (data.errorCode == '200') {
-                    $.each(data.item.Category, function (index, content) {
-                        html += '<tr class="text-c" id = "parent_' + content.cId + '">\n' +
-                            '                    <td>' + content.cId + '</td>\n' +
+                    $.each(data.item.parentClass, function (index, content) {
+                        parentNum++;
+                        if(content.cState == 1){
+                            state = '<span class="label label-success radius">已启用</span>';
+                            state_action = '<a style="text-decoration:none" onClick="class_stop(this,\''+content.cId+'\')" href="javascript:;" title="停用" class="btn btn-success radius"><i class="Hui-iconfont">&#xe631;</i>停用</a>';
+                        }else{
+                            state = '<span class="label label-error radius">未启用</span>';
+                            state_action = '<a style="text-decoration:none" onClick="class_start(this,\''+content.cId+'\')" href="javascript:;" title="启用" class="btn btn-success-outline radius"><i class="Hui-iconfont">&#xe631;</i>启用</a>';
+                        }
+                        html = '<tr class="text-c" id = "parent_' + content.cId + '">\n' +
+                            '                    <td>' + parentNum + '</td>\n' +
                             '                    <td><h4>' + content.cName + '</h4></td>\n' +
                             '                    <td>一级类</td>\n' +
                             '                    <td class="">\n' +
-                            '                        <img class="public-items-imgaes" src="${ctx}/admin/images/test-images/7declare1497949733.jpg"/>\n' +
+                            '                        <img class="public-items-imgaes" src="${ctx}/image/class-images/'+content.cLogo+'"/>\n' +
                             '                    </td>\n' +
-                            '                    <td><input class="input-text public-sort-input" value="' + content.cSort + '" maxlength="4"/></td>\n' +
+                            '                    <td><input onBlur="update_sort(this,\''+content.cId+'\')" class="input-text public-sort-input" value="' + content.cSort + '" maxlength="4"/></td>\n' +
                             '                    <td class="td-status">\n' +
-                            '                        <span class="label label-success radius">已通过</span>\n' +
+                            '                        '+state+'\n' +
                             '                    </td>\n' +
                             '                    <td class="td-manage">\n' +
-                            '                        <a style="text-decoration:none" onclick="member_add(\'添加用户\',\'/admin/item1/add\',\'600\',\'400\')" href="javascript:;"\n' +
+                            '                        <a style="text-decoration:none" onclick="class_add(\'添加子分类\',\'/admin/item1/add/'+content.cId+'\',\'600\',\'400\')" href="javascript:;"\n' +
                             '                           title="添加子分类" class="btn btn-secondary radius">\n' +
                             '                            <i class="Hui-iconfont">&#xe610;</i>添加子分类\n' +
-                            '                        </a>\n' +
-                            '                        <a style="text-decoration:none" onClick="member_stop(this,\'10001\')" href="javascript:;"\n' +
-                            '                           title="停用" class="btn btn-success radius">\n' +
-                            '                            <i class="Hui-iconfont">&#xe631;</i>通过审核\n' +
-                            '                        </a>\n' +
-                            '                        <a title="编辑" href="javascript:;"   onclick="member_add(\'添加用户\',\'/admin/item1/add\',\'600\',\'400\')"\n' +
+                            '                        </a>\n'+state_action+
+                            '                        <a title="编辑" href="javascript:;" onclick="class_edit(\'修改分类\',\'/admin/item1/updateClass/'+content.cId+'\',\'600\',\'400\')"\n' +
                             '                           class="ml-5 btn btn-warning radius" style="text-decoration:none">\n' +
                             '                            <i class="Hui-iconfont">&#xe6df;</i>修改\n' +
                             '                        </a>\n' +
-                            '                        <a title="删除" href="javascript:;" onclick="member_del(this,\'' + content.cId + '\')" class="ml-5 btn btn-danger radius "\n' +
+                            '                        <a title="删除" href="javascript:;" onclick="table_del(this,\'' + content.cId + '\')" class="ml-5 btn btn-danger radius "\n' +
                             '                           style="text-decoration:none">\n' +
                             '                            <i class="Hui-iconfont">&#xe6e2;</i>删除\n' +
                             '                        </a>\n' +
                             '                    </td>\n' +
                             '                </tr>';
-                    });
-                }
-                $('#content').html(html);
-            }
-        });
-    });
-
-
-    //获取子类型ajax请求
-
-
-    $(function () {
-        var html = '';
-        $.ajax({
-            type: "get",
-            contentType: "application/json; charset=utf-8",// 必须
-            //data: JSON.stringify({'name':"王五","password":"1234"}),//转换为json对象
-            url: "item1/sonClassAjax",
-            dataType: "json",//必须
-            async: false,
-            success: function (data) {
-                if (data.errorCode == '200') {
+                        $('#content').append(html);
+                    })
                     $.each(data.item.sonClass, function (index, content) {
+                        sonNum++;
+                        if(content.cState == 1){
+                            state = '<span class="label label-success radius">已启用</span>';
+                            state_action = '<a style="text-decoration:none" onClick="class_stop(this,\''+content.cId+'\')" href="javascript:;" title="停用" class="btn btn-success radius"><i class="Hui-iconfont">&#xe631;</i>停用</a>';
+                        }else{
+                            state = '<span class="label label-error radius">未启用</span>';
+                            state_action = '<a style="text-decoration:none" onClick="class_start(this,\''+content.cId+'\')" href="javascript:;" title="启用" class="btn btn-success-outline radius"><i class="Hui-iconfont">&#xe631;</i>启用</a>';
+                        }
                         html = '<tr class="text-c">\n' +
-                            '                    <td>' + content.cId + '</td>\n' +
+                            '                    <td> </td>\n' +
                             '                    <td><span class="type-symbol">&nbsp;&nbsp; ├ </span>' + content.cName + '</td>\n' +
                             '                    <td>二级类</td>\n' +
                             '                    <td class="">\n' +
-                            '                        <img class="public-items-imgaes" src="${ctx}/admin/images/test-images/7declare1497950456.jpg"/>\n' +
+                            '                        <img class="public-items-imgaes" src="${ctx}/image/class-images/'+content.cLogo+'"/>\n' +
                             '                    </td>\n' +
-                            '                    <td><input class="input-text public-sort-input" maxlength="4" value="1001"/></td>\n' +
+                            '                    <td><input onBlur="update_sort(this,\''+content.cId+'\')" class="input-text public-sort-input" maxlength="4" value="'+content.cSort+'"/></td>\n' +
                             '                    <td class="td-status">\n' +
-                            '                        <span class="label label-error radius">未通过</span>\n' +
+                            '                        '+state+'\n' +
                             '                    </td>\n' +
                             '                    <td class="td-manage">\n' +
                             '                        <a style="visibility: hidden" style="text-decoration:none" onclick="member_add(\'添加用户\',\'/admin/item1/add\',\'600\',\'400\')" href="javascript:;"\n' +
                             '                           title="添加子分类" class="btn btn-secondary radius">\n' +
                             '                            <i class="Hui-iconfont">&#xe610;</i>添加子分类\n' +
-                            '                        </a>\n' +
-                            '                        <a style="text-decoration:none" onClick="member_stop(this,\'10001\')" href="javascript:;"\n' +
-                            '                           title="停用" class="btn btn-success radius">\n' +
-                            '                            <i class="Hui-iconfont">&#xe631;</i>通过审核\n' +
-                            '                        </a>\n' +
-                            '                        <a title="编辑" href="javascript:;"   onclick="member_add(\'添加用户\',\'/admin/item1/add\',\'600\',\'400\')"\n' +
+                            '                        </a>\n' +state_action+
+                            '                        <a title="编辑" href="javascript:;"  onclick="class_edit(\'修改分类\',\'/admin/item1/updateClass/'+content.cId+'\',\'600\',\'400\')"\n' +
                             '                           class="ml-5 btn btn-warning radius" style="text-decoration:none">\n' +
                             '                            <i class="Hui-iconfont">&#xe6df;</i>修改\n' +
                             '                        </a>\n' +
-                            '                        <a title="删除" href="javascript:;" onclick="member_del(this,\'1\')" class="ml-5 btn btn-danger radius "\n' +
+                            '                        <a title="删除" href="javascript:;" onclick="table_del(this,\'' + content.cId + '\')" class="ml-5 btn btn-danger radius "\n' +
                             '                           style="text-decoration:none">\n' +
                             '                            <i class="Hui-iconfont">&#xe6e2;</i>删除\n' +
                             '                        </a>\n' +
@@ -303,12 +359,13 @@
 
 
                         $('#parent_' + content.cParentId).after(html);
-                    });
+                    })
                 }
-                //$('#content').html(html);
             }
         });
     });
+
+
 </script>
 <!--/请在上方写此页面业务相关的脚本-->
 </body>

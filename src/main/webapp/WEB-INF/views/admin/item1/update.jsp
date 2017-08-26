@@ -51,7 +51,7 @@
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>分类名称：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text" placeholder="分类名称" id="cName" name="cName">
+                <input type="text" class="input-text" placeholder="分类名称" value="${category.cName}" id="cName" name="cName">
             </div>
         </div>
 
@@ -59,7 +59,7 @@
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>排序：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text" placeholder="排序" id="cSort" name="cSort">
+                <input type="text" class="input-text" placeholder="排序" id="cSort" value="${category.cSort}" name="cSort">
             </div>
         </div>
 
@@ -69,7 +69,7 @@
             <label class="form-label col-xs-4 col-sm-3">图片：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <span class="btn-upload form-group">
-                    <input class="input-text upload-url" type="text" name="uploadfile" id="uploadfile" readonly nullmsg="请添加附件！" style="width:200px">
+                    <input class="input-text upload-url" value="${category.cLogo}" type="text" name="uploadfile" id="uploadfile" readonly nullmsg="请添加附件！" style="width:200px">
                     <a href="javascript:void();" class="btn btn-primary radius upload-btn">
                         <i class="Hui-iconfont">&#xe642;</i>
                         浏览文件
@@ -86,23 +86,23 @@
             <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>状态：</label>
             <div class="formControls col-xs-8 col-sm-9 skin-minimal">
                 <div class="radio-box">
-                    <input name="cState" type="radio" id="cState1" value="1" checked>
+                    <input name="cState" type="radio" id="cState1" value="1" <c:choose>	<c:when test="${category.cState=='1'}">checked</c:when></c:choose>>
                     <label for="cState1">启用</label>
                 </div>
                 <div class="radio-box">
-                    <input type="radio" id="cState0" name="cState" value="0">
+                    <input type="radio" id="cState0" name="cState" value="0" <c:choose><c:when test="${category.cState=='0'}">checked</c:when></c:choose>>
                     <label for="cState0">禁用</label>
                 </div>
             </div>
         </div>
 
-        <input type="hidden" name="cLogo" value="aa.jpg">
-        <input type="hidden" name="cCreator" value="${sessionScope.session_admin_id}">
+        <input type="hidden" name="cId" value="${category.cId}">
+        <input type="hidden" name="cCreator" value="${category.cCreator}">
 
 
         <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
-                <input class="btn btn-primary radius" onclick="add_class_ajax()" type="button" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+                <input class="btn btn-primary radius" onclick="update_class_ajax()" type="button" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
             </div>
         </div>
     </form>
@@ -139,7 +139,7 @@
                     {
                         jQuery('#cParentId').append('<option value="' + content.cId + '">' + content.cName + '</option>');
                     });
-                    $("#cParentId").val('${sessionScope.parent_id}');
+                    $("#cParentId").val('${category.cParentId}');
                 }
             }
         });
@@ -147,10 +147,10 @@
 
 
     //添加分类ajax请求
-    function add_class_ajax() {
+    function update_class_ajax() {
 
         var option = {
-            url : '/admin/item1/add/',
+            url : '/admin/item1/updateClass',
             type : 'post',
             dataType : 'json',
             //contentType :  "application/json; charset=utf-8",// 必须
@@ -161,13 +161,13 @@
                     layer.alert('添加的内容不能为空', {icon: 0});
                 }
                 if(data.errorCode == "200"){
-                    parent.layer.msg('添加成功！', {icon: 1});
+                    parent.layer.msg('修改成功！', {icon: 1});
                     setTimeout(closePage,1000);
 
 
                 }
                 if(data.errorCode == "500"){
-                    layer.alert('添加失败，请重试！', {icon: 5});
+                    layer.alert('修改失败，请重试！', {icon: 5});
                 }
             },
             error: function(data) {

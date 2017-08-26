@@ -20,9 +20,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryExample categoryExample = new CategoryExample();
         CategoryExample.Criteria criteria= categoryExample.createCriteria();
-        criteria.andCParentIdEqualTo(0);
+        criteria.andCParentIdEqualTo("0");
 
-        categoryExample.setOrderByClause("c_id asc");
+        categoryExample.setOrderByClause("c_sort asc");
 
         return categoryMapper.selectByExample(categoryExample);
     }
@@ -37,15 +37,45 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> selectSonClass() {
         CategoryExample categoryExample = new CategoryExample();
         CategoryExample.Criteria criteria = categoryExample.createCriteria();
-        criteria.andCParentIdNotEqualTo(0);
-        categoryExample.setOrderByClause("c_parent_id desc, c_id desc");
+        criteria.andCParentIdNotEqualTo("0");
+        categoryExample.setOrderByClause("c_sort desc");
 
         return categoryMapper.selectByExample(categoryExample);
     }
 
     @Override
-    public int deleteClass(Integer id) {
+    public int deleteClass(String id) {
         return categoryMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public List<Category> selectAllClass() {
+        CategoryExample categoryExample = new CategoryExample();
+        categoryExample.setOrderByClause("c_sort asc");
+
+        return categoryMapper.selectByExample(categoryExample);
+    }
+
+    @Override
+    public int updateClass(Category category) {
+        return categoryMapper.updateByPrimaryKey(category);
+    }
+
+    @Override
+    public Category selectClass(String id) {
+        return categoryMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int updateClassSort(String sort, String id) {
+        CategoryExample categoryExample = new CategoryExample();
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        criteria.andCIdEqualTo(id);
+
+        Category category = new Category();
+        category.setcSort(sort);
+
+        return categoryMapper.updateByExampleSelective(category, categoryExample);
     }
 
 
