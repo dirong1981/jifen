@@ -1,5 +1,8 @@
 package com.gljr.jifen.pojo;
 
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class Product {
@@ -7,9 +10,9 @@ public class Product {
 
     private String pName;
 
-    private String bcId;
+    private String cpId;
 
-    private String scId;
+    private String cId;
 
     private String sId;
 
@@ -31,7 +34,7 @@ public class Product {
 
     private Integer pState;
 
-    private Integer pCreator;
+    private String pCreator;
 
     private String pIntro;
 
@@ -43,6 +46,7 @@ public class Product {
         this.pId = pId == null ? null : pId.trim();
     }
 
+    @NotBlank
     public String getpName() {
         return pName;
     }
@@ -51,22 +55,25 @@ public class Product {
         this.pName = pName == null ? null : pName.trim();
     }
 
-    public String getBcId() {
-        return bcId;
+    @NotBlank
+    public String getCpId() {
+        return cpId;
     }
 
-    public void setBcId(String bcId) {
-        this.bcId = bcId == null ? null : bcId.trim();
+    public void setCpId(String cpId) {
+        this.cpId = cpId == null ? null : cpId.trim();
     }
 
-    public String getScId() {
-        return scId;
+    @NotBlank
+    public String getcId() {
+        return cId;
     }
 
-    public void setScId(String scId) {
-        this.scId = scId == null ? null : scId.trim();
+    public void setcId(String cId) {
+        this.cId = cId == null ? null : cId.trim();
     }
 
+    @NotBlank
     public String getsId() {
         return sId;
     }
@@ -83,6 +90,7 @@ public class Product {
         this.pTime = pTime;
     }
 
+    @NotNull
     public Integer getpPrice() {
         return pPrice;
     }
@@ -91,6 +99,7 @@ public class Product {
         this.pPrice = pPrice;
     }
 
+    @NotNull
     public Integer getpIntegral() {
         return pIntegral;
     }
@@ -107,6 +116,7 @@ public class Product {
         this.pDiscounts = pDiscounts;
     }
 
+
     public String getpLogo() {
         return pLogo;
     }
@@ -115,6 +125,7 @@ public class Product {
         this.pLogo = pLogo == null ? null : pLogo.trim();
     }
 
+    @NotNull
     public Integer getpStorage() {
         return pStorage;
     }
@@ -131,6 +142,7 @@ public class Product {
         this.pSales = pSales;
     }
 
+    @NotBlank
     public String getpUnit() {
         return pUnit;
     }
@@ -139,6 +151,7 @@ public class Product {
         this.pUnit = pUnit == null ? null : pUnit.trim();
     }
 
+    @NotNull
     public Integer getpState() {
         return pState;
     }
@@ -147,14 +160,16 @@ public class Product {
         this.pState = pState;
     }
 
-    public Integer getpCreator() {
+    @NotBlank
+    public String getpCreator() {
         return pCreator;
     }
 
-    public void setpCreator(Integer pCreator) {
-        this.pCreator = pCreator;
+    public void setpCreator(String pCreator) {
+        this.pCreator = pCreator == null ? null : pCreator.trim();
     }
 
+    @NotBlank
     public String getpIntro() {
         return pIntro;
     }

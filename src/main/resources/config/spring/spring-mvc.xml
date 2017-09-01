@@ -19,6 +19,11 @@
     <context:component-scan base-package="com.gljr.jifen.controller"></context:component-scan>
 
 
+    <!--
+    <mvc:cors>
+        <mvc:mapping path="/**"/>
+    </mvc:cors>
+    -->
 
     <!-- 注解的映射器 -->
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
@@ -38,17 +43,19 @@
         <!-- 最大内存大小 -->
         <property name="maxInMemorySize" value="10240"/>
         <!-- 最大文件大小，-1为不限制大小 -->
-        <property name="maxUploadSize" value="-1"/>
+        <property name="maxUploadSize" value="5000000"/>
     </bean>
 
-
     <mvc:interceptors>
-
         <mvc:interceptor>
-            <mvc:mapping path="/admin/*" />
-            <bean class="com.gljr.jifen.filter.SessionIntecepter" />
+            <!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->
+            <mvc:mapping path="/jifen/**" />
+            <!-- /register 和 /login 不需要拦截-->
+            <mvc:exclude-mapping path="/**/register" />
+            <mvc:exclude-mapping path="/**/login" />
+            <bean class="com.gljr.jifen.filter.TokenIntecepter"></bean>
         </mvc:interceptor>
-
+        <!-- 当设置多个拦截器时，先按顺序调用preHandle方法，然后逆序调用每个拦截器的postHandle和afterCompletion方法 -->
     </mvc:interceptors>
 
 

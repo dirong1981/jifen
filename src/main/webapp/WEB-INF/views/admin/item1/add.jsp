@@ -69,7 +69,7 @@
             <label class="form-label col-xs-4 col-sm-3">图片：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <span class="btn-upload form-group">
-                    <input class="input-text upload-url" type="text" name="uploadfile" id="uploadfile" readonly nullmsg="请添加附件！" style="width:200px">
+                    <input class="input-text upload-url" type="text" name="uploadfile" id="uploadfile" readonly nullmsg="请添加附件！">
                     <a href="javascript:void();" class="btn btn-primary radius upload-btn">
                         <i class="Hui-iconfont">&#xe642;</i>
                         浏览文件
@@ -96,7 +96,6 @@
             </div>
         </div>
 
-        <input type="hidden" name="cLogo" value="aa.jpg">
         <input type="hidden" name="cCreator" value="${sessionScope.session_admin_id}">
 
 
@@ -123,7 +122,7 @@
 <script type="text/javascript">
 
 
-    //获取class列表并更新option
+    //获取class列表并更新option,通过获取session中的父类id，来判断是添加一级类还是二级类
     $(function(){
 
         $.ajax({
@@ -181,8 +180,10 @@
     }
 
 
+    //关闭当前弹框
     function closePage() {
         var index = parent.layer.getFrameIndex(window.name);
+        parent.location.reload();
         parent.layer.close(index);
     }
 </script>

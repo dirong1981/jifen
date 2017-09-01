@@ -2,60 +2,78 @@ package com.gljr.jifen.pojo;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.Date;
 
 public class Admin {
-    private String aId;
+    private Integer id;
 
-    private String aName;
+    private Byte accountType;
 
-    private String aPassword;
+    private String username;
 
-    private Date aLasttime;
+    private String password;
 
-    private String aSalt;
+    private String salt;
 
-    public String getaId() {
-        return aId;
+    private Byte status;
+
+    private Date createTime;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setaId(String aId) {
-        this.aId = aId == null ? null : aId.trim();
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Byte getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(Byte accountType) {
+        this.accountType = accountType;
     }
 
     @NotBlank
-    public String getaName() {
-        return aName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setaName(String aName) {
-        this.aName = aName == null ? null : aName.trim();
+    public void setUsername(String username) {
+        this.username = username == null ? null : username.trim();
     }
 
     @NotBlank
-    public String getaPassword() {
-        return aPassword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setaPassword(String aPassword) {
-        this.aPassword = aPassword == null ? null : aPassword.trim();
+    public void setPassword(String password) {
+        this.password = password == null ? null : password.trim();
     }
 
-    public Date getaLasttime() {
-        return aLasttime;
+    public String getSalt() {
+        return salt;
     }
 
-    public void setaLasttime(Date aLasttime) {
-        this.aLasttime = aLasttime;
+    public void setSalt(String salt) {
+        this.salt = salt == null ? null : salt.trim();
     }
 
-    public String getaSalt() {
-        return aSalt;
+    public Byte getStatus() {
+        return status;
     }
 
-    public void setaSalt(String aSalt) {
-        this.aSalt = aSalt == null ? null : aSalt.trim();
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

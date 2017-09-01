@@ -49,6 +49,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public int deleteSonClass(String id) {
+        CategoryExample categoryExample = new CategoryExample();
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        criteria.andCParentIdEqualTo(id);
+
+        return categoryMapper.deleteByExample(categoryExample);
+    }
+
+    @Override
     public List<Category> selectAllClass() {
         CategoryExample categoryExample = new CategoryExample();
         categoryExample.setOrderByClause("c_sort asc");
@@ -76,6 +85,28 @@ public class CategoryServiceImpl implements CategoryService {
         category.setcSort(sort);
 
         return categoryMapper.updateByExampleSelective(category, categoryExample);
+    }
+
+    @Override
+    public List<Category> selectShowParentClass() {
+        CategoryExample categoryExample = new CategoryExample();
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        criteria.andCParentIdEqualTo("0");
+        criteria.andCStateEqualTo(1);
+
+        categoryExample.setOrderByClause("c_sort asc");
+        return categoryMapper.selectByExample(categoryExample);
+    }
+
+    @Override
+    public List<Category> selectShowSonClass() {
+        CategoryExample categoryExample = new CategoryExample();
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        criteria.andCParentIdNotEqualTo("0");
+        criteria.andCStateEqualTo(1);
+
+        categoryExample.setOrderByClause("c_sort asc");
+        return categoryMapper.selectByExample(categoryExample);
     }
 
 

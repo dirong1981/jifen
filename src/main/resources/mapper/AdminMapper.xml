@@ -2,11 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gljr.jifen.dao.AdminMapper">
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.Admin">
-    <id column="a_id" jdbcType="VARCHAR" property="aId" />
-    <result column="a_name" jdbcType="VARCHAR" property="aName" />
-    <result column="a_password" jdbcType="VARCHAR" property="aPassword" />
-    <result column="a_lasttime" jdbcType="TIMESTAMP" property="aLasttime" />
-    <result column="a_salt" jdbcType="VARCHAR" property="aSalt" />
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="account_type" jdbcType="TINYINT" property="accountType" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="salt" jdbcType="VARCHAR" property="salt" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,7 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    a_id, a_name, a_password, a_lasttime, a_salt
+    id, account_type, username, password, salt, status, create_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.AdminExample" resultMap="BaseResultMap">
     select
@@ -83,15 +85,15 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from admin
-    where a_id = #{aId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from admin
-    where a_id = #{aId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
   </delete>
   <delete id="deleteByExample" parameterType="com.gljr.jifen.pojo.AdminExample">
     delete from admin
@@ -100,45 +102,59 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.gljr.jifen.pojo.Admin">
-    insert into admin (a_id, a_name, a_password, 
-      a_lasttime, a_salt)
-    values (#{aId,jdbcType=VARCHAR}, #{aName,jdbcType=VARCHAR}, #{aPassword,jdbcType=VARCHAR}, 
-      #{aLasttime,jdbcType=TIMESTAMP}, #{aSalt,jdbcType=VARCHAR})
+    insert into admin (id, account_type, username, 
+      password, salt, status, 
+      create_time)
+    values (#{id,jdbcType=INTEGER}, #{accountType,jdbcType=TINYINT}, #{username,jdbcType=VARCHAR}, 
+      #{password,jdbcType=VARCHAR}, #{salt,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Admin">
     insert into admin
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="aId != null">
-        a_id,
+      <if test="id != null">
+        id,
       </if>
-      <if test="aName != null">
-        a_name,
+      <if test="accountType != null">
+        account_type,
       </if>
-      <if test="aPassword != null">
-        a_password,
+      <if test="username != null">
+        username,
       </if>
-      <if test="aLasttime != null">
-        a_lasttime,
+      <if test="password != null">
+        password,
       </if>
-      <if test="aSalt != null">
-        a_salt,
+      <if test="salt != null">
+        salt,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createTime != null">
+        create_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="aId != null">
-        #{aId,jdbcType=VARCHAR},
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
       </if>
-      <if test="aName != null">
-        #{aName,jdbcType=VARCHAR},
+      <if test="accountType != null">
+        #{accountType,jdbcType=TINYINT},
       </if>
-      <if test="aPassword != null">
-        #{aPassword,jdbcType=VARCHAR},
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
       </if>
-      <if test="aLasttime != null">
-        #{aLasttime,jdbcType=TIMESTAMP},
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
       </if>
-      <if test="aSalt != null">
-        #{aSalt,jdbcType=VARCHAR},
+      <if test="salt != null">
+        #{salt,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -151,20 +167,26 @@
   <update id="updateByExampleSelective" parameterType="map">
     update admin
     <set>
-      <if test="record.aId != null">
-        a_id = #{record.aId,jdbcType=VARCHAR},
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
       </if>
-      <if test="record.aName != null">
-        a_name = #{record.aName,jdbcType=VARCHAR},
+      <if test="record.accountType != null">
+        account_type = #{record.accountType,jdbcType=TINYINT},
       </if>
-      <if test="record.aPassword != null">
-        a_password = #{record.aPassword,jdbcType=VARCHAR},
+      <if test="record.username != null">
+        username = #{record.username,jdbcType=VARCHAR},
       </if>
-      <if test="record.aLasttime != null">
-        a_lasttime = #{record.aLasttime,jdbcType=TIMESTAMP},
+      <if test="record.password != null">
+        password = #{record.password,jdbcType=VARCHAR},
       </if>
-      <if test="record.aSalt != null">
-        a_salt = #{record.aSalt,jdbcType=VARCHAR},
+      <if test="record.salt != null">
+        salt = #{record.salt,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=TINYINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     <if test="_parameter != null">
@@ -173,11 +195,13 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update admin
-    set a_id = #{record.aId,jdbcType=VARCHAR},
-      a_name = #{record.aName,jdbcType=VARCHAR},
-      a_password = #{record.aPassword,jdbcType=VARCHAR},
-      a_lasttime = #{record.aLasttime,jdbcType=TIMESTAMP},
-      a_salt = #{record.aSalt,jdbcType=VARCHAR}
+    set id = #{record.id,jdbcType=INTEGER},
+      account_type = #{record.accountType,jdbcType=TINYINT},
+      username = #{record.username,jdbcType=VARCHAR},
+      password = #{record.password,jdbcType=VARCHAR},
+      salt = #{record.salt,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -185,27 +209,35 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.gljr.jifen.pojo.Admin">
     update admin
     <set>
-      <if test="aName != null">
-        a_name = #{aName,jdbcType=VARCHAR},
+      <if test="accountType != null">
+        account_type = #{accountType,jdbcType=TINYINT},
       </if>
-      <if test="aPassword != null">
-        a_password = #{aPassword,jdbcType=VARCHAR},
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
       </if>
-      <if test="aLasttime != null">
-        a_lasttime = #{aLasttime,jdbcType=TIMESTAMP},
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
       </if>
-      <if test="aSalt != null">
-        a_salt = #{aSalt,jdbcType=VARCHAR},
+      <if test="salt != null">
+        salt = #{salt,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where a_id = #{aId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.Admin">
     update admin
-    set a_name = #{aName,jdbcType=VARCHAR},
-      a_password = #{aPassword,jdbcType=VARCHAR},
-      a_lasttime = #{aLasttime,jdbcType=TIMESTAMP},
-      a_salt = #{aSalt,jdbcType=VARCHAR}
-    where a_id = #{aId,jdbcType=VARCHAR}
+    set account_type = #{accountType,jdbcType=TINYINT},
+      username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      salt = #{salt,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

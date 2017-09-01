@@ -13,7 +13,7 @@
         </commentGenerator>
         <!--数据库连接的信息：驱动类、连接地址、用户名、密码 -->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3306/jifen" userId="root"
+                        connectionURL="jdbc:mysql://localhost:3306/jifen?tinyInt1isBit=false" userId="root"
                         password="root123">
         </jdbcConnection>
         <!-- 默认false，把JDBC DECIMAL 和 NUMERIC 类型解析为 Integer，为 true时把JDBC DECIMAL 和
@@ -47,7 +47,9 @@
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
         <!-- 指定数据库表 -->
-        <table schema="" tableName="category"></table>
+        <table schema="" tableName="admin"></table>
+        <table schema="" tableName="admin_online"></table>
+        <table schema="" tableName="admin_permission_assign"></table>
 
     </context>
 </generatorConfiguration>

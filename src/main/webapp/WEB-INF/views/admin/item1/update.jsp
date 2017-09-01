@@ -183,6 +183,7 @@
 
     function closePage() {
         var index = parent.layer.getFrameIndex(window.name);
+        parent.location.reload();
         parent.layer.close(index);
     }
 </script>

@@ -8,4 +8,7 @@
     <!--扫描service-->
     <context:component-scan base-package="com.gljr.jifen.service"/>
 
+    <context:component-scan base-package="com.gljr.jifen.common"/>
+    <context:component-scan base-package="com.gljr.jifen.pojo"/>
+
 </beans>

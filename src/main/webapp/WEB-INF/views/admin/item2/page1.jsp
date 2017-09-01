@@ -39,7 +39,7 @@
 </nav>
 <div class="Hui-article">
     <article class="cl pd-20">
-        <div class="row cl search-box">
+        <div class="row cl search-box" style="display: none">
 
             <div class="col-xs-2" style="padding-left: 0">
                 <span class="select-box">
@@ -56,7 +56,7 @@
         </div>
         <div class="cl pd-5 bg-1 bk-gray mt-20">
             <span class="l">
-                <a href="javascript:;" onclick="picture_add('添加商品','page1-add')"
+                <a href="javascript:;" onclick="product_add('添加商品','page1-add')"
                    class="btn btn-primary radius">
                     <i class="Hui-iconfont">&#xe600;</i>
                     添加商品
@@ -64,10 +64,11 @@
             </span>
             <span class="r">共有数据：<strong>88</strong> 条</span></div>
         <div class="mt-20">
-            <table class="table table-border table-bordered table-hover table-bg table-sort">
+            <table class="table table-border table-bordered table-hover table-bg table-sort" id="allProduct">
                 <thead>
                 <tr class="text-c">
-                    <th width="5%">ID</th>
+                    <th width="5%">序号</th>
+                    <th width="5%">商品id</th>
                     <th width="15%">图片</th>
                     <th width="30%">商品名称</th>
                     <th width="10%">价格</th>
@@ -75,59 +76,7 @@
                     <th width="">操作</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr class="text-c">
-                    <td>1</td>
-                    <td>
-                        <img class="public-items-imgaes" src="${ctx}/admin/images/test-images/7declare1497949733.jpg"/>
-                    </td>
-                    <td>小米6 128gb陶瓷</td>
-                    <td>4500分</td>
-                    <td class="td-status">
-                        <span class="label label-success radius">上架</span>
-                    </td>
-                    <td class="td-manage">
-                        <a class="ml-5 btn btn-secondary radius" style="text-decoration:none"  onClick="change_password('审核','change-password.html','10001','600','270')" href="javascript:;" title="审核">
-                            <i class="Hui-iconfont">&#xe63f;</i>审核
-                        </a>
-                        <a class="ml-5 btn btn-success radius" title="编辑" href="javascript:;" onclick="picture_add('添加商品','page1-add.jsp')" style="text-decoration:none">
-                            <i class="Hui-iconfont">&#xe6df;</i>编辑
-                        </a>
 
-                        <a  class="ml-5 btn btn-danger radius"  title="删除" href="javascript:;" onclick="member_del(this,'1')" class="ml-5" style="text-decoration:none">
-                            <i class="Hui-iconfont">&#xe6e2;</i>删除
-                        </a>
-                    </td>
-                </tr>
-
-
-
-                <tr class="text-c">
-                    <td>2</td>
-                    <td>
-                        <img class="public-items-imgaes" src="${ctx}/admin/images/test-images/7declare1497949733.jpg"/>
-                    </td>
-                    <td>小米note plus 128gb陶瓷</td>
-                    <td>4500分</td>
-                    <td class="td-status">
-                        <span class="label label-error radius">下架</span>
-                    </td>
-                    <td class="td-manage">
-                        <a class="ml-5 btn btn-secondary radius" style="text-decoration:none"  onClick="change_password('审核','change-password.html','10001','600','270')" href="javascript:;" title="审核">
-                            <i class="Hui-iconfont">&#xe63f;</i>审核
-                        </a>
-                        <a class="ml-5 btn btn-success radius" title="编辑" href="javascript:;" onclick="picture_add('添加商品','page1-add.jsp')" style="text-decoration:none">
-                            <i class="Hui-iconfont">&#xe6df;</i>编辑
-                        </a>
-
-                        <a  class="ml-5 btn btn-danger radius"  title="删除" href="javascript:;" onclick="member_del(this,'1')" class="ml-5" style="text-decoration:none">
-                            <i class="Hui-iconfont">&#xe6e2;</i>删除
-                        </a>
-                    </td>
-                </tr>
-
-
-                </tbody>
             </table>
         </div>
     </article>
@@ -146,15 +95,132 @@
 <script type="text/javascript" src="${ctx}/admin/h-ui/lib/laypage/1.2/laypage.js"></script>
 <script type="text/javascript">
     $(function () {
-        $('.table-sort').dataTable({
-            "bStateSave": true,//状态保存
-            "aoColumnDefs": [
-                //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
-                {"orderable": false, "aTargets": [0, 1, 2, 3, 4, 5]}// 制定列不参与排序
+        var t = $('#allProduct').DataTable({
+            ajax: {
+                //指定数据源
+                url: "/admin/item2/allProductAjax"
+            },
+            //每页显示三条数据
+//            pageLength: 3,
+            processing: true,
+            //deferRender: true,
+            bStateSave: true,
+            columns: [
+                {
+                    className: "text-c",
+                    "data": null //此列不绑定数据源，用来显示序号
+                },
+                {
+                    "data": "pId" //此列不绑定数据源，用来显示序号
+                },
+                {
+                    className: "text-c",
+                    "data": "pLogo"
+                },
+                {
+                    className: "text-c",
+                    "data": "pName"
+                },
+                {
+                    className: "text-c",
+                    "data": "pIntegral"
+                },
+                {
+                    className: "text-c td-status",
+                    "data": "pState"
+                },
+                {
+                    className: "text-c td-manage",
+                    "data": "pCreator"
+                }
+            ],
+            columnDefs: [
+                {
+                    "render": function(data, type, row, meta) {
+                        //渲染 把数据源中的标题和url组成超链接
+                        return '<img class="public-items-imgaes" src="${ctx}/image/product-images/'+data+'"/>';
+                    },
+                    //指定是第三列
+                    "targets": 2
+
+                },
+                {
+                    "visible": false,
+                    "targets": 1
+
+                },
+                {
+                    "render": function(data, type, row, meta) {
+                        //渲染 把数据源中的标题和url组成超链接
+                        return data + '分';
+                    },
+                    //指定是第三列
+                    "targets": 4
+
+                },
+                {
+                    "render": function(data, type, row, meta) {
+                        //渲染 把数据源中的标题和url组成超链接
+                        var state = '';
+                        if(data == 1){
+                            state = '<span class="label label-success radius">上架</span>';
+                        }else{
+                            state = '<span class="label label-error radius">下架</span>';
+                        }
+                        return state;
+                    },
+                    //指定是第三列
+                    "targets": 5
+
+                },
+                {
+                    "render": function(data, type, row, meta) {
+
+                        var check = '';
+                        if(row.pState == 1){
+                            check = '<a class="ml-5 btn btn-secondary radius" style="text-decoration:none"  onClick="product_stop(this,\''+row.pId+'\')" href="javascript:;" title="下架">'+
+                                '<i class="Hui-iconfont">&#xe63f;</i>下架'+
+                                '</a>';
+                        }else{
+                            check = '<a class="ml-5 btn btn-secondary-outline radius" style="text-decoration:none"  onClick="product_start(this,\''+row.pId+'\')" href="javascript:;" title="上架">'+
+                                '<i class="Hui-iconfont">&#xe63f;</i>上架'+
+                                '</a>';
+                        }
+
+
+                        //渲染 把数据源中的标题和url组成超链接
+                        return check +
+                        '<a class="ml-5 btn btn-success radius" title="编辑" href="javascript:;" onclick="product_edit(\'修改商品信息\',\'/admin/item2/updateProduct/'+row.pId+'\')" style="text-decoration:none">'+
+                         '   <i class="Hui-iconfont">&#xe6df;</i>编辑'+
+                        '</a>'+
+                        '<a  class="ml-5 btn btn-danger radius"  title="删除" href="javascript:;" onclick="product_del(this,\''+row.pId+'\')" class="ml-5" style="text-decoration:none">'+
+                         '   <i class="Hui-iconfont">&#xe6e2;</i>删除'+
+                        '</a>';
+                    },
+                    //指定是第三列
+                    "targets": 6
+                }
             ]
         });
+
+
+        t.on('order.dt search.dt',
+            function() {
+                t.column(0, {
+                    "search": 'applied',
+                    "order": 'applied'
+                }).nodes().each(function(cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+
     });
-    function picture_add(title,url){
+
+
+
+    //打开添加窗口
+    function product_add(title,url){
         var index = layer.open({
             type: 2,
             title: title,
@@ -162,42 +228,89 @@
         });
         layer.full(index);
     }
-    /*用户-查看*/
-    function member_show(title, url, id, w, h) {
-        layer_show(title, url, w, h);
-    }
-    /*用户-停用*/
-    function member_stop(obj, id) {
-        layer.confirm('确认要停用吗？', function (index) {
-            $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="member_start(this,id)" href="javascript:;" title="启用"><i class="Hui-iconfont">&#xe6e1;</i></a>');
-            $(obj).parents("tr").find(".td-status").html('<span class="label label-defaunt radius">已停用</span>');
+
+
+
+
+    /*商品下架*/
+    function product_stop(obj, id) {
+        layer.confirm('确认要下架该商品吗？', function (index) {
+            jQuery($(obj).parents("tr").find(".td-manage")).prepend('&nbsp;<a style="text-decoration:none" onClick="product_start(this,\''+id+'\')" href="javascript:;" title="上架" class="btn btn-secondary-outline radius"><i class="Hui-iconfont">&#xe63f;</i>上架</a>');
+            $(obj).parents("tr").find(".td-status").html('<span class="label label-defaunt radius">下架</span>');
             $(obj).remove();
-            layer.msg('已停用!', {icon: 5, time: 1000});
+            $.ajax({
+                type:"get",
+                contentType :  "application/json; charset=utf-8",// 必须
+                //data: JSON.stringify({'name':"王五","password":"1234"}),//转换为json对象
+                url:"/admin/item2/stopProductAjax/"+id,
+                dataType: "json",//必须
+                async:  false,
+                success:function(data){
+                    if(data.errorCode == '200'){
+                        layer.msg('已下架!', {icon: 5, time: 1000});
+                    }
+                }
+            });
+
         });
     }
 
-    /*用户-启用*/
-    function member_start(obj, id) {
-        layer.confirm('确认要启用吗？', function (index) {
-            $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="member_stop(this,id)" href="javascript:;" title="停用"><i class="Hui-iconfont">&#xe631;</i></a>');
-            $(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">已启用</span>');
+
+    /*商品上架*/
+    function product_start(obj, id) {
+        layer.confirm('确认要上架该商品吗？', function (index) {
+            jQuery($(obj).parents("tr").find(".td-manage")).prepend('&nbsp;<a style="text-decoration:none" onClick="product_stop(this,\''+id+'\')" href="javascript:;" title="下架" class="btn btn-secondary radius"><i class="Hui-iconfont">&#xe63f;</i>下架</a>');
+            $(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">上架</span>');
             $(obj).remove();
-            layer.msg('已启用!', {icon: 6, time: 1000});
+            $.ajax({
+                type:"get",
+                contentType :  "application/json; charset=utf-8",// 必须
+                //data: JSON.stringify({'name':"王五","password":"1234"}),//转换为json对象
+                url:"/admin/item2/startProductAjax/"+id,
+                dataType: "json",//必须
+                async:  false,
+                success:function(data){
+                    if(data.errorCode == '200'){
+                        layer.msg('已上架!', {icon: 1, time: 1000});
+                    }
+                }
+            });
+
         });
     }
+
+
     /*用户-编辑*/
-    function member_edit(title, url, id, w, h) {
-        layer_show(title, url, w, h);
+    function product_edit(title, url, w, h) {
+
+        var index = layer.open({
+            type: 2,
+            title: title,
+            content: url
+        });
+        layer.full(index);
     }
     /*密码-修改*/
     function change_password(title, url, id, w, h) {
         layer_show(title, url, w, h);
     }
     /*用户-删除*/
-    function member_del(obj, id) {
+    function product_del(obj, id) {
         layer.confirm('确认要删除吗？', function (index) {
-            $(obj).parents("tr").remove();
-            layer.msg('已删除!', {icon: 1, time: 1000});
+            $.ajax({
+                type:"get",
+                contentType :  "application/json; charset=utf-8",// 必须
+                //data: JSON.stringify({'name':"王五","password":"1234"}),//转换为json对象
+                url:"/admin/item2/deleteProductAjax/"+id,
+                dataType: "json",//必须
+                async:  false,
+                success:function(data){
+                    if(data.errorCode == '200'){
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!', {icon: 1, time: 1000});
+                    }
+                }
+            });
         });
     }
 </script>

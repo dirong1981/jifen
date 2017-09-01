@@ -130,9 +130,7 @@
             shade: 0.4,
             title: title,
             content: url,
-            end: function () {
-                reload();
-            }
+
         });
 
 
@@ -211,9 +209,7 @@
             shade: 0.4,
             title: title,
             content: url,
-            end: function () {
-                reload();
-            }
+
         });
     }
 

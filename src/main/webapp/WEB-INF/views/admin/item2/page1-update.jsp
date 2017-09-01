@@ -28,7 +28,7 @@
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>商品名称：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text" value="" placeholder="商品名称" id="pName" name="pName">
+                <input type="text" class="input-text" value="${product.pName}" placeholder="商品名称" id="pName" name="pName">
             </div>
         </div>
 
@@ -62,8 +62,7 @@
 				<span class="price">
 					￥
 				</span>
-                <input type="text" class="input-text short-input prive-input" placeholder="价格" id="pPrice"
-                       name="pPrice">
+                <input type="text" class="input-text short-input prive-input" value="${product.pPrice}" placeholder="价格" id="pPrice" name="pPrice">
             </div>
         </div>
 
@@ -74,8 +73,7 @@
 				<span class="price">
 					<i class="Hui-iconfont Hui-iconfont-jifen"></i>
 				</span>
-                <input type="text" class="input-text short-input prive-input" placeholder="兑换积分" id="pIntegral"
-                       name="pIntegral">
+                <input type="text" class="input-text short-input prive-input" value="${product.pIntegral}" placeholder="兑换积分" id="pIntegral" name="pIntegral">
             </div>
         </div>
 
@@ -86,8 +84,7 @@
 				<span class="price">
 					<i class="Hui-iconfont Hui-iconfont-jifen"></i>
 				</span>
-                <input type="text" class="input-text short-input prive-input" placeholder="优惠积分" id="pDiscounts"
-                       name="pDiscounts">
+                <input type="text" class="input-text short-input prive-input" value="${product.pDiscounts}" placeholder="优惠积分" id="pDiscounts" name="pDiscounts">
             </div>
         </div>
 
@@ -96,7 +93,7 @@
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>商品库存：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text short-input" placeholder="商品库存" id="pStorage" name="pStorage">
+                <input type="text" class="input-text short-input" value="${product.pStorage}" placeholder="商品库存" id="pStorage" name="pStorage">
             </div>
         </div>
 
@@ -104,7 +101,7 @@
         <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>商品单位：</label>
             <div class="formControls col-xs-8 col-sm-9">
-                <input type="text" class="input-text short-input" placeholder="商品单位" id="pUnit" name="pUnit">
+                <input type="text" class="input-text short-input" value="${product.pUnit}" placeholder="商品单位" id="pUnit" name="pUnit">
             </div>
         </div>
 
@@ -113,8 +110,7 @@
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>缩略图：</label>
             <div class="formControls col-xs-8 col-sm-9">
                    <span class="btn-upload form-group">
-                    <input class="input-text upload-url" type="text" name="uploadfile" id="uploadfile" readonly
-                           nullmsg="请添加附件！" style="width:200px">
+                    <input class="input-text upload-url" value="${product.pLogo}" type="text" name="uploadfile" id="uploadfile" readonly nullmsg="请添加附件！" style="width:200px">
                     <a href="javascript:void(0);" class="btn btn-primary radius upload-btn">
                         <i class="Hui-iconfont">&#xe642;</i>
                         浏览文件
@@ -150,7 +146,7 @@
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>商品介绍：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <textarea name="pIntro" cols="" rows="" class="textarea" placeholder="商品介绍...最少输入10个字符" datatype="*10-100"
-                          dragonfly="true" nullmsg="备注不能为空！" id="pIntro"></textarea>
+                          dragonfly="true" nullmsg="备注不能为空！" id="pIntro">${product.pIntro}</textarea>
                 <p class="textarea-numberbar"><em class="textarea-length">0</em>/200</p>
             </div>
         </div>
@@ -159,22 +155,23 @@
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>商品状态：</label>
             <div class="formControls col-xs-8 col-sm-9">
                 <div class="radio-box">
-                    <input name="pState" type="radio" id="pState-1" value="1" checked>
+                    <input name="pState" type="radio" id="pState-1" value="1" <c:choose><c:when test="${product.pState=='1'}">checked</c:when></c:choose>>
                     <label for="pState-1">上架</label>
                 </div>
                 <div class="radio-box">
-                    <input type="radio" id="pState-2" name="pState" value="0">
+                    <input type="radio" id="pState-2" name="pState" value="0" <c:choose><c:when test="${product.pState=='0'}">checked</c:when></c:choose>>
                     <label for="pState-2">下架</label>
                 </div>
             </div>
         </div>
 
-        <input type="hidden" name="pCreator" value="${sessionScope.session_admin_id}">
-        <input type="hidden" name="sId" value="${sessionScope.session_admin_id}">
+        <input type="hidden" name="pCreator" value="${product.pCreator}">
+        <input type="hidden" name="sId" value="${product.sId}">
+        <input type="hidden" name="pId" value="${product.pId}">
 
         <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
-                <button onClick="addProductAjax();" class="btn btn-primary radius" type="button"><i
+                <button onClick="updateProductAjax();" class="btn btn-primary radius" type="button"><i
                         class="Hui-iconfont">&#xe632;</i> 保存并提交审核
                 </button>
                 <button onClick="article_save();" class="btn btn-secondary radius" type="button"><i
@@ -220,6 +217,7 @@
                         {
                             jQuery('#cpId').append('<option value="' + content.cId + '">' + content.cName + '</option>');
                         });
+                        $("#cpId").val("${product.cpId}");
                     }
                 }
 
@@ -241,11 +239,20 @@
                             jQuery('#cId').append('<option value="' + content.cId + '" parentId="'+content.cParentId+'">' + content.cName + '</option>');
                         });
 
-                        $('#cid option').hide();
+                        var parentClass = '${product.cpId}';
+                        //alert(parentClass);
+
+
+                        $('#cId option').hide();
+                        $('#cId option[value = "-1"]').show();
+                        $('#cId option[parentid = "'+parentClass+'"]').show();
+                        $('#cId').val("${product.cId}");
                     }
                 }
 
         });
+
+        //updateProductAjax();
     });
 
 
@@ -264,45 +271,74 @@
 
 
     //添加商品ajax请求
-    function addProductAjax() {
+    function updateProductAjax() {
+       // alert("ddd");
+//        $("#form-add-product").validate({
+//            rules:{
+//                pName:{
+//                    required:true,
+//                },
+//                cpId:{
+//                    required:true,
+//                },
+//                cId:{
+//                    required:true,
+//                },
+//                pPrice:{
+//                    required:true,
+//                    range:[1,100000]
+//                },
+//                pIntegral:{
+//                    required:true,
+//                    range:[1,1000000]
+//                },
+//                pStorage:{
+//                    required:true,
+//                    range:[1,10000],
+//                },
+//                pUnit:{
+//                    required:true,
+//                },
+//                pIntro:{
+//                    required:true,
+//                },
+//            },
+//            onkeyup:false,
+//            focusCleanup:true,
+//            success:"valid",
+//            submitHandler:function(form){
+//                $("#modal-shenqing-success").modal("show");
+                var option = {
+                    url : '/admin/item2/updateProduct',
+                    type : 'post',
+                    dataType : 'json',
+                    //contentType :  "application/json; charset=utf-8",// 必须
+                    success : function(data) {
+                        if(data.errorCode == "600"){
+                            layer.alert('添加的内容不能为空', {icon: 0});
+                        }
+                        if(data.errorCode == "200"){
+                            parent.layer.msg('修改成功！', {icon: 1});
+                            setTimeout(closePage,1000);
+                        }
+                        if(data.errorCode == "300"){
+                            layer.alert('图片添加失败，请重试！', {icon: 5});
+                        }
+                        if(data.errorCode == "500"){
+                            layer.alert('添加失败，请重试！', {icon: 5});
+                        }
+                    },
+                    error: function(data) {
+                        layer.alert('网络错误，请重试！', {icon: 3});
+                    }
+                };
+                $("#form-add-product").ajaxSubmit(option);
+                return false;
+//            }
+//        });
 
-        var option = {
-            url : '/admin/item2/addProductAjax',
-            type : 'post',
-            dataType : 'json',
-            //contentType :  "application/json; charset=utf-8",// 必须
-            success : function(data) {
 
 
-
-                if(data.errorCode == "600"){
-                    layer.alert('添加的内容不能为空', {icon: 0});
-                }
-                if(data.errorCode == "200"){
-                    parent.layer.msg('添加成功！', {icon: 1});
-                    setTimeout(closePage,1000);
-
-
-                }
-
-                if(data.errorCode == "300"){
-                    layer.alert('图片添加失败，请重试！', {icon: 5});
-                }
-
-                if(data.errorCode == "500"){
-                    layer.alert('添加失败，请重试！', {icon: 5});
-                }
-
-            },
-            error: function(data) {
-
-                layer.alert('网络错误，请重试！', {icon: 3});
-            }
-        };
-
-        $("#form-add-product").ajaxSubmit(option);
-        //alert("aaa");
-        return false;
     }
 
 
