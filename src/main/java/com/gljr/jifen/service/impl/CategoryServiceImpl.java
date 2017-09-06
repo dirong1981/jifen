@@ -20,9 +20,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryExample categoryExample = new CategoryExample();
         CategoryExample.Criteria criteria= categoryExample.createCriteria();
-        criteria.andCParentIdEqualTo("0");
 
-        categoryExample.setOrderByClause("c_sort asc");
+        criteria.andTypeEqualTo(new Byte("1"));
+        criteria.andParentCodeEqualTo(0);
+        categoryExample.setOrderByClause("sort asc");
 
         return categoryMapper.selectByExample(categoryExample);
     }
@@ -37,22 +38,23 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> selectSonClass() {
         CategoryExample categoryExample = new CategoryExample();
         CategoryExample.Criteria criteria = categoryExample.createCriteria();
-        criteria.andCParentIdNotEqualTo("0");
-        categoryExample.setOrderByClause("c_sort desc");
+        criteria.andTypeEqualTo(new Byte("1"));
+        criteria.andParentCodeNotEqualTo(0);
+        categoryExample.setOrderByClause("sort desc");
 
         return categoryMapper.selectByExample(categoryExample);
     }
 
     @Override
-    public int deleteClass(String id) {
+    public int deleteClass(int id) {
         return categoryMapper.deleteByPrimaryKey(id);
     }
 
     @Override
-    public int deleteSonClass(String id) {
+    public int deleteSonClass(int parentCode) {
         CategoryExample categoryExample = new CategoryExample();
         CategoryExample.Criteria criteria = categoryExample.createCriteria();
-        criteria.andCParentIdEqualTo(id);
+        criteria.andParentCodeEqualTo(parentCode);
 
         return categoryMapper.deleteByExample(categoryExample);
     }
@@ -60,7 +62,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> selectAllClass() {
         CategoryExample categoryExample = new CategoryExample();
-        categoryExample.setOrderByClause("c_sort asc");
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        criteria.andTypeEqualTo(new Byte("1"));
+        categoryExample.setOrderByClause("sort asc");
 
         return categoryMapper.selectByExample(categoryExample);
     }
@@ -71,18 +75,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category selectClass(String id) {
+    public Category selectClass(int id) {
         return categoryMapper.selectByPrimaryKey(id);
     }
 
     @Override
-    public int updateClassSort(String sort, String id) {
+    public int updateClassSort(int sort, int id) {
         CategoryExample categoryExample = new CategoryExample();
         CategoryExample.Criteria criteria = categoryExample.createCriteria();
-        criteria.andCIdEqualTo(id);
+        criteria.andIdEqualTo(id);
 
         Category category = new Category();
-        category.setcSort(sort);
+        category.setSort(sort);
 
         return categoryMapper.updateByExampleSelective(category, categoryExample);
     }
@@ -91,10 +95,11 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> selectShowParentClass() {
         CategoryExample categoryExample = new CategoryExample();
         CategoryExample.Criteria criteria = categoryExample.createCriteria();
-        criteria.andCParentIdEqualTo("0");
-        criteria.andCStateEqualTo(1);
+        criteria.andParentCodeEqualTo(0);
+        criteria.andStatusEqualTo(new Byte("1"));
+        criteria.andTypeEqualTo(new Byte("1"));
 
-        categoryExample.setOrderByClause("c_sort asc");
+        categoryExample.setOrderByClause("sort asc");
         return categoryMapper.selectByExample(categoryExample);
     }
 
@@ -102,10 +107,11 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> selectShowSonClass() {
         CategoryExample categoryExample = new CategoryExample();
         CategoryExample.Criteria criteria = categoryExample.createCriteria();
-        criteria.andCParentIdNotEqualTo("0");
-        criteria.andCStateEqualTo(1);
+        criteria.andParentCodeNotEqualTo(0);
+        criteria.andStatusEqualTo(new Byte("1"));
+        criteria.andTypeEqualTo(new Byte("1"));
 
-        categoryExample.setOrderByClause("c_sort asc");
+        categoryExample.setOrderByClause("sort asc");
         return categoryMapper.selectByExample(categoryExample);
     }
 

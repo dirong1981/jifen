@@ -17,9 +17,9 @@ public interface CategoryService {
     List<Category> selectSonClass();
 
     //删除一个分类
-    int deleteClass(String id);
+    int deleteClass(int id);
 
-    int deleteSonClass(String id);
+    int deleteSonClass(int id);
 
     //查询所有分类
     List<Category> selectAllClass();
@@ -28,10 +28,10 @@ public interface CategoryService {
     int updateClass(Category category);
 
     //查找一个分类
-    Category selectClass(String id);
+    Category selectClass(int id);
 
     //更新一个分类的排序
-    int updateClassSort(String sort, String id);
+    int updateClassSort(int sort, int id);
 
     //查询所有通过审核的父分类
     List<Category> selectShowParentClass();

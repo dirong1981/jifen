@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gljr.jifen.dao.StoreInfoMapper">
+  <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.StoreInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="serial_code" jdbcType="VARCHAR" property="serialCode" />
+    <result column="category_code" jdbcType="INTEGER" property="categoryCode" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="location_code" jdbcType="INTEGER" property="locationCode" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="contact_phone" jdbcType="VARCHAR" property="contactPhone" />
+    <result column="logo_key" jdbcType="VARCHAR" property="logoKey" />
+    <result column="pay_status" jdbcType="TINYINT" property="payStatus" />
+    <result column="aid" jdbcType="INTEGER" property="aid" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.gljr.jifen.pojo.StoreInfo">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, serial_code, category_code, name, location_code, address, contact_phone, logo_key, 
+    pay_status, aid, status, create_time
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.gljr.jifen.pojo.StoreInfoExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from store_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.gljr.jifen.pojo.StoreInfoExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from store_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from store_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from store_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.gljr.jifen.pojo.StoreInfoExample">
+    delete from store_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.gljr.jifen.pojo.StoreInfo">
+    insert into store_info (id, serial_code, category_code, 
+      name, location_code, address, 
+      contact_phone, logo_key, pay_status, 
+      aid, status, create_time, 
+      description)
+    values (#{id,jdbcType=INTEGER}, #{serialCode,jdbcType=VARCHAR}, #{categoryCode,jdbcType=INTEGER}, 
+      #{name,jdbcType=VARCHAR}, #{locationCode,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, 
+      #{contactPhone,jdbcType=VARCHAR}, #{logoKey,jdbcType=VARCHAR}, #{payStatus,jdbcType=TINYINT}, 
+      #{aid,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.StoreInfo">
+    insert into store_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="serialCode != null">
+        serial_code,
+      </if>
+      <if test="categoryCode != null">
+        category_code,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="locationCode != null">
+        location_code,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="contactPhone != null">
+        contact_phone,
+      </if>
+      <if test="logoKey != null">
+        logo_key,
+      </if>
+      <if test="payStatus != null">
+        pay_status,
+      </if>
+      <if test="aid != null">
+        aid,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="serialCode != null">
+        #{serialCode,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryCode != null">
+        #{categoryCode,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="locationCode != null">
+        #{locationCode,jdbcType=INTEGER},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null">
+        #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="logoKey != null">
+        #{logoKey,jdbcType=VARCHAR},
+      </if>
+      <if test="payStatus != null">
+        #{payStatus,jdbcType=TINYINT},
+      </if>
+      <if test="aid != null">
+        #{aid,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.gljr.jifen.pojo.StoreInfoExample" resultType="java.lang.Long">
+    select count(*) from store_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update store_info
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.serialCode != null">
+        serial_code = #{record.serialCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.categoryCode != null">
+        category_code = #{record.categoryCode,jdbcType=INTEGER},
+      </if>
+      <if test="record.name != null">
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.locationCode != null">
+        location_code = #{record.locationCode,jdbcType=INTEGER},
+      </if>
+      <if test="record.address != null">
+        address = #{record.address,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contactPhone != null">
+        contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.logoKey != null">
+        logo_key = #{record.logoKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.payStatus != null">
+        pay_status = #{record.payStatus,jdbcType=TINYINT},
+      </if>
+      <if test="record.aid != null">
+        aid = #{record.aid,jdbcType=INTEGER},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=TINYINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update store_info
+    set id = #{record.id,jdbcType=INTEGER},
+      serial_code = #{record.serialCode,jdbcType=VARCHAR},
+      category_code = #{record.categoryCode,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR},
+      location_code = #{record.locationCode,jdbcType=INTEGER},
+      address = #{record.address,jdbcType=VARCHAR},
+      contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
+      logo_key = #{record.logoKey,jdbcType=VARCHAR},
+      pay_status = #{record.payStatus,jdbcType=TINYINT},
+      aid = #{record.aid,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      description = #{record.description,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update store_info
+    set id = #{record.id,jdbcType=INTEGER},
+      serial_code = #{record.serialCode,jdbcType=VARCHAR},
+      category_code = #{record.categoryCode,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR},
+      location_code = #{record.locationCode,jdbcType=INTEGER},
+      address = #{record.address,jdbcType=VARCHAR},
+      contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
+      logo_key = #{record.logoKey,jdbcType=VARCHAR},
+      pay_status = #{record.payStatus,jdbcType=TINYINT},
+      aid = #{record.aid,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gljr.jifen.pojo.StoreInfo">
+    update store_info
+    <set>
+      <if test="serialCode != null">
+        serial_code = #{serialCode,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryCode != null">
+        category_code = #{categoryCode,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="locationCode != null">
+        location_code = #{locationCode,jdbcType=INTEGER},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null">
+        contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="logoKey != null">
+        logo_key = #{logoKey,jdbcType=VARCHAR},
+      </if>
+      <if test="payStatus != null">
+        pay_status = #{payStatus,jdbcType=TINYINT},
+      </if>
+      <if test="aid != null">
+        aid = #{aid,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.gljr.jifen.pojo.StoreInfo">
+    update store_info
+    set serial_code = #{serialCode,jdbcType=VARCHAR},
+      category_code = #{categoryCode,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      location_code = #{locationCode,jdbcType=INTEGER},
+      address = #{address,jdbcType=VARCHAR},
+      contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      logo_key = #{logoKey,jdbcType=VARCHAR},
+      pay_status = #{payStatus,jdbcType=TINYINT},
+      aid = #{aid,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.StoreInfo">
+    update store_info
+    set serial_code = #{serialCode,jdbcType=VARCHAR},
+      category_code = #{categoryCode,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      location_code = #{locationCode,jdbcType=INTEGER},
+      address = #{address,jdbcType=VARCHAR},
+      contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      logo_key = #{logoKey,jdbcType=VARCHAR},
+      pay_status = #{payStatus,jdbcType=TINYINT},
+      aid = #{aid,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

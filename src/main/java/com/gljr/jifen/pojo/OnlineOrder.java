@@ -1,0 +1,135 @@
+package com.gljr.jifen.pojo;
+
+import java.util.Date;
+
+public class OnlineOrder {
+    private Integer id;
+
+    private Integer uid;
+
+    private Integer pid;
+
+    private Integer trxId;
+
+    private String trxCode;
+
+    private Integer integral;
+
+    private Integer quantity;
+
+    private Byte status;
+
+    private Date createTime;
+
+    private Date updateTime;
+
+    private String pName;
+
+    private String createTimeText;
+
+    private String uName;
+
+    public String getuName() {
+        return uName;
+    }
+
+    public void setuName(String uName) {
+        this.uName = uName;
+    }
+
+    public String getCreateTimeText() {
+        return createTimeText;
+    }
+
+    public void setCreateTimeText(String createTimeText) {
+        this.createTimeText = createTimeText;
+    }
+
+    public String getpName() {
+        return pName;
+    }
+
+    public void setpName(String pName) {
+        this.pName = pName;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public Integer getPid() {
+        return pid;
+    }
+
+    public void setPid(Integer pid) {
+        this.pid = pid;
+    }
+
+    public Integer getTrxId() {
+        return trxId;
+    }
+
+    public void setTrxId(Integer trxId) {
+        this.trxId = trxId;
+    }
+
+    public String getTrxCode() {
+        return trxCode;
+    }
+
+    public void setTrxCode(String trxCode) {
+        this.trxCode = trxCode == null ? null : trxCode.trim();
+    }
+
+    public Integer getIntegral() {
+        return integral;
+    }
+
+    public void setIntegral(Integer integral) {
+        this.integral = integral;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+}

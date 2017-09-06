@@ -3,6 +3,7 @@ package com.gljr.jifen.controller;
 
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.Category;
 import com.gljr.jifen.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,90 +11,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@CrossOrigin(origins = "http://localhost", maxAge = 3600)
+
 @Controller
 @RequestMapping(value = "/jifen")
 public class ClassController {
 
     @Autowired
     private CategoryService categoryService;
-
-
-    /**
-     * 视图跳转
-     */
-
-
-    /**
-     * 设置页面跳转
-     * @param httpServletRequest
-     * @return
-     */
-    @RequestMapping(value = "/item1", method = RequestMethod.GET)
-    public ModelAndView item1Page(HttpServletRequest httpServletRequest){
-        ModelAndView mv = new ModelAndView("/admin/item1/page1");
-
-        return mv;
-    }
-
-
-    /**
-     * 打开添加类别页面
-     * @param httpServletRequest
-     * @return
-     */
-    @RequestMapping(value = "/item1/add", method = RequestMethod.GET)
-    public ModelAndView item1AddPage(HttpServletRequest httpServletRequest){
-        ModelAndView mv = new ModelAndView("/admin/item1/add");
-
-        HttpSession httpSession = httpServletRequest.getSession();
-        httpSession.setAttribute("parent_id", "0");
-
-        return mv;
-    }
-
-    @RequestMapping(value = "/item1/add/{id}", method = RequestMethod.GET)
-    public ModelAndView item1AddSonPage(@PathVariable("id") String id, HttpServletRequest httpServletRequest){
-        ModelAndView mv = new ModelAndView("/admin/item1/add");
-
-        HttpSession httpSession = httpServletRequest.getSession();
-        httpSession.setAttribute("parent_id", id);
-
-        return mv;
-    }
-
-
-    //修改分类
-    @RequestMapping(value = "/item1/updateClass/{id}", method = RequestMethod.GET)
-    public ModelAndView updateClass(@PathVariable("id") String id, HttpServletRequest httpServletRequest){
-        ModelAndView mv = new ModelAndView("/admin/item1/update");
-
-        try{
-            Category category = categoryService.selectClass(id);
-            mv.addObject("category",category);
-        }catch (Exception e){
-
-        }
-
-        return mv;
-    }
-
-
-
-
-
 
 
     /**
@@ -110,8 +45,11 @@ public class ClassController {
      */
     @RequestMapping(value = "/categories/{type}", method = RequestMethod.GET)
     @ResponseBody
+    @AuthPassport(permission_code = "100")
+
     public JsonResult parentClassAjax(@PathVariable("type") String type, @RequestParam(value = "id", required = false) String id, @RequestParam(value = "sort", required = false) String sort, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
+
 
         Map map = new HashMap<>();
 
@@ -130,24 +68,32 @@ public class ClassController {
 
                 map.put("categories", list);
             }else if(type.equals("delete")){
-                categoryService.deleteClass(id);
-                categoryService.deleteSonClass(id);
+                Category category = categoryService.selectClass(Integer.parseInt(id));
+                categoryService.deleteClass(Integer.parseInt(id));
+
+                categoryService.deleteSonClass(category.getCode());
             }else if(type.equals("sort")){
-                Category category = categoryService.selectClass(id);
-                category.setcSort(sort);
+                Category category = categoryService.selectClass(Integer.parseInt(id));
+                category.setSort(Integer.parseInt(sort));
                 categoryService.updateClass(category);
             }else if(type.equals("stop")){
-                Category category = categoryService.selectClass(id);
-                category.setcState(0);
+                Category category = categoryService.selectClass(Integer.parseInt(id));
+                category.setStatus(new Byte("0"));
                 categoryService.updateClass(category);
             }else if(type.equals("start")){
-                Category category = categoryService.selectClass(id);
-                category.setcState(1);
+                Category category = categoryService.selectClass(Integer.parseInt(id));
+                category.setStatus(new Byte("1"));
                 categoryService.updateClass(category);
             }else if(type.equals("update")){
-                Category category = categoryService.selectClass(id);
+                Category category = categoryService.selectClass(Integer.parseInt(id));
 
                 map.put("categories",category);
+            }else if(type.equals("showParent")){
+                list = categoryService.selectShowParentClass();
+                map.put("categories", list);
+            }else if(type.equals("showSon")){
+                list = categoryService.selectShowSonClass();
+                map.put("categories", list);
             }
 
             jsonResult.setItem(map);
@@ -174,10 +120,17 @@ public class ClassController {
      */
     @RequestMapping(value = "/categories", method = RequestMethod.POST)
     @ResponseBody
+    @AuthPassport(permission_code = "100")
     public JsonResult addClassAjax(@Valid Category category, BindingResult bindingResult, @RequestParam(value="file-2",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception{
         JsonResult jsonResult = new JsonResult();
 
+
+
         //System.out.println(category.toString());
+        int code = (int)(Math.random()*100000000);
+
+        category.setCode(code);
+        category.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
         if(bindingResult.hasErrors()){
             jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
@@ -185,8 +138,8 @@ public class ClassController {
         }
 
         //生成分类id
-        String c_id = UUID.randomUUID().toString().replaceAll("-","");
-        category.setcId(c_id);
+        String pic = UUID.randomUUID().toString().replaceAll("-","");
+        //category.setcId(c_id);
 
 
         //上传图片
@@ -197,18 +150,20 @@ public class ClassController {
 
         try {
 
-            if (!file.isEmpty()) {
+            if (file != null && !file.isEmpty()) {
                 //获得文件类型（可以判断如果不是图片，禁止上传）
                 String contentType = file.getContentType();
                 //获得文件后缀名称
                 String imageName = contentType.substring(contentType.indexOf("/") + 1);
-                String fileName = c_id + "." + imageName;
+                String fileName = pic + "." + imageName;
                 path = "/WEB-INF/static/image/class-images/" + fileName;
                 file.transferTo(new File(pathRoot + path));
 
-                category.setcLogo(fileName);
+                category.setLogoKey(fileName);
 
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            }else{
+                category.setLogoKey("default.png");
             }
         }catch (Exception e){
             jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
@@ -245,14 +200,26 @@ public class ClassController {
      */
     @RequestMapping(value = "/categories/update", method = RequestMethod.POST)
     @ResponseBody
+    @AuthPassport(permission_code = "100")
     public JsonResult updateClass(@Valid Category category, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile, @RequestParam(value="file-2",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
+//        System.out.println(category.getId());
+//        System.out.println(category.getName());
+//        System.out.println(category.getType());
+//        System.out.println(category.getParentCode());
+//        System.out.println(category.getCode());
+//        System.out.println(category.getSort());
+//        System.out.println(category.getStatus());
+//        System.out.println(category.getCreateTime());
+//        System.out.println(category.getLogoKey());
 
 
-        if(bindingResult.hasErrors()){
-            jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
-            return jsonResult;
-        }
+        category.setCreateTime(new Timestamp(System.currentTimeMillis()));
+
+//        if(bindingResult.hasErrors()){
+//            jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
+//            return jsonResult;
+//        }
 
         //上传图片
 
@@ -267,16 +234,16 @@ public class ClassController {
                 String contentType=file.getContentType();
                 //获得文件后缀名称
                 String imageName=contentType.substring(contentType.indexOf("/")+1);
-                String fileName = category.getcId() + "." + imageName;
+                String fileName = category.getLogoKey() + "." + imageName;
                 path="/WEB-INF/static/image/class-images/"+fileName;
                 file.transferTo(new File(pathRoot+path));
 
-                category.setcLogo(fileName);
+                category.setLogoKey(fileName);
 
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
             } else {
                 //System.out.println("bbb");
-                category.setcLogo(uploadfile);
+                category.setLogoKey(uploadfile);
             }
         }catch (Exception e){
             jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
@@ -288,6 +255,7 @@ public class ClassController {
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
 
         }catch (Exception e){
+            System.out.println(e);
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
         }
 

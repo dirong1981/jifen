@@ -1,6 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gljr.jifen.dao.AdminMapper">
+
+
+  <!--  我就喜欢把他们放一起...好找!  -->
+  <!--自定义返回值   这个一般用于前台-->
+  <resultMap id="ResultMap" type="com.gljr.jifen.pojo.AdminList">
+    <id column="id" jdbcType="VARCHAR" property="id"/>
+    <result column="username" jdbcType="VARCHAR" property="userName"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+
+    <result column="permission_code" jdbcType="VARCHAR" property="permissionCode"/>
+  </resultMap>
+
+  <!-- 查询语句 -->
+  <!--<select id="getAllAdmin" resultMap="ResultMap">-->
+  <!--select id, username, create_time from admin-->
+  <!--</select>-->
+
+  <!--
+  AdminMapper.java 文件中定义如下：
+      List&lt;Map&lt;String, Object&gt;&gt; getAllAdmin();
+  AdminService.java 用 List&lt; Map&lt; String, Object &gt; &gt; 来接收
+      List&lt;Map&lt;String, Object&gt;&gt; map = adminMapper.getAllAdmin();
+  -->
+
+  <!--
+    联表查询返回管理员信息
+  -->
+  <select id="getListAdmin" resultMap="ResultMap">
+    SELECT admin.id,admin.username, admin.create_time,admin_permission_assign.permission_code
+    FROM admin
+    LEFT JOIN admin_permission_assign
+    ON admin.id=admin_permission_assign.aid
+  </select>
+
+
+
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.Admin">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="account_type" jdbcType="TINYINT" property="accountType" />

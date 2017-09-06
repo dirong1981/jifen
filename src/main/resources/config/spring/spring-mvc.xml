@@ -14,16 +14,25 @@
 
     <mvc:resources location="/WEB-INF/views/" mapping="/**/*.html"/>
 
+    <mvc:cors>
+        <mvc:mapping path="/**" />
+    </mvc:cors>
+
+    <!--<mvc:cors>-->
+
+        <!--<mvc:mapping path="/**"-->
+                     <!--allowed-origins="http://127.0.0.1, http://localhost, http://localhost:808"-->
+                     <!--allowed-methods="GET, PUT, DELETE, OPTIONS"-->
+                     <!--allowed-headers="header1, header2, header3"-->
+                     <!--exposed-headers="header1, header2" allow-credentials="false"-->
+                     <!--max-age="3600" />-->
+
+    <!--</mvc:cors>-->
+
 
     <!-- 扫描所有控制器-->
     <context:component-scan base-package="com.gljr.jifen.controller"></context:component-scan>
 
-
-    <!--
-    <mvc:cors>
-        <mvc:mapping path="/**"/>
-    </mvc:cors>
-    -->
 
     <!-- 注解的映射器 -->
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
@@ -46,17 +55,35 @@
         <property name="maxUploadSize" value="5000000"/>
     </bean>
 
-    <mvc:interceptors>
-        <mvc:interceptor>
-            <!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->
-            <mvc:mapping path="/jifen/**" />
-            <!-- /register 和 /login 不需要拦截-->
-            <mvc:exclude-mapping path="/**/register" />
-            <mvc:exclude-mapping path="/**/login" />
-            <bean class="com.gljr.jifen.filter.TokenIntecepter"></bean>
-        </mvc:interceptor>
-        <!-- 当设置多个拦截器时，先按顺序调用preHandle方法，然后逆序调用每个拦截器的postHandle和afterCompletion方法 -->
-    </mvc:interceptors>
+
+
+
+
+
+
+    <!--<mvc:interceptors>-->
+
+        <!--<mvc:interceptor>-->
+            <!--<mvc:mapping path="/jifen/**" />-->
+            <!--<mvc:exclude-mapping path="/**/register" />-->
+            <!--<mvc:exclude-mapping path="/**/login" />-->
+            <!--<mvc:exclude-mapping path="/**/uploadFiles" />-->
+            <!--<bean class="com.gljr.jifen.filter.TokenIntecepter"></bean>-->
+        <!--</mvc:interceptor>-->
+
+
+
+        <!--<mvc:interceptor>-->
+            <!--&lt;!&ndash; 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller &ndash;&gt;-->
+            <!--<mvc:mapping path="/jifen/**" />-->
+            <!--&lt;!&ndash; /register 和 /login 不需要拦截&ndash;&gt;-->
+            <!--<mvc:exclude-mapping path="/**/register" />-->
+            <!--<mvc:exclude-mapping path="/**/login" />-->
+            <!--<mvc:exclude-mapping path="/**/uploadFiles" />-->
+            <!--<bean class="com.gljr.jifen.filter.AuthInterceptor"></bean>-->
+        <!--</mvc:interceptor>-->
+
+    <!--</mvc:interceptors>-->
 
 
 </beans>

@@ -3,80 +3,105 @@ package com.gljr.jifen.pojo;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import java.util.Date;
 
 public class Category {
-    private String cId;
+    private Integer id;
 
-    private String cName;
+    private Byte type;
 
-    private String cParentId;
+    private Integer parentCode;
 
-    private String cLogo;
+    private Integer code;
 
-    private Integer cState;
+    private String name;
 
-    private String cSort;
+    private String logoKey;
 
-    private String cCreator;
+    private Byte status;
 
-    public String getcId() {
-        return cId;
+    private Integer sort;
+
+    private Date createTime;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setcId(String cId) {
-        this.cId = cId == null ? null : cId.trim();
-    }
-
-    @NotBlank
-    public String getcName() {
-        return cName;
-    }
-
-    public void setcName(String cName) {
-        this.cName = cName == null ? null : cName.trim();
-    }
-
-    @NotBlank
-    public String getcParentId() {
-        return cParentId;
-    }
-
-    public void setcParentId(String cParentId) {
-        this.cParentId = cParentId == null ? null : cParentId.trim();
-    }
-
-    public String getcLogo() {
-        return cLogo;
-    }
-
-    public void setcLogo(String cLogo) {
-        this.cLogo = cLogo == null ? null : cLogo.trim();
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     @NotNull
-    public Integer getcState() {
-        return cState;
+    public Byte getType() {
+        return type;
     }
 
-    public void setcState(Integer cState) {
-        this.cState = cState;
+    public void setType(Byte type) {
+        this.type = type;
+    }
+
+    @NotNull
+    public Integer getParentCode() {
+        return parentCode;
+    }
+
+    public void setParentCode(Integer parentCode) {
+        this.parentCode = parentCode;
+    }
+
+    @Null
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
     }
 
     @NotBlank
-    public String getcSort() {
-        return cSort;
+    public String getName() {
+        return name;
     }
 
-    public void setcSort(String cSort) {
-        this.cSort = cSort == null ? null : cSort.trim();
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
     }
 
-    @NotBlank
-    public String getcCreator() {
-        return cCreator;
+    @Null
+    public String getLogoKey() {
+        return logoKey;
     }
 
-    public void setcCreator(String cCreator) {
-        this.cCreator = cCreator == null ? null : cCreator.trim();
+    public void setLogoKey(String logoKey) {
+        this.logoKey = logoKey == null ? null : logoKey.trim();
+    }
+
+    @NotNull
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    @NotNull
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    @Null
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

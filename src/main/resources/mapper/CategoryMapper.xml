@@ -2,13 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gljr.jifen.dao.CategoryMapper">
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.Category">
-    <id column="c_id" jdbcType="VARCHAR" property="cId" />
-    <result column="c_name" jdbcType="VARCHAR" property="cName" />
-    <result column="c_parent_id" jdbcType="VARCHAR" property="cParentId" />
-    <result column="c_logo" jdbcType="VARCHAR" property="cLogo" />
-    <result column="c_state" jdbcType="INTEGER" property="cState" />
-    <result column="c_sort" jdbcType="VARCHAR" property="cSort" />
-    <result column="c_creator" jdbcType="VARCHAR" property="cCreator" />
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="parent_code" jdbcType="INTEGER" property="parentCode" />
+    <result column="code" jdbcType="INTEGER" property="code" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="logo_key" jdbcType="VARCHAR" property="logoKey" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    c_id, c_name, c_parent_id, c_logo, c_state, c_sort, c_creator
+    id, type, parent_code, code, name, logo_key, status, sort, create_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.CategoryExample" resultMap="BaseResultMap">
     select
@@ -85,15 +87,15 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from category
-    where c_id = #{cId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from category
-    where c_id = #{cId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
   </delete>
   <delete id="deleteByExample" parameterType="com.gljr.jifen.pojo.CategoryExample">
     delete from category
@@ -102,59 +104,73 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.gljr.jifen.pojo.Category">
-    insert into category (c_id, c_name, c_parent_id, 
-      c_logo, c_state, c_sort, 
-      c_creator)
-    values (#{cId,jdbcType=VARCHAR}, #{cName,jdbcType=VARCHAR}, #{cParentId,jdbcType=VARCHAR}, 
-      #{cLogo,jdbcType=VARCHAR}, #{cState,jdbcType=INTEGER}, #{cSort,jdbcType=VARCHAR}, 
-      #{cCreator,jdbcType=VARCHAR})
+    insert into category (id, type, parent_code, 
+      code, name, logo_key, 
+      status, sort, create_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{type,jdbcType=TINYINT}, #{parentCode,jdbcType=INTEGER}, 
+      #{code,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{logoKey,jdbcType=VARCHAR}, 
+      #{status,jdbcType=TINYINT}, #{sort,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Category">
     insert into category
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="cId != null">
-        c_id,
+      <if test="id != null">
+        id,
       </if>
-      <if test="cName != null">
-        c_name,
+      <if test="type != null">
+        type,
       </if>
-      <if test="cParentId != null">
-        c_parent_id,
+      <if test="parentCode != null">
+        parent_code,
       </if>
-      <if test="cLogo != null">
-        c_logo,
+      <if test="code != null">
+        code,
       </if>
-      <if test="cState != null">
-        c_state,
+      <if test="name != null">
+        name,
       </if>
-      <if test="cSort != null">
-        c_sort,
+      <if test="logoKey != null">
+        logo_key,
       </if>
-      <if test="cCreator != null">
-        c_creator,
+      <if test="status != null">
+        status,
+      </if>
+      <if test="sort != null">
+        sort,
+      </if>
+      <if test="createTime != null">
+        create_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="cId != null">
-        #{cId,jdbcType=VARCHAR},
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
       </if>
-      <if test="cName != null">
-        #{cName,jdbcType=VARCHAR},
+      <if test="type != null">
+        #{type,jdbcType=TINYINT},
       </if>
-      <if test="cParentId != null">
-        #{cParentId,jdbcType=VARCHAR},
+      <if test="parentCode != null">
+        #{parentCode,jdbcType=INTEGER},
       </if>
-      <if test="cLogo != null">
-        #{cLogo,jdbcType=VARCHAR},
+      <if test="code != null">
+        #{code,jdbcType=INTEGER},
       </if>
-      <if test="cState != null">
-        #{cState,jdbcType=INTEGER},
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
       </if>
-      <if test="cSort != null">
-        #{cSort,jdbcType=VARCHAR},
+      <if test="logoKey != null">
+        #{logoKey,jdbcType=VARCHAR},
       </if>
-      <if test="cCreator != null">
-        #{cCreator,jdbcType=VARCHAR},
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -167,26 +183,32 @@
   <update id="updateByExampleSelective" parameterType="map">
     update category
     <set>
-      <if test="record.cId != null">
-        c_id = #{record.cId,jdbcType=VARCHAR},
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
       </if>
-      <if test="record.cName != null">
-        c_name = #{record.cName,jdbcType=VARCHAR},
+      <if test="record.type != null">
+        type = #{record.type,jdbcType=TINYINT},
       </if>
-      <if test="record.cParentId != null">
-        c_parent_id = #{record.cParentId,jdbcType=VARCHAR},
+      <if test="record.parentCode != null">
+        parent_code = #{record.parentCode,jdbcType=INTEGER},
       </if>
-      <if test="record.cLogo != null">
-        c_logo = #{record.cLogo,jdbcType=VARCHAR},
+      <if test="record.code != null">
+        code = #{record.code,jdbcType=INTEGER},
       </if>
-      <if test="record.cState != null">
-        c_state = #{record.cState,jdbcType=INTEGER},
+      <if test="record.name != null">
+        name = #{record.name,jdbcType=VARCHAR},
       </if>
-      <if test="record.cSort != null">
-        c_sort = #{record.cSort,jdbcType=VARCHAR},
+      <if test="record.logoKey != null">
+        logo_key = #{record.logoKey,jdbcType=VARCHAR},
       </if>
-      <if test="record.cCreator != null">
-        c_creator = #{record.cCreator,jdbcType=VARCHAR},
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=TINYINT},
+      </if>
+      <if test="record.sort != null">
+        sort = #{record.sort,jdbcType=INTEGER},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     <if test="_parameter != null">
@@ -195,13 +217,15 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update category
-    set c_id = #{record.cId,jdbcType=VARCHAR},
-      c_name = #{record.cName,jdbcType=VARCHAR},
-      c_parent_id = #{record.cParentId,jdbcType=VARCHAR},
-      c_logo = #{record.cLogo,jdbcType=VARCHAR},
-      c_state = #{record.cState,jdbcType=INTEGER},
-      c_sort = #{record.cSort,jdbcType=VARCHAR},
-      c_creator = #{record.cCreator,jdbcType=VARCHAR}
+    set id = #{record.id,jdbcType=INTEGER},
+      type = #{record.type,jdbcType=TINYINT},
+      parent_code = #{record.parentCode,jdbcType=INTEGER},
+      code = #{record.code,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR},
+      logo_key = #{record.logoKey,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=TINYINT},
+      sort = #{record.sort,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -209,35 +233,43 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.gljr.jifen.pojo.Category">
     update category
     <set>
-      <if test="cName != null">
-        c_name = #{cName,jdbcType=VARCHAR},
+      <if test="type != null">
+        type = #{type,jdbcType=TINYINT},
       </if>
-      <if test="cParentId != null">
-        c_parent_id = #{cParentId,jdbcType=VARCHAR},
+      <if test="parentCode != null">
+        parent_code = #{parentCode,jdbcType=INTEGER},
       </if>
-      <if test="cLogo != null">
-        c_logo = #{cLogo,jdbcType=VARCHAR},
+      <if test="code != null">
+        code = #{code,jdbcType=INTEGER},
       </if>
-      <if test="cState != null">
-        c_state = #{cState,jdbcType=INTEGER},
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
       </if>
-      <if test="cSort != null">
-        c_sort = #{cSort,jdbcType=VARCHAR},
+      <if test="logoKey != null">
+        logo_key = #{logoKey,jdbcType=VARCHAR},
       </if>
-      <if test="cCreator != null">
-        c_creator = #{cCreator,jdbcType=VARCHAR},
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="sort != null">
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where c_id = #{cId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.Category">
     update category
-    set c_name = #{cName,jdbcType=VARCHAR},
-      c_parent_id = #{cParentId,jdbcType=VARCHAR},
-      c_logo = #{cLogo,jdbcType=VARCHAR},
-      c_state = #{cState,jdbcType=INTEGER},
-      c_sort = #{cSort,jdbcType=VARCHAR},
-      c_creator = #{cCreator,jdbcType=VARCHAR}
-    where c_id = #{cId,jdbcType=VARCHAR}
+    set type = #{type,jdbcType=TINYINT},
+      parent_code = #{parentCode,jdbcType=INTEGER},
+      code = #{code,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      logo_key = #{logoKey,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      sort = #{sort,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

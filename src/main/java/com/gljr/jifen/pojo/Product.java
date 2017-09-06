@@ -6,175 +6,149 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class Product {
-    private String pId;
+    private Integer id;
 
-    private String pName;
+    private String name;
 
-    private String cpId;
+    private Integer categoryCode;
 
-    private String cId;
+    private Integer siId;
 
-    private String sId;
+    private Integer price;
 
-    private Date pTime;
+    private Integer integral;
 
-    private Integer pPrice;
+    private Integer discounts;
 
-    private Integer pIntegral;
+    private String logoKey;
 
-    private Integer pDiscounts;
+    private Integer invetory;
 
-    private String pLogo;
+    private Integer sales;
 
-    private Integer pStorage;
+    private String unit;
 
-    private Integer pSales;
+    private Byte status;
 
-    private String pUnit;
+    private Date createTime;
 
-    private Integer pState;
+    private String description;
 
-    private String pCreator;
-
-    private String pIntro;
-
-    public String getpId() {
-        return pId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setpId(String pId) {
-        this.pId = pId == null ? null : pId.trim();
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     @NotBlank
-    public String getpName() {
-        return pName;
+    public String getName() {
+        return name;
     }
 
-    public void setpName(String pName) {
-        this.pName = pName == null ? null : pName.trim();
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
     }
 
-    @NotBlank
-    public String getCpId() {
-        return cpId;
+    public Integer getCategoryCode() {
+        return categoryCode;
     }
 
-    public void setCpId(String cpId) {
-        this.cpId = cpId == null ? null : cpId.trim();
+    public void setCategoryCode(Integer categoryCode) {
+        this.categoryCode = categoryCode;
     }
 
-    @NotBlank
-    public String getcId() {
-        return cId;
+    public Integer getSiId() {
+        return siId;
     }
 
-    public void setcId(String cId) {
-        this.cId = cId == null ? null : cId.trim();
-    }
-
-    @NotBlank
-    public String getsId() {
-        return sId;
-    }
-
-    public void setsId(String sId) {
-        this.sId = sId == null ? null : sId.trim();
-    }
-
-    public Date getpTime() {
-        return pTime;
-    }
-
-    public void setpTime(Date pTime) {
-        this.pTime = pTime;
+    public void setSiId(Integer siId) {
+        this.siId = siId;
     }
 
     @NotNull
-    public Integer getpPrice() {
-        return pPrice;
+    public Integer getPrice() {
+        return price;
     }
 
-    public void setpPrice(Integer pPrice) {
-        this.pPrice = pPrice;
-    }
-
-    @NotNull
-    public Integer getpIntegral() {
-        return pIntegral;
-    }
-
-    public void setpIntegral(Integer pIntegral) {
-        this.pIntegral = pIntegral;
-    }
-
-    public Integer getpDiscounts() {
-        return pDiscounts;
-    }
-
-    public void setpDiscounts(Integer pDiscounts) {
-        this.pDiscounts = pDiscounts;
-    }
-
-
-    public String getpLogo() {
-        return pLogo;
-    }
-
-    public void setpLogo(String pLogo) {
-        this.pLogo = pLogo == null ? null : pLogo.trim();
+    public void setPrice(Integer price) {
+        this.price = price;
     }
 
     @NotNull
-    public Integer getpStorage() {
-        return pStorage;
+    public Integer getIntegral() {
+        return integral;
     }
 
-    public void setpStorage(Integer pStorage) {
-        this.pStorage = pStorage;
+    public void setIntegral(Integer integral) {
+        this.integral = integral;
     }
 
-    public Integer getpSales() {
-        return pSales;
+    public Integer getDiscounts() {
+        return discounts;
     }
 
-    public void setpSales(Integer pSales) {
-        this.pSales = pSales;
+    public void setDiscounts(Integer discounts) {
+        this.discounts = discounts;
     }
 
-    @NotBlank
-    public String getpUnit() {
-        return pUnit;
+    public String getLogoKey() {
+        return logoKey;
     }
 
-    public void setpUnit(String pUnit) {
-        this.pUnit = pUnit == null ? null : pUnit.trim();
+    public void setLogoKey(String logoKey) {
+        this.logoKey = logoKey == null ? null : logoKey.trim();
     }
 
     @NotNull
-    public Integer getpState() {
-        return pState;
+    public Integer getInvetory() {
+        return invetory;
     }
 
-    public void setpState(Integer pState) {
-        this.pState = pState;
+    public void setInvetory(Integer invetory) {
+        this.invetory = invetory;
     }
 
-    @NotBlank
-    public String getpCreator() {
-        return pCreator;
+    public Integer getSales() {
+        return sales;
     }
 
-    public void setpCreator(String pCreator) {
-        this.pCreator = pCreator == null ? null : pCreator.trim();
+    public void setSales(Integer sales) {
+        this.sales = sales;
     }
 
-    @NotBlank
-    public String getpIntro() {
-        return pIntro;
+    @NotNull
+    public String getUnit() {
+        return unit;
     }
 
-    public void setpIntro(String pIntro) {
-        this.pIntro = pIntro == null ? null : pIntro.trim();
+    public void setUnit(String unit) {
+        this.unit = unit == null ? null : unit.trim();
+    }
+
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    @NotNull
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description == null ? null : description.trim();
     }
 }

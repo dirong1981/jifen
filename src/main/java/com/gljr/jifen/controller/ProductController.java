@@ -3,8 +3,10 @@ package com.gljr.jifen.controller;
 
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.Category;
 import com.gljr.jifen.pojo.Product;
+import com.gljr.jifen.pojo.ProductPhoto;
 import com.gljr.jifen.service.CategoryService;
 import com.gljr.jifen.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +17,16 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.*;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @Controller
-@RequestMapping(value = "/jifen/class")
+@RequestMapping(value = "/jifen")
 public class ProductController {
 
     @Autowired
@@ -32,96 +36,25 @@ public class ProductController {
     private CategoryService categoryService;
 
 
-    /**
-     * 视图
-     * @param httpServletRequest
-     * @return
-     */
 
-    //显示商品列表页面
-    @RequestMapping(value = "/item2/page1", method = RequestMethod.GET)
-    public ModelAndView item2Page(HttpServletRequest httpServletRequest){
-        ModelAndView mv = new ModelAndView("/admin/item2/page1");
-        return mv;
-    }
-
-
-    //显示添加商品页面
-    @RequestMapping(value = "/item2/page1-add", method = RequestMethod.GET)
-    public ModelAndView item2AddPage(HttpServletRequest httpServletRequest){
-        ModelAndView mv = new ModelAndView("/admin/item2/page1-add");
-        return mv;
-    }
-
-
-
-
-    /**
-     * 获取启用父类别列表的ajax请求
-     */
-    @RequestMapping(value = "/item2/parentClassAjax", method = RequestMethod.GET)
+    @RequestMapping(value = "/products", method = RequestMethod.POST)
     @ResponseBody
-    public JsonResult parentClassAjax(HttpServletRequest httpServletRequest){
+    @AuthPassport(permission_code = "200")
+    public JsonResult addProduct(@Valid Product product, BindingResult bindingResult, @RequestParam(value="file-2",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jr = new JsonResult();
 
-        try {
-            //设置操作标记
-            jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            //设置数据
-            Map<Object, Object> map = new HashMap<>();
-            List<Category> list = categoryService.selectShowParentClass();//获取大分类
-            map.put("parentClass", list);
-            jr.setItem(map);
-        }catch (Exception e){
-            jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
-        }
-        return jr;
 
-    }
-
-
-
-    /**
-     * 获取启用子类别列表的ajax请求
-     */
-    @RequestMapping(value = "/item2/sonClassAjax", method = RequestMethod.GET)
-    @ResponseBody
-    public JsonResult sonClassAjax(HttpServletRequest httpServletRequest){
-        JsonResult jr = new JsonResult();
-
-        try {
-            //设置操作标记
-            jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            //设置数据
-            Map<Object, Object> map = new HashMap<>();
-            List<Category> list = categoryService.selectShowSonClass();//获取大分类
-            map.put("sonClass", list);
-            jr.setItem(map);
-        }catch (Exception e){
-            jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
-        }
-        return jr;
-
-    }
-
-
-    @RequestMapping(value = "/item2/addProductAjax", method = RequestMethod.POST)
-    @ResponseBody
-    public JsonResult addClassAjax(@Valid Product product, BindingResult bindingResult, @RequestParam(value="file-2",required=false) MultipartFile file, HttpServletRequest httpServletRequest){
-        JsonResult jr = new JsonResult();
-        //System.out.printf(product.getBcId());
-//        System.out.printf(product.getBcId());
 
         if(bindingResult.hasErrors()){
             jr.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
             return jr;
         }
 
-        String p_id = UUID.randomUUID().toString().replaceAll("-","");
-        product.setpId(p_id);
+        String logoKey = UUID.randomUUID().toString().replaceAll("-","");
+        //product.setpId(p_id);
 
 
-        product.setpTime(new Timestamp(System.currentTimeMillis()));
+        product.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
         //上传图片
 
@@ -130,18 +63,20 @@ public class ProductController {
         String path="";
 
         try {
-            if (!file.isEmpty()) {
+            if (file != null && !file.isEmpty()) {
                 //获得文件类型（可以判断如果不是图片，禁止上传）
                 String contentType = file.getContentType();
                 //获得文件后缀名称
                 String imageName = contentType.substring(contentType.indexOf("/") + 1);
-                String fileName = p_id + "." + imageName;
+                String fileName = logoKey + "." + imageName;
                 path = "/WEB-INF/static/image/product-images/" + fileName;
                 file.transferTo(new File(pathRoot + path));
 
-                product.setpLogo(fileName);
+                product.setLogoKey(fileName);
 
                 //jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            }else{
+                product.setLogoKey("default.png");
             }
         }catch (Exception e){
             jr.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
@@ -151,6 +86,18 @@ public class ProductController {
 
         try {
             productService.addProduct(product);
+
+            //查询存入商品的id
+            System.out.println(product.getId());
+
+//            HttpSession httpSession = httpServletRequest.getSession();
+//            int productId = (int) httpSession.getAttribute("productId");
+//
+//            List<ProductPhoto> list = productService.selectProductPhoto(productId);
+//            for(ProductPhoto productPhoto: list){
+//                productPhoto.setPid(pid);
+//                productService.updateProductPhoto(productPhoto);
+//            }
 
             jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
             //product.setpId(UUID.randomUUID().toString().replaceAll("-",""));
@@ -165,12 +112,17 @@ public class ProductController {
     }
 
 
-
-    //查询所有商品ajax
-    @RequestMapping(value = "/item2/allProductAjax", method = RequestMethod.GET)
+    /**
+     * 查询所有商品
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/products", method = RequestMethod.GET)
     @ResponseBody
-    public Map allProductAjax(HttpServletRequest httpServletRequest){
+    @AuthPassport(permission_code = "200")
+    public Map allProductAjax(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
+
 
 
         try{
@@ -193,17 +145,17 @@ public class ProductController {
     }
 
 
-    @RequestMapping(value = "/item2/stopProductAjax/{id}")
+    @RequestMapping(value = "/products/stop/{id}")
     @ResponseBody
-    public JsonResult stopProductAjax(@PathVariable("id") String id, HttpServletRequest httpServletRequest){
+    @AuthPassport(permission_code = "200")
+    public JsonResult stopProductAjax(@PathVariable("id") String id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
-        HttpSession httpSession = httpServletRequest.getSession();
-        String p_creator = (String)httpSession.getAttribute(GlobalConstants.SESSION_ADMIN_ID);
+
+
 
         try {
-            Product product = productService.selectProduct(id);
-            product.setpState(0);
-            product.setpCreator(p_creator);
+            Product product = productService.selectProduct(Integer.parseInt(id));
+            product.setStatus(new Byte("0"));
 
             productService.updateProduct(product);
 
@@ -219,17 +171,17 @@ public class ProductController {
     }
 
 
-    @RequestMapping(value = "/item2/startProductAjax/{id}")
+    @RequestMapping(value = "/products/start/{id}")
     @ResponseBody
-    public JsonResult startProductAjax(@PathVariable("id") String id, HttpServletRequest httpServletRequest){
+    @AuthPassport(permission_code = "200")
+    public JsonResult startProductAjax(@PathVariable("id") String id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
-        HttpSession httpSession = httpServletRequest.getSession();
-        String p_creator = (String)httpSession.getAttribute(GlobalConstants.SESSION_ADMIN_ID);
+
+
 
         try {
-            Product product = productService.selectProduct(id);
-            product.setpState(1);
-            product.setpCreator(p_creator);
+            Product product = productService.selectProduct(Integer.parseInt(id));
+            product.setStatus(new Byte("1"));
 
             productService.updateProduct(product);
 
@@ -251,13 +203,16 @@ public class ProductController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping(value = "/item2/deleteProductAjax/{id}")
+    @RequestMapping(value = "/products/delete/{id}")
     @ResponseBody
-    public JsonResult deleteProductAjax(@PathVariable("id") String id, HttpServletRequest httpServletRequest){
+    @AuthPassport(permission_code = "200")
+    public JsonResult deleteProductAjax(@PathVariable("id") String id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
 
+
+
         try {
-            productService.deleteProduct(id);
+            productService.deleteProduct(Integer.parseInt(id));
 
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
 
@@ -271,20 +226,34 @@ public class ProductController {
     }
 
 
-    /**
-     * 打开商品编辑页面,获取一个商品
-     * @param httpServletRequest
-     * @return
-     */
-    @RequestMapping(value = "/item2/updateProduct/{id}", method = RequestMethod.GET)
-    public ModelAndView updateProductAjax(@PathVariable("id") String id, HttpServletRequest httpServletRequest){
-        ModelAndView modelAndView = new ModelAndView("/admin/item2/page1-update");
+    @RequestMapping(value = "/products/update/{id}")
+    @ResponseBody
+    @AuthPassport(permission_code = "200")
+    public JsonResult updateProductAjax(@PathVariable("id") String id, HttpServletRequest httpServletRequest){
+        JsonResult jsonResult = new JsonResult();
 
-        Product product = productService.selectProduct(id);
-        modelAndView.addObject("product",product);
+        try {
+            Product product = productService.selectProduct(Integer.parseInt(id));
 
-        return modelAndView;
+            Map map = new HashMap();
+            map.put("products",product);
+            jsonResult.setItem(map);
+
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+
+        }catch (Exception e){
+            System.out.println(e);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+        }
+
+
+        return jsonResult;
     }
+
+
+
+
+
 
     /**
      * 修改商品内容
@@ -295,17 +264,20 @@ public class ProductController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping(value = "/item2/updateProduct", method = RequestMethod.POST)
+    @RequestMapping(value = "/products/update", method = RequestMethod.POST)
     @ResponseBody
-    public JsonResult updateProduct(@Valid Product product, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile, @RequestParam(value="file-2",required=false) MultipartFile file, HttpServletRequest httpServletRequest){
+    @AuthPassport(permission_code = "200")
+    public JsonResult updateProduct(@Valid Product product, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile, @RequestParam(value="file-2",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
+
+
 
         if(bindingResult.hasErrors()){
             jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
             return jsonResult;
         }
 
-        product.setpTime(new Timestamp(System.currentTimeMillis()));
+        product.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
         //上传图片
 
@@ -320,16 +292,16 @@ public class ProductController {
                 String contentType=file.getContentType();
                 //获得文件后缀名称
                 String imageName=contentType.substring(contentType.indexOf("/")+1);
-                String fileName = product.getpId() + "." + imageName;
+                String fileName = product.getLogoKey() + "." + imageName;
                 path="/WEB-INF/static/image/product-images/"+fileName;
                 file.transferTo(new File(pathRoot+path));
 
-                product.setpLogo(fileName);
+                product.setLogoKey(fileName);
 
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
             } else {
                 //System.out.println("bbb");
-                product.setpLogo(uploadfile);
+                product.setLogoKey(uploadfile);
             }
         }catch (Exception e){
             jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
@@ -344,6 +316,70 @@ public class ProductController {
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
         }
 
+        return jsonResult;
+    }
+
+
+
+
+    @RequestMapping(value = "/uploadFiles")
+    @ResponseBody
+    public JsonResult uploadImages(@RequestParam(value="file",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+
+
+
+        String photo = UUID.randomUUID().toString().replaceAll("-","");
+        //上传图片
+
+        HttpSession httpSession = httpServletRequest.getSession();
+        System.out.println(httpSession.getId());
+
+        //获得物理路径webapp所在路径
+        String pathRoot = httpServletRequest.getSession().getServletContext().getRealPath("");
+        String path="";
+
+        try {
+            if (file != null && !file.isEmpty()) {
+                //获得文件类型（可以判断如果不是图片，禁止上传）
+                String contentType = file.getContentType();
+                //获得文件后缀名称
+                String imageName = contentType.substring(contentType.indexOf("/") + 1);
+                String fileName = photo + "." + imageName;
+                path = "/WEB-INF/static/image/product-images/" + fileName;
+                file.transferTo(new File(pathRoot + path));
+
+
+                int productId;
+
+               // System.out.println(httpSession.getId());
+                if(httpSession.getAttribute("productId") == null){
+                    productId = (int)(Math.random()*100000);
+                    httpSession.setAttribute("productId", productId);
+
+                }else {
+                    productId = (int) httpSession.getAttribute("productId");
+                    System.out.println("====="+productId);
+                }
+
+
+//                httpSession.setAttribute("productId", productId);
+//
+//                ProductPhoto productPhoto = new ProductPhoto();
+//                productPhoto.setImgKey(fileName);
+//                productPhoto.setCreateTime(new Timestamp(System.currentTimeMillis()));
+//                productPhoto.setPid(productId);
+//                productPhoto.setSort(1);
+//                productService.insertProductPhoto(productPhoto);
+
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            }else{
+            }
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
+            System.out.println(e);
+            return  jsonResult;
+        }
         return jsonResult;
     }
 }

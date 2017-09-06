@@ -6,7 +6,9 @@ public class GlobalConstants {
     public static final String SECRET = "XX#$%()(#*!()!KL<><MQLMNQNQJQK sdfkjsdrow32234545fdf>?N<:{LWPW";
 
 
-    //设置验证返回码
+    //设置返回的请求域名
+    public static final String DOMAIN = "http://localhost";
+
 
     //数据验证错误
     public static final String VALIDATION_ERROR_CODE = "600";
@@ -20,8 +22,14 @@ public class GlobalConstants {
     //错误请求
     public static final String BAD_REQUEST = "400";
 
-    //禁止访问
+    //没有权限
     public static final String FORBIDDEN_CODE = "403";
+
+    //没有登录
+    public static final String NOT_LOGIN = "401";
+
+    //Token过期
+    public static final String TOKEN_EXPIRED = "405";
 
     //操作失败返回码
     public static final String OPERATION_FAILED = "500";

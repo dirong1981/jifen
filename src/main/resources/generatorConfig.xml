@@ -47,9 +47,8 @@
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
         <!-- 指定数据库表 -->
-        <table schema="" tableName="admin"></table>
-        <table schema="" tableName="admin_online"></table>
-        <table schema="" tableName="admin_permission_assign"></table>
+        <table schema="" tableName="product"></table>
+        <table schema="" tableName="product_photo"></table>
 
     </context>
 </generatorConfiguration>
