@@ -2,6 +2,7 @@ package com.gljr.jifen.controller;
 
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.OnlineOrderService;
 import com.gljr.jifen.util.DateUtils;
@@ -13,14 +14,68 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Array;
 import java.util.*;
+
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Controller
-
-@RequestMapping(value = ("/jifen"))
+@RequestMapping(value = "/v1")
 public class OnlineOrderController {
 
     @Autowired
     private OnlineOrderService onlineOrderService;
+
+
+    /**
+     * 查询所有订单，uid为0，查询所有订单，uid不为0，查询该用户订单
+     * @param httpServletResponse
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/online-orders", method = RequestMethod.GET)
+    @ResponseBody
+    public JsonResult selectAllOnlineOrder(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
+        JsonResult jsonResult = new JsonResult();
+
+        try {
+            int uid;
+            //获取头部商城用户id，如果不存在查询所有订单
+            String uId = httpServletRequest.getHeader("uid");
+            if(uId == null || uId.equals("")){
+                uid = 0;
+            }else{
+                uid = Integer.parseInt(uId);
+            }
+            List<OnlineOrder> onlineOrders = onlineOrderService.selectAllOnlineOrders(uid);
+            Map  map = new HashMap();
+            map.put("data", onlineOrders);
+
+            jsonResult.setItem(map);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+
+        } catch (Exception e) {
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        }
+
+        return jsonResult;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 添加线上订单
@@ -30,6 +85,7 @@ public class OnlineOrderController {
      */
     @RequestMapping(value = "/onlines/insert", method = RequestMethod.POST)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult insertOnlineOrder(@RequestBody OnlineOrder onlineOrder) {
         JsonResult jr = new JsonResult();
         try {
@@ -55,28 +111,6 @@ public class OnlineOrderController {
         return jr;
     }
 
-    /**
-     * 查询全部线上订单数据
-     *
-     * @return
-     */
-    @RequestMapping(value = "/onlines", method = RequestMethod.GET)
-    @ResponseBody
-    public Map selectAllOnlineOrder() {
-        JsonResult jsonResult = new JsonResult();
-        try {
-            List<OnlineOrder> onlineOrders = onlineOrderService.selectAllClass();
-            Map  map = new HashMap();
-            map.put("data", onlineOrders);
-            jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            return map;
-        } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-        }
-
-        return null;
-    }
 
     /**
      * 查询带条件参数的线上订单数据
@@ -85,7 +119,8 @@ public class OnlineOrderController {
      */
     @RequestMapping(value = "/onlines/param", method = RequestMethod.GET)
     @ResponseBody
-    public Map selectAllParamOnlineOrder(OnlineOrderSearch onlineSearch)  {
+    @AuthPassport(permission_code = "5")
+    public JsonResult selectAllParamOnlineOrder(OnlineOrderSearch onlineSearch)  {
         JsonResult jr = new JsonResult();
         try {
             ArrayList arrayList = new ArrayList();
@@ -118,12 +153,12 @@ public class OnlineOrderController {
             map.put("data", arrayList);
             jr.setItem(map);
             jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            return map;
+            return jr;
         } catch (Exception e) {
             jr.setErrorCode(GlobalConstants.OPERATION_FAILED + e.getLocalizedMessage());
         }
 
-        return null;
+        return jr;
     }
 
     /**
@@ -133,6 +168,7 @@ public class OnlineOrderController {
      */
     @RequestMapping(value = "/onlines/update/{id}", method = RequestMethod.GET)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult selectOnlineOrder(@PathVariable("id") String id) {
         JsonResult jr = new JsonResult();
         try {
@@ -155,6 +191,7 @@ public class OnlineOrderController {
      */
     @RequestMapping(value = "/onlines/delete/{id}", method = RequestMethod.GET)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult deleteOnlineOrder(@PathVariable("id") String id) {
         JsonResult jr = new JsonResult();
         try {
@@ -178,6 +215,7 @@ public class OnlineOrderController {
      */
     @RequestMapping(value = "/onlines/update", method = RequestMethod.POST)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult updateOnlineOrder( HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         JsonResult jr = new JsonResult();
         try {

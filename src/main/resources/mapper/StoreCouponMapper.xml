@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gljr.jifen.dao.StoreCouponMapper">
+  <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.StoreCoupon">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="si_id" jdbcType="INTEGER" property="siId" />
+    <result column="max_generated" jdbcType="INTEGER" property="maxGenerated" />
+    <result column="integral" jdbcType="INTEGER" property="integral" />
+    <result column="equal_money" jdbcType="INTEGER" property="equalMoney" />
+    <result column="validity_type" jdbcType="TINYINT" property="validityType" />
+    <result column="valid_from" jdbcType="DATE" property="validFrom" />
+    <result column="valid_to" jdbcType="DATE" property="validTo" />
+    <result column="valid_days" jdbcType="INTEGER" property="validDays" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, si_id, max_generated, integral, equal_money, validity_type, valid_from, valid_to, 
+    valid_days, status, create_time
+  </sql>
+  <select id="selectByExample" parameterType="com.gljr.jifen.pojo.StoreCouponExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from store_coupon
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from store_coupon
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from store_coupon
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.gljr.jifen.pojo.StoreCouponExample">
+    delete from store_coupon
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.gljr.jifen.pojo.StoreCoupon">
+    insert into store_coupon (id, si_id, max_generated, 
+      integral, equal_money, validity_type, 
+      valid_from, valid_to, valid_days, 
+      status, create_time)
+    values (#{id,jdbcType=INTEGER}, #{siId,jdbcType=INTEGER}, #{maxGenerated,jdbcType=INTEGER}, 
+      #{integral,jdbcType=INTEGER}, #{equalMoney,jdbcType=INTEGER}, #{validityType,jdbcType=TINYINT}, 
+      #{validFrom,jdbcType=DATE}, #{validTo,jdbcType=DATE}, #{validDays,jdbcType=INTEGER}, 
+      #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.StoreCoupon">
+    insert into store_coupon
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="siId != null">
+        si_id,
+      </if>
+      <if test="maxGenerated != null">
+        max_generated,
+      </if>
+      <if test="integral != null">
+        integral,
+      </if>
+      <if test="equalMoney != null">
+        equal_money,
+      </if>
+      <if test="validityType != null">
+        validity_type,
+      </if>
+      <if test="validFrom != null">
+        valid_from,
+      </if>
+      <if test="validTo != null">
+        valid_to,
+      </if>
+      <if test="validDays != null">
+        valid_days,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="siId != null">
+        #{siId,jdbcType=INTEGER},
+      </if>
+      <if test="maxGenerated != null">
+        #{maxGenerated,jdbcType=INTEGER},
+      </if>
+      <if test="integral != null">
+        #{integral,jdbcType=INTEGER},
+      </if>
+      <if test="equalMoney != null">
+        #{equalMoney,jdbcType=INTEGER},
+      </if>
+      <if test="validityType != null">
+        #{validityType,jdbcType=TINYINT},
+      </if>
+      <if test="validFrom != null">
+        #{validFrom,jdbcType=DATE},
+      </if>
+      <if test="validTo != null">
+        #{validTo,jdbcType=DATE},
+      </if>
+      <if test="validDays != null">
+        #{validDays,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.gljr.jifen.pojo.StoreCouponExample" resultType="java.lang.Long">
+    select count(*) from store_coupon
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update store_coupon
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.siId != null">
+        si_id = #{record.siId,jdbcType=INTEGER},
+      </if>
+      <if test="record.maxGenerated != null">
+        max_generated = #{record.maxGenerated,jdbcType=INTEGER},
+      </if>
+      <if test="record.integral != null">
+        integral = #{record.integral,jdbcType=INTEGER},
+      </if>
+      <if test="record.equalMoney != null">
+        equal_money = #{record.equalMoney,jdbcType=INTEGER},
+      </if>
+      <if test="record.validityType != null">
+        validity_type = #{record.validityType,jdbcType=TINYINT},
+      </if>
+      <if test="record.validFrom != null">
+        valid_from = #{record.validFrom,jdbcType=DATE},
+      </if>
+      <if test="record.validTo != null">
+        valid_to = #{record.validTo,jdbcType=DATE},
+      </if>
+      <if test="record.validDays != null">
+        valid_days = #{record.validDays,jdbcType=INTEGER},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=TINYINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update store_coupon
+    set id = #{record.id,jdbcType=INTEGER},
+      si_id = #{record.siId,jdbcType=INTEGER},
+      max_generated = #{record.maxGenerated,jdbcType=INTEGER},
+      integral = #{record.integral,jdbcType=INTEGER},
+      equal_money = #{record.equalMoney,jdbcType=INTEGER},
+      validity_type = #{record.validityType,jdbcType=TINYINT},
+      valid_from = #{record.validFrom,jdbcType=DATE},
+      valid_to = #{record.validTo,jdbcType=DATE},
+      valid_days = #{record.validDays,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gljr.jifen.pojo.StoreCoupon">
+    update store_coupon
+    <set>
+      <if test="siId != null">
+        si_id = #{siId,jdbcType=INTEGER},
+      </if>
+      <if test="maxGenerated != null">
+        max_generated = #{maxGenerated,jdbcType=INTEGER},
+      </if>
+      <if test="integral != null">
+        integral = #{integral,jdbcType=INTEGER},
+      </if>
+      <if test="equalMoney != null">
+        equal_money = #{equalMoney,jdbcType=INTEGER},
+      </if>
+      <if test="validityType != null">
+        validity_type = #{validityType,jdbcType=TINYINT},
+      </if>
+      <if test="validFrom != null">
+        valid_from = #{validFrom,jdbcType=DATE},
+      </if>
+      <if test="validTo != null">
+        valid_to = #{validTo,jdbcType=DATE},
+      </if>
+      <if test="validDays != null">
+        valid_days = #{validDays,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.StoreCoupon">
+    update store_coupon
+    set si_id = #{siId,jdbcType=INTEGER},
+      max_generated = #{maxGenerated,jdbcType=INTEGER},
+      integral = #{integral,jdbcType=INTEGER},
+      equal_money = #{equalMoney,jdbcType=INTEGER},
+      validity_type = #{validityType,jdbcType=TINYINT},
+      valid_from = #{validFrom,jdbcType=DATE},
+      valid_to = #{validTo,jdbcType=DATE},
+      valid_days = #{validDays,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

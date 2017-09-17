@@ -22,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
+@CrossOrigin(origins = "*", maxAge = 3600)
 @Controller
-@RequestMapping(value = "/jifen")
+@RequestMapping(value = "/v1")
 public class ClassController {
 
     @Autowired
@@ -32,96 +32,248 @@ public class ClassController {
 
 
     /**
-     * Get请求控制
-     */
-
-
-    /**
-     *
-     * 获取分类：all所有，parent父分类，son子分类
-     * @param type
+     * 查询所有通过审核的商品分类
      * @param httpServletRequest
+     * @param httpServletResponse
      * @return
      */
-    @RequestMapping(value = "/categories/{type}", method = RequestMethod.GET)
+    @RequestMapping(value = "/categories", method = RequestMethod.GET)
     @ResponseBody
-    @AuthPassport(permission_code = "100")
-
-    public JsonResult parentClassAjax(@PathVariable("type") String type, @RequestParam(value = "id", required = false) String id, @RequestParam(value = "sort", required = false) String sort, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult getcategories(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
+        Map map = new HashMap();
 
-
-        Map map = new HashMap<>();
-
-        try {
+        try{
             List<Category> list = null;
-            if(type.equals("all")) {
-                list = categoryService.selectAllClass();
 
-                map.put("categories", list);
-            }else if(type.equals("parent")){
-                list = categoryService.selectParentClass();
+            list = categoryService.selectShowParentClass();
+            map.put("parents", list);
 
-                map.put("categories", list);
-            }else if(type.equals("son")){
-                list = categoryService.selectSonClass();
-
-                map.put("categories", list);
-            }else if(type.equals("delete")){
-                Category category = categoryService.selectClass(Integer.parseInt(id));
-                categoryService.deleteClass(Integer.parseInt(id));
-
-                categoryService.deleteSonClass(category.getCode());
-            }else if(type.equals("sort")){
-                Category category = categoryService.selectClass(Integer.parseInt(id));
-                category.setSort(Integer.parseInt(sort));
-                categoryService.updateClass(category);
-            }else if(type.equals("stop")){
-                Category category = categoryService.selectClass(Integer.parseInt(id));
-                category.setStatus(new Byte("0"));
-                categoryService.updateClass(category);
-            }else if(type.equals("start")){
-                Category category = categoryService.selectClass(Integer.parseInt(id));
-                category.setStatus(new Byte("1"));
-                categoryService.updateClass(category);
-            }else if(type.equals("update")){
-                Category category = categoryService.selectClass(Integer.parseInt(id));
-
-                map.put("categories",category);
-            }else if(type.equals("showParent")){
-                list = categoryService.selectShowParentClass();
-                map.put("categories", list);
-            }else if(type.equals("showSon")){
-                list = categoryService.selectShowSonClass();
-                map.put("categories", list);
-            }
+            list = categoryService.selectShowSonClass();
+            map.put("sons", list);
 
             jsonResult.setItem(map);
-
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
 
         }catch (Exception e){
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
         }
 
-        return jsonResult;
+        return  jsonResult;
+    }
 
+
+    /**
+     * 获取所有通过审核的商户分类
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return
+     */
+    @RequestMapping(value = "/store-categories", method = RequestMethod.GET)
+    @ResponseBody
+    public JsonResult getStorecategories(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+        Map map = new HashMap();
+
+        try{
+            List<Category> list = null;
+
+            list = categoryService.selectShowStoreParentClass();
+            map.put("parents", list);
+
+            list = categoryService.selectShowStoreSonClass();
+            map.put("sons", list);
+
+            jsonResult.setItem(map);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        }
+
+        return  jsonResult;
+    }
+
+
+    /**
+     * 获取一个分类信息
+     * @param id 分类id
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return 返回该分类的信息
+     */
+    @RequestMapping(value = "/categories/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public JsonResult getOneCategories(@PathVariable("id") Integer id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+
+        try{
+            //通过id查询该分类
+            Category category = categoryService.selectClass(id);
+            Map map = new HashMap();
+            map.put("category", category);
+
+            jsonResult.setItem(map);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        }
+
+        return  jsonResult;
     }
 
 
 
 
     /**
-     * 添加类别
-     * @param category
-     * @param bindingResult
+     * 删除一个分类
+     * @param id
      * @param httpServletRequest
+     * @param httpServletResponse
      * @return
+     */
+    @RequestMapping(value = "/categories/{id}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public JsonResult deleteCategories(@PathVariable("id") Integer id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+
+        try{
+            //通过id查询该分类
+            Category category = categoryService.selectClass(id);
+            //通过id删除该分类
+            categoryService.deleteClass(id);
+
+            //删除该分类下的子分类
+            categoryService.deleteSonClass(category.getCode());
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        }
+
+        return  jsonResult;
+    }
+
+
+    /**
+     * 取消审核分类
+     * @param id 分类id
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return 返回状态码
+     */
+    @RequestMapping(value = "/categories/{id}/stop", method = RequestMethod.GET)
+    @ResponseBody
+    public JsonResult stopCategories(@PathVariable("id") Integer id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+
+        try{
+            //通过id查询该分类
+            Category category = categoryService.selectClass(id);
+
+            category.setStatus(new Byte("0"));
+
+            //删除该分类下的子分类
+            categoryService.updateClass(category);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        }
+
+        return  jsonResult;
+    }
+
+
+    /**
+     * 通过审核分类
+     * @param id 分类id
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return 返回状态吗
+     */
+    @RequestMapping(value = "/categories/{id}/start", method = RequestMethod.GET)
+    @ResponseBody
+    public JsonResult startCategories(@PathVariable("id") Integer id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+
+        try{
+            //通过id查询该分类
+            Category category = categoryService.selectClass(id);
+
+            category.setStatus(new Byte("1"));
+
+            //删除该分类下的子分类
+            categoryService.updateClass(category);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        }
+
+        return  jsonResult;
+    }
+
+
+    /**
+     * 给一个分类排序
+     * @param id 分类id
+     * @param sort 排序值
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return 返回状态码
+     */
+    @RequestMapping(value = "/categories/{id}/sort/{sort}", method = RequestMethod.GET)
+    @ResponseBody
+    public JsonResult sortCategories(@PathVariable("id") Integer id, @PathVariable("sort") Integer sort, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+
+        try{
+            //通过id查询该分类
+            Category category = categoryService.selectClass(id);
+
+            category.setSort(sort);
+
+            //删除该分类下的子分类
+            categoryService.updateClass(category);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        }
+
+        return  jsonResult;
+    }
+
+
+    /**
+     * 添加分类
+     * @param category 分类模型
+     * @param bindingResult 验证类
+     * @param file 上传的图片
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return
+     * @throws Exception
      */
     @RequestMapping(value = "/categories", method = RequestMethod.POST)
     @ResponseBody
-    @AuthPassport(permission_code = "100")
-    public JsonResult addClassAjax(@Valid Category category, BindingResult bindingResult, @RequestParam(value="file-2",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception{
+    public JsonResult addClassAjax(@Valid Category category, BindingResult bindingResult, @RequestParam(value="pic",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception{
         JsonResult jsonResult = new JsonResult();
 
 
@@ -162,23 +314,26 @@ public class ClassController {
                 category.setLogoKey(fileName);
 
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+                jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
             }else{
                 category.setLogoKey("default.png");
             }
         }catch (Exception e){
             jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
+            jsonResult.setMessage(GlobalConstants.UPLOAD_PICTURE_FAILED_MESSAGE);
         }
 
 
 
         try {
-            int result = categoryService.insertClass(category);
+            categoryService.insertClass(category);
 
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
 
         }catch (Exception e){
-            System.out.println(e);
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
         }
 
 
@@ -186,32 +341,20 @@ public class ClassController {
     }
 
 
-
-
-
     /**
-     * 修改分类内容
-     * @param category
-     * @param bindingResult
-     * @param uploadfile
-     * @param file
+     * 修改分类信息
+     * @param category 分类模型
+     * @param bindingResult 验证类
+     * @param uploadfile 原分类图片名称
+     * @param file 新上传的图片
      * @param httpServletRequest
-     * @return
+     * @param httpServletResponse
+     * @return 返回状态值
      */
     @RequestMapping(value = "/categories/update", method = RequestMethod.POST)
     @ResponseBody
-    @AuthPassport(permission_code = "100")
-    public JsonResult updateClass(@Valid Category category, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile, @RequestParam(value="file-2",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult updateClass(@Valid Category category, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile, @RequestParam(value="pic",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
-//        System.out.println(category.getId());
-//        System.out.println(category.getName());
-//        System.out.println(category.getType());
-//        System.out.println(category.getParentCode());
-//        System.out.println(category.getCode());
-//        System.out.println(category.getSort());
-//        System.out.println(category.getStatus());
-//        System.out.println(category.getCreateTime());
-//        System.out.println(category.getLogoKey());
 
 
         category.setCreateTime(new Timestamp(System.currentTimeMillis()));
@@ -234,32 +377,105 @@ public class ClassController {
                 String contentType=file.getContentType();
                 //获得文件后缀名称
                 String imageName=contentType.substring(contentType.indexOf("/")+1);
-                String fileName = category.getLogoKey() + "." + imageName;
+                String pic = UUID.randomUUID().toString().replaceAll("-","");
+                String fileName = pic + "." + imageName;
                 path="/WEB-INF/static/image/class-images/"+fileName;
                 file.transferTo(new File(pathRoot+path));
 
                 category.setLogoKey(fileName);
 
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+
             } else {
-                //System.out.println("bbb");
                 category.setLogoKey(uploadfile);
             }
         }catch (Exception e){
             jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
-            System.out.println(e);
         }
 
         try{
             categoryService.updateClass(category);
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            Map map = new HashMap();
+            map.put("cate", category);
+            jsonResult.setItem(map);
 
         }catch (Exception e){
-            System.out.println(e);
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
         }
 
         return jsonResult;
     }
+
+
+
+
+
+
+    /**
+     * 获取所有分类，包括为通过的分类
+     * @return
+     */
+    @RequestMapping(value = "/allCategories", method = RequestMethod.GET)
+    @ResponseBody
+    public JsonResult allCategories(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+        Map map = new HashMap();
+
+        try{
+            List<Category> list = null;
+
+            list = categoryService.selectParentClass();
+            map.put("parents", list);
+
+            list = categoryService.selectSonClass();
+            map.put("sons", list);
+
+            jsonResult.setItem(map);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+        }
+
+        return  jsonResult;
+    }
+
+
+    /**
+     * 获取所有分类，包括为通过的分类
+     * @return
+     */
+    @RequestMapping(value = "/allStoreCategories", method = RequestMethod.GET)
+    @ResponseBody
+    public JsonResult allStoreCategories(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+        Map map = new HashMap();
+
+        try{
+            List<Category> list = null;
+
+            list = categoryService.selectStoreParentClass();
+            map.put("parents", list);
+
+            list = categoryService.selectStoreSonClass();
+            map.put("sons", list);
+
+            jsonResult.setItem(map);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+        }
+
+        return  jsonResult;
+    }
+
+
+
+
+
+
+
 
 }

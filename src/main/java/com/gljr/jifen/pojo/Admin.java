@@ -19,6 +19,8 @@ public class Admin {
 
     private Date createTime;
 
+    private String permission;
+
     public Integer getId() {
         return id;
     }
@@ -35,7 +37,7 @@ public class Admin {
         this.accountType = accountType;
     }
 
-    @NotBlank
+    @NotBlank(message = "用户名不能为空")
     public String getUsername() {
         return username;
     }
@@ -44,7 +46,7 @@ public class Admin {
         this.username = username == null ? null : username.trim();
     }
 
-    @NotBlank
+    @NotBlank(message = "密码不能为空")
     public String getPassword() {
         return password;
     }
@@ -75,5 +77,13 @@ public class Admin {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
     }
 }

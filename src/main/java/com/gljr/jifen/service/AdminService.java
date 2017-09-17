@@ -15,22 +15,43 @@ public interface AdminService {
 
     List<AdminOnline> selectAdminOnlines(int aId, Byte clientType);
 
-    int updataPwd(Admin admin);
+//    int updataPwd(Admin admin);
+//
+//    Admin getAdmin(Integer id);
+//
+//
+    List<Admin> selectAdminByUsername(String username);
 
-    Admin getAdmin(Integer id);
+    Admin selectAdminById(Integer id);
+
+    int insertAdmin(Admin admin);
+
+    int deleteAdminById(Integer id);
+
+    int updateAdminById(Admin admin);
 
 
-    Admin getAdmin(String username);
+//
+//    int insertAdminPermissionAssign(AdminPermissionAssign adminPermissionAssign);
+//
+//    int updataAdminPermissionAssign(AdminPermissionAssign adminPermissionAssign);
+//
+//    int deleteProduct(Integer id);
 
+    List<Admin> getAdmins(String type);
 
-    int addAdmin(Admin admin);
+    List<AdminPermissionAssign> getAdminPermissionAssign(Integer aId);
 
-    List<AdminList> getListAdmin();
+    SystemPermission getSystemPermission(int code);
 
-    int insertAdminPermissionAssign(AdminPermissionAssign adminPermissionAssign);
+    int insertSystemPermission(SystemPermission systemPermission);
 
-    int updataAdminPermissionAssign(AdminPermissionAssign adminPermissionAssign);
+    List<SystemPermission> selectSystemPermission();
 
-    int deleteProduct(Integer id);
+    int deleteSystemPermission(Integer id);
+
+    int deleteSonSystemPermission(Integer code);
+
+    SystemPermission selectSystemPermissionById(Integer id);
 
 }

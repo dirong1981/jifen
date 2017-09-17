@@ -2,6 +2,7 @@ package com.gljr.jifen.controller;
 
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.IntegralTransferOrder;
 import com.gljr.jifen.pojo.StoreInfo;
 import com.gljr.jifen.pojo.StoreOfflineOrder;
@@ -20,7 +21,7 @@ import java.util.Map;
 
 @Controller
 
-@RequestMapping(value = ("/jifen"))
+@RequestMapping(value = "/v1")
 public class StoreOfflineOrderController {
 
     @Autowired
@@ -35,6 +36,7 @@ public class StoreOfflineOrderController {
      */
     @RequestMapping(value = "/class/insertOfflineOrderAjax", method = RequestMethod.POST)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult insertOnlineOrder(@RequestBody StoreOfflineOrder storeOfflineOrder) {
         JsonResult jr = new JsonResult();
         try {
@@ -66,7 +68,8 @@ public class StoreOfflineOrderController {
      */
     @RequestMapping(value = "/offlines", method = RequestMethod.GET)
     @ResponseBody
-    public Map selectAllOnlineOrder() {
+    @AuthPassport(permission_code = "5")
+    public JsonResult selectAllOnlineOrder() {
         JsonResult jr = new JsonResult();
         try {
             jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
@@ -74,13 +77,13 @@ public class StoreOfflineOrderController {
             Map map = new HashMap();
             map.put("data", storeOfflineOrders);
             jr.setItem(map);
-            return map;
+            return jr;
         } catch (Exception e) {
             System.out.println(e);
             jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
         }
 
-        return null;
+        return jr;
     }
 
     /**
@@ -90,6 +93,7 @@ public class StoreOfflineOrderController {
      */
     @RequestMapping(value = "/offlines/update/{id}", method = RequestMethod.GET)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult selectOnlineOrder(@PathVariable("id") String id) {
         JsonResult jr = new JsonResult();
         try {
@@ -113,6 +117,7 @@ public class StoreOfflineOrderController {
      */
     @RequestMapping(value = "/class/updateStoreOfflineOrderAjax", method = RequestMethod.POST)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult updateOnlineOrder(@RequestBody StoreOfflineOrder storeOfflineOrder) {
         JsonResult jr = new JsonResult();
         try {
@@ -152,6 +157,7 @@ public class StoreOfflineOrderController {
      */
     @RequestMapping(value = "/offlines/update/status/{id}", method = RequestMethod.GET)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult updateStateOnlineOrder(@PathVariable("id") String id) {
         JsonResult jr = new JsonResult();
         try {
@@ -172,6 +178,7 @@ public class StoreOfflineOrderController {
      */
     @RequestMapping(value = "/offlines/delete/{id}", method = RequestMethod.GET)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult deleteOnlineOrder(@PathVariable("id") String id) {
         JsonResult jr = new JsonResult();
         try {

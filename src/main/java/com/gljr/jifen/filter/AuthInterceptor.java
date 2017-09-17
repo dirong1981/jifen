@@ -1,5 +1,6 @@
 package com.gljr.jifen.filter;
 
+import com.gljr.jifen.common.JedisUtil;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.StrUtil;
 import com.gljr.jifen.constants.GlobalConstants;
@@ -19,44 +20,52 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Autowired
     private StrUtil strUtil;
 
+    @Autowired
+    private JedisUtil jedisUtil;
+
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
 
-
-        //从传入的handler中检查是否有AuthCheck的声明
+            //从传入的handler中检查是否有AuthCheck的声明
         if (handler instanceof HandlerMethod) {
-            HandlerMethod method = (HandlerMethod) handler;
-            AuthPassport authPassport = method.getMethodAnnotation(AuthPassport.class);
 
-            String id = httpServletRequest.getHeader("id");
-            HttpSession httpSession = httpServletRequest.getSession();
-            String permission_codes = "";
-//            if(httpSession.getAttribute("permission_codes") != null){
-//                permission_codes = (String) httpSession.getAttribute("permission_codes");
-//            }
-            Jedis jedis = new Jedis("localhost");
-            permission_codes = jedis.get("permission_codes"+id);
-
-            //没有声明需要权限,或者声明不验证权限
-            if (authPassport == null || authPassport.validate() == false) {
+//            String userAgent = httpServletRequest.getHeader("user-agent");
+            String device = httpServletRequest.getHeader("device");
+//            if(userAgent.indexOf("Android") != -1 || userAgent.indexOf("iPhone") != -1 || userAgent.indexOf("iPad") != -1){
+            if(device.equals("mobile")){
                 return true;
-            } else {
+            }else{
+                HandlerMethod method = (HandlerMethod) handler;
+                AuthPassport authPassport = method.getMethodAnnotation(AuthPassport.class);
 
-                try {
-                    //通过id查询用户的权限
-                    String permission_code = authPassport.permission_code();
+                String id = httpServletRequest.getHeader("id");
+                String permission_codes = "";
 
-                    //如果不包含权限，则不允许访问
-                    if (permission_codes.contains(permission_code)) {
-                        return true;
-                    } else {
-                        JsonResult jsonResult = new JsonResult();
-                        jsonResult.setErrorCode(GlobalConstants.FORBIDDEN_CODE);
-                        strUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+
+                Jedis jedis = jedisUtil.getJedis();
+                permission_codes = jedis.get("permission_codes"+id);
+
+                //没有声明需要权限,或者声明不验证权限
+                if (authPassport == null || authPassport.validate() == false) {
+                    return true;
+                } else {
+
+                    try {
+                        //通过id查询用户的权限
+                        String permission_code = authPassport.permission_code();
+
+                        //如果不包含权限，则不允许访问
+                        if (permission_codes.contains(permission_code)) {
+                            return true;
+                        } else {
+                            JsonResult jsonResult = new JsonResult();
+                            jsonResult.setErrorCode(GlobalConstants.FORBIDDEN_CODE);
+                            strUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+                            return false;
+                        }
+                    }catch (Exception e){
                         return false;
                     }
-                }catch (Exception e){
-                    return false;
                 }
             }
         }else{
@@ -64,6 +73,8 @@ public class AuthInterceptor implements HandlerInterceptor {
             //不能被转化为方法，直接通过
             return true;
         }
+
+
 
     }
 

@@ -137,7 +137,8 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.gljr.jifen.pojo.Admin">
+  <insert id="insert" parameterType="com.gljr.jifen.pojo.Admin" keyProperty="id"
+          keyColumn="ID" useGeneratedKeys="true">
     insert into admin (id, account_type, username, 
       password, salt, status, 
       create_time)

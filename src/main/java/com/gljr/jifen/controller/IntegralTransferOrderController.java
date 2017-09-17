@@ -3,6 +3,7 @@ package com.gljr.jifen.controller;
 
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.IntegralTransferOrder;
 import com.gljr.jifen.pojo.IntegralTransferOrderSearch;
 import com.gljr.jifen.pojo.StoreOfflineOrder;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 @Controller
 
-@RequestMapping(value = ("/jifen"))
+@RequestMapping(value = "/v1")
 public class IntegralTransferOrderController {
 
     @Autowired
@@ -31,7 +32,8 @@ public class IntegralTransferOrderController {
      */
     @RequestMapping(value = "/integrals", method = RequestMethod.GET)
     @ResponseBody
-    public Map selectAllOnlineOrder() {
+    @AuthPassport(permission_code = "5")
+    public JsonResult selectAllOnlineOrder() {
         JsonResult jr = new JsonResult();
         try {
             jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
@@ -39,12 +41,12 @@ public class IntegralTransferOrderController {
             Map map = new HashMap();
             map.put("data", integralTransferOrders);
             jr.setItem(map);
-            return map;
+            return jr;
         } catch (Exception e) {
             jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
         }
 
-        return null;
+        return jr;
     }
 
     /**
@@ -54,6 +56,7 @@ public class IntegralTransferOrderController {
      */
     @RequestMapping(value = "/integrals/update/{id}", method = RequestMethod.GET)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult selectOnlineOrder(@PathVariable("id") String id) {
         JsonResult jr = new JsonResult();
         try {
@@ -76,6 +79,7 @@ public class IntegralTransferOrderController {
      */
     @RequestMapping(value = "/integrals/update/status/{id}", method = RequestMethod.GET)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult updateStateOnlineOrder(@PathVariable("id") String id) {
         JsonResult jr = new JsonResult();
         try {
@@ -96,7 +100,8 @@ public class IntegralTransferOrderController {
      */
     @RequestMapping(value = "/integrals/param", method = RequestMethod.GET)
     @ResponseBody
-    public Map selectAllParamOnlineOrder(IntegralTransferOrderSearch integralTransferOrderSearch)  {
+    @AuthPassport(permission_code = "5")
+    public JsonResult selectAllParamOnlineOrder(IntegralTransferOrderSearch integralTransferOrderSearch)  {
         JsonResult jr = new JsonResult();
         try {
             ArrayList arrayList = new ArrayList();
@@ -129,12 +134,12 @@ public class IntegralTransferOrderController {
             map.put("data", arrayList);
             jr.setItem(map);
             jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            return map;
+            return jr;
         } catch (Exception e) {
             jr.setErrorCode(GlobalConstants.OPERATION_FAILED + e.getLocalizedMessage());
         }
 
-        return null;
+        return jr;
     }
     /**
      * 删除指定id线上订单数据
@@ -143,6 +148,7 @@ public class IntegralTransferOrderController {
      */
     @RequestMapping(value = "/integrals/delete/{id}", method = RequestMethod.GET)
     @ResponseBody
+    @AuthPassport(permission_code = "5")
     public JsonResult deleteOnlineOrder(@PathVariable("id") String id) {
         JsonResult jr = new JsonResult();
         try {

@@ -1,11 +1,8 @@
 package com.gljr.jifen.controller;
 
 
-import com.gljr.jifen.common.JwtUtil;
-import com.gljr.jifen.common.Md5Util;
-import com.gljr.jifen.common.StrUtil;
+import com.gljr.jifen.common.*;
 import com.gljr.jifen.constants.GlobalConstants;
-import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.Admin;
 import com.gljr.jifen.pojo.AdminOnline;
@@ -32,7 +29,7 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping(value = "/jifen")
+@RequestMapping(value = "/v1")
 public class LoginController {
 
 
@@ -51,20 +48,20 @@ public class LoginController {
     @Autowired
     private AdminOnline adminOnline;
 
-
+    @Autowired
+    private JedisUtil jedisUtil;
 
 
     /**
-     * 用户登录控制
-     * @param admin
-     * @param bindingResult
+     * 管理员登录
+     * @param admin 管理员模型
+     * @param bindingResult 验证类
      * @param httpServletRequest
-     * @return
+     * @param httpServletResponse
+     * @return 返回状态码
      */
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/login/admin", method = RequestMethod.POST)
     @ResponseBody
-    @AuthPassport(validate = false)
-
     public JsonResult login(@Valid Admin admin, BindingResult bindingResult, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
 
         JsonResult jsonResult = new JsonResult();
@@ -74,6 +71,7 @@ public class LoginController {
          */
         if(bindingResult.hasErrors()){
             jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
+            jsonResult.setMessage(GlobalConstants.NOTNULL);
             return jsonResult;
         }
 
@@ -87,8 +85,6 @@ public class LoginController {
                     //生成32位token的key
                     String key = strUtil.randomKey(32);
 
-                    //生成session
-                    HttpSession httpSession = httpServletRequest.getSession();
 
                     //生成token中的数据
                     JSONObject jsonObject = new JSONObject();
@@ -125,6 +121,8 @@ public class LoginController {
                         key = list.get(0).getToken();
                         token = jwtUtil.createJWT("gljr", jsonObject.toString(), key, 60*60*24*360);
                         map.put("refreshToken", token);
+                        map.put("id", selectAdmin.getId());
+                        map.put("username", selectAdmin.getUsername());
                     }
 
                     jsonResult.setItem(map);
@@ -138,44 +136,58 @@ public class LoginController {
 
                     //admin这个管理员具有所有权限
                     if(selectAdmin.getUsername().equals("admin")){
-                        permission_codes = "100,200,300,400,500,600,700,800,900";
+                        permission_codes = "1,2,3,4,5,6,7,8,9";
                     }
                     //把token和用户权限放入session中，方便拦截器调用
 //                    httpSession.setAttribute("token", token);
 //                    httpSession.setAttribute("permission_codes", permission_codes);
 
-                    Jedis jedis = new Jedis("localhost");
+                    Jedis jedis = jedisUtil.getJedis();
 
                     jedis.set("token"+selectAdmin.getId(), token);
                     jedis.set("permission_codes"+selectAdmin.getId(), permission_codes);
 
                     jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+                    jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
                 }else{
                     jsonResult.setErrorCode(GlobalConstants.USER_PASSWORD_ERROR);
+                    jsonResult.setMessage(GlobalConstants.USER_PASSWORD_ERROR_STR);
                 }
             }catch (Exception e){
                 jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
+                jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
             }
         }else{
             jsonResult.setErrorCode(GlobalConstants.USER_DOES_NOT_EXIST);
+            jsonResult.setMessage(GlobalConstants.USER_DOES_NOT_EXIST_STR);
         }
 
         return jsonResult;
     }
 
-    //用户登出
-    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+
+
+    /**
+     * 管理员退出
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return 返回状态码
+     */
+    @RequestMapping(value = "/logout/admin", method = RequestMethod.GET)
     @ResponseBody
     public JsonResult logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
 
-        httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
-        httpServletResponse.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS,DELETE,PUT");
+        String id = httpServletRequest.getHeader("id");
 
-        HttpSession httpSession = httpServletRequest.getSession();
-        httpSession.invalidate();
+
+        Jedis jedis = jedisUtil.getJedis();
+
+        jedis.set("token"+id, "");
+        jedis.set("permission_codes"+id, "");
 
         jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+        jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
 
         return  jsonResult;
     }

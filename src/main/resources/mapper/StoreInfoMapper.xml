@@ -131,7 +131,8 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.gljr.jifen.pojo.StoreInfo">
+  <insert id="insert" parameterType="com.gljr.jifen.pojo.StoreInfo" keyProperty="id"
+          keyColumn="ID" useGeneratedKeys="true">
     insert into store_info (id, serial_code, category_code, 
       name, location_code, address, 
       contact_phone, logo_key, pay_status, 

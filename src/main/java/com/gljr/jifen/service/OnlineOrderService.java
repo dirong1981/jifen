@@ -40,7 +40,7 @@ public interface OnlineOrderService {
      * @return
      */
     //
-    List<OnlineOrder> selectAllClass();
+    List<OnlineOrder> selectAllOnlineOrders(Integer uid);
 
     /**
      * 查询指定状态

@@ -45,19 +45,19 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
         return onlineOrderMapper.deleteByPrimaryKey(id);
     }
 
+    /**
+     * 查询所有在线订单
+     * @param uid 用户id，如果为0，查询所有订单，不为0，查询该用户订单
+     * @return 订单列表
+     */
     @Override
-    public List<OnlineOrder> selectAllClass() {
-        List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(null);
-        LinkedList lls = new LinkedList();
-        for(int i=0;i<onlineOrders.size();i++){
-            OnlineOrder onlineOrder = onlineOrders.get(i);
-            Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());
-            onlineOrder.setpName(product.getName());
-            onlineOrder.setCreateTimeText(DateUtils.getTimeStr(onlineOrder.getCreateTime()));
-            onlineOrder.setuName("小冰");
-            lls.add(onlineOrder);
+    public List<OnlineOrder> selectAllOnlineOrders(Integer uid) {
+        OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
+        OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
+        if(uid != 0){
+            criteria.andUidEqualTo(uid);
         }
-        return lls;
+        return onlineOrderMapper.selectByExample(onlineOrderExample);
     }
 
     @Override

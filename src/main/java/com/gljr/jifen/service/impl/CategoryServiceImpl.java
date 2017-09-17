@@ -29,6 +29,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> selectStoreParentClass() {
+        CategoryExample categoryExample = new CategoryExample();
+        CategoryExample.Criteria criteria= categoryExample.createCriteria();
+
+        criteria.andTypeEqualTo(new Byte("2"));
+        criteria.andParentCodeEqualTo(0);
+        categoryExample.setOrderByClause("sort asc");
+
+        return categoryMapper.selectByExample(categoryExample);
+    }
+
+    @Override
     public int insertClass(Category category) {
 
         return  categoryMapper.insert(category);
@@ -39,6 +51,17 @@ public class CategoryServiceImpl implements CategoryService {
         CategoryExample categoryExample = new CategoryExample();
         CategoryExample.Criteria criteria = categoryExample.createCriteria();
         criteria.andTypeEqualTo(new Byte("1"));
+        criteria.andParentCodeNotEqualTo(0);
+        categoryExample.setOrderByClause("sort desc");
+
+        return categoryMapper.selectByExample(categoryExample);
+    }
+
+    @Override
+    public List<Category> selectStoreSonClass() {
+        CategoryExample categoryExample = new CategoryExample();
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        criteria.andTypeEqualTo(new Byte("2"));
         criteria.andParentCodeNotEqualTo(0);
         categoryExample.setOrderByClause("sort desc");
 
@@ -115,5 +138,29 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.selectByExample(categoryExample);
     }
 
+
+    @Override
+    public List<Category> selectShowStoreParentClass() {
+        CategoryExample categoryExample = new CategoryExample();
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        criteria.andParentCodeEqualTo(0);
+        criteria.andStatusEqualTo(new Byte("1"));
+        criteria.andTypeEqualTo(new Byte("2"));
+
+        categoryExample.setOrderByClause("sort asc");
+        return categoryMapper.selectByExample(categoryExample);
+    }
+
+    @Override
+    public List<Category> selectShowStoreSonClass() {
+        CategoryExample categoryExample = new CategoryExample();
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        criteria.andParentCodeNotEqualTo(0);
+        criteria.andStatusEqualTo(new Byte("1"));
+        criteria.andTypeEqualTo(new Byte("2"));
+
+        categoryExample.setOrderByClause("sort asc");
+        return categoryMapper.selectByExample(categoryExample);
+    }
 
 }
