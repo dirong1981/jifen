@@ -104,21 +104,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.gljr.jifen.pojo.IntegralTransferOrder">
-    insert into integral_transfer_order (id, uid, g_uid, 
-      trx_id, trx_code, integral, 
-      title, status, create_time
-      )
-    values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER}, #{gUid,jdbcType=INTEGER}, 
-      #{trxId,jdbcType=INTEGER}, #{trxCode,jdbcType=VARCHAR}, #{integral,jdbcType=INTEGER}, 
-      #{title,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}
-      )
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into integral_transfer_order (uid, g_uid, trx_id, 
+      trx_code, integral, title, 
+      status, create_time)
+    values (#{uid,jdbcType=INTEGER}, #{gUid,jdbcType=INTEGER}, #{trxId,jdbcType=INTEGER}, 
+      #{trxCode,jdbcType=VARCHAR}, #{integral,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
+      #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.IntegralTransferOrder">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into integral_transfer_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="uid != null">
         uid,
       </if>
@@ -145,9 +146,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="uid != null">
         #{uid,jdbcType=INTEGER},
       </if>

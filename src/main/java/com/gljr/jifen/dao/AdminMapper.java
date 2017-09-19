@@ -3,9 +3,6 @@ package com.gljr.jifen.dao;
 import com.gljr.jifen.pojo.Admin;
 import com.gljr.jifen.pojo.AdminExample;
 import java.util.List;
-import java.util.Map;
-
-import com.gljr.jifen.pojo.AdminList;
 import org.apache.ibatis.annotations.Param;
 
 public interface AdminMapper {
@@ -30,6 +27,4 @@ public interface AdminMapper {
     int updateByPrimaryKeySelective(Admin record);
 
     int updateByPrimaryKey(Admin record);
-
-    List<AdminList> getListAdmin();
 }

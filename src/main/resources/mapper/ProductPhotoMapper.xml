@@ -100,17 +100,20 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.gljr.jifen.pojo.ProductPhoto">
-    insert into product_photo (id, pid, img_key, 
-      sort, create_time)
-    values (#{id,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, #{imgKey,jdbcType=VARCHAR}, 
-      #{sort,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into product_photo (pid, img_key, sort, 
+      create_time)
+    values (#{pid,jdbcType=INTEGER}, #{imgKey,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.ProductPhoto">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into product_photo
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="pid != null">
         pid,
       </if>
@@ -125,9 +128,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="pid != null">
         #{pid,jdbcType=INTEGER},
       </if>

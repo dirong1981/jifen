@@ -57,4 +57,14 @@ public class UserServiceImpl implements UserService {
     public int updateUserAddressById(UserAddress userAddress) {
         return userAddressMapper.updateByPrimaryKey(userAddress);
     }
+
+    @Override
+    public int deleteUserAddressById(Integer id) {
+        return userAddressMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public UserAddress selectUserAddressById(Integer id) {
+        return userAddressMapper.selectByPrimaryKey(id);
+    }
 }

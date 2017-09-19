@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.UserAddress">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="uid" jdbcType="INTEGER" property="uid" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="contact_name" jdbcType="VARCHAR" property="contactName" />
     <result column="contact_phone" jdbcType="VARCHAR" property="contactPhone" />
     <result column="location_code" jdbcType="INTEGER" property="locationCode" />
     <result column="address" jdbcType="VARCHAR" property="address" />
@@ -70,7 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, uid, name, contact_phone, location_code, address, is_default, create_time
+    id, uid, contact_name, contact_phone, location_code, address, is_default, create_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.UserAddressExample" resultMap="BaseResultMap">
     select
@@ -103,24 +103,27 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.gljr.jifen.pojo.UserAddress">
-    insert into user_address (id, uid, name, 
-      contact_phone, location_code, address, 
-      is_default, create_time)
-    values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
-      #{contactPhone,jdbcType=VARCHAR}, #{locationCode,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, 
-      #{isDefault,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP})
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user_address (uid, contact_name, contact_phone, 
+      location_code, address, is_default, 
+      create_time)
+    values (#{uid,jdbcType=INTEGER}, #{contactName,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, 
+      #{locationCode,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, #{isDefault,jdbcType=TINYINT}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.UserAddress">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into user_address
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="uid != null">
         uid,
       </if>
-      <if test="name != null">
-        name,
+      <if test="contactName != null">
+        contact_name,
       </if>
       <if test="contactPhone != null">
         contact_phone,
@@ -139,14 +142,11 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="uid != null">
         #{uid,jdbcType=INTEGER},
       </if>
-      <if test="name != null">
-        #{name,jdbcType=VARCHAR},
+      <if test="contactName != null">
+        #{contactName,jdbcType=VARCHAR},
       </if>
       <if test="contactPhone != null">
         #{contactPhone,jdbcType=VARCHAR},
@@ -180,8 +180,8 @@
       <if test="record.uid != null">
         uid = #{record.uid,jdbcType=INTEGER},
       </if>
-      <if test="record.name != null">
-        name = #{record.name,jdbcType=VARCHAR},
+      <if test="record.contactName != null">
+        contact_name = #{record.contactName,jdbcType=VARCHAR},
       </if>
       <if test="record.contactPhone != null">
         contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
@@ -207,7 +207,7 @@
     update user_address
     set id = #{record.id,jdbcType=INTEGER},
       uid = #{record.uid,jdbcType=INTEGER},
-      name = #{record.name,jdbcType=VARCHAR},
+      contact_name = #{record.contactName,jdbcType=VARCHAR},
       contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
       location_code = #{record.locationCode,jdbcType=INTEGER},
       address = #{record.address,jdbcType=VARCHAR},
@@ -223,8 +223,8 @@
       <if test="uid != null">
         uid = #{uid,jdbcType=INTEGER},
       </if>
-      <if test="name != null">
-        name = #{name,jdbcType=VARCHAR},
+      <if test="contactName != null">
+        contact_name = #{contactName,jdbcType=VARCHAR},
       </if>
       <if test="contactPhone != null">
         contact_phone = #{contactPhone,jdbcType=VARCHAR},
@@ -247,7 +247,7 @@
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.UserAddress">
     update user_address
     set uid = #{uid,jdbcType=INTEGER},
-      name = #{name,jdbcType=VARCHAR},
+      contact_name = #{contactName,jdbcType=VARCHAR},
       contact_phone = #{contactPhone,jdbcType=VARCHAR},
       location_code = #{locationCode,jdbcType=INTEGER},
       address = #{address,jdbcType=VARCHAR},

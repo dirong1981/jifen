@@ -7,7 +7,7 @@ public class UserAddress {
 
     private Integer uid;
 
-    private String name;
+    private String contactName;
 
     private String contactPhone;
 
@@ -35,12 +35,12 @@ public class UserAddress {
         this.uid = uid;
     }
 
-    public String getName() {
-        return name;
+    public String getContactName() {
+        return contactName;
     }
 
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
+    public void setContactName(String contactName) {
+        this.contactName = contactName == null ? null : contactName.trim();
     }
 
     public String getContactPhone() {

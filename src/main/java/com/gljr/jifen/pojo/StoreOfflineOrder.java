@@ -25,37 +25,6 @@ public class StoreOfflineOrder {
 
     private Date updateTime;
 
-    private String oContext;
-
-    private String createTimeText;
-
-    private String uName;
-
-
-    public String getoContext() {
-        return oContext;
-    }
-
-    public void setoContext(String oContext) {
-        this.oContext = oContext;
-    }
-
-    public String getCreateTimeText() {
-        return createTimeText;
-    }
-
-    public void setCreateTimeText(String createTimeText) {
-        this.createTimeText = createTimeText;
-    }
-
-    public String getuName() {
-        return uName;
-    }
-
-    public void setuName(String uName) {
-        this.uName = uName;
-    }
-
     public Integer getId() {
         return id;
     }

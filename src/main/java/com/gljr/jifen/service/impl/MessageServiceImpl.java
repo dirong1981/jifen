@@ -29,4 +29,9 @@ public class MessageServiceImpl implements MessageService {
         return messageMapper.updateByPrimaryKey(message);
     }
 
+    @Override
+    public int insertMessage(Message message) {
+        return messageMapper.insert(message);
+    }
+
 }

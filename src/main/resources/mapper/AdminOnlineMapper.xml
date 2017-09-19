@@ -100,17 +100,20 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.gljr.jifen.pojo.AdminOnline">
-    insert into admin_online (id, aid, client_type, 
-      token, login_time)
-    values (#{id,jdbcType=INTEGER}, #{aid,jdbcType=INTEGER}, #{clientType,jdbcType=TINYINT}, 
-      #{token,jdbcType=VARCHAR}, #{loginTime,jdbcType=TIMESTAMP})
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into admin_online (aid, client_type, token, 
+      login_time)
+    values (#{aid,jdbcType=INTEGER}, #{clientType,jdbcType=TINYINT}, #{token,jdbcType=VARCHAR}, 
+      #{loginTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.AdminOnline">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into admin_online
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="aid != null">
         aid,
       </if>
@@ -125,9 +128,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="aid != null">
         #{aid,jdbcType=INTEGER},
       </if>

@@ -1,0 +1,75 @@
+package com.gljr.jifen.pojo;
+
+import java.util.Date;
+
+public class UserCredits {
+    private Integer id;
+
+    private Byte ownerType;
+
+    private Integer ownerId;
+
+    private String walletAddress;
+
+    private Integer integral;
+
+    private Integer frozenIntegral;
+
+    private Date createTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Byte getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(Byte ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getWalletAddress() {
+        return walletAddress;
+    }
+
+    public void setWalletAddress(String walletAddress) {
+        this.walletAddress = walletAddress == null ? null : walletAddress.trim();
+    }
+
+    public Integer getIntegral() {
+        return integral;
+    }
+
+    public void setIntegral(Integer integral) {
+        this.integral = integral;
+    }
+
+    public Integer getFrozenIntegral() {
+        return frozenIntegral;
+    }
+
+    public void setFrozenIntegral(Integer frozenIntegral) {
+        this.frozenIntegral = frozenIntegral;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+}

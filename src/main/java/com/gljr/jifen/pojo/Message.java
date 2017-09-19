@@ -9,7 +9,7 @@ public class Message {
 
     private String content;
 
-    private Byte isread;
+    private Byte readStatus;
 
     private Date createTime;
 
@@ -37,12 +37,12 @@ public class Message {
         this.content = content == null ? null : content.trim();
     }
 
-    public Byte getIsread() {
-        return isread;
+    public Byte getReadStatus() {
+        return readStatus;
     }
 
-    public void setIsread(Byte isread) {
-        this.isread = isread;
+    public void setReadStatus(Byte readStatus) {
+        this.readStatus = readStatus;
     }
 
     public Date getCreateTime() {

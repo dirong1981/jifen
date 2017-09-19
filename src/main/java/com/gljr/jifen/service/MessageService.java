@@ -20,4 +20,12 @@ public interface MessageService {
      */
     int updateAllMessageById(Message message);
 
+
+    /**
+     * 插入一条消息
+     * @param message 消息模型
+     * @return int
+     */
+    int insertMessage(Message message);
+
 }

@@ -55,4 +55,34 @@ public class StrUtil {
         }
     }
 
+
+
+    /**
+     * 生成签名字符串
+     *
+     * @param text 需要加密的字符串
+     * @param code 可为任意大于等于四位数的数字
+     * @return 返回MD5加密字符串
+     */
+    public String encryption4AnyCode(String text, String code) {
+        int codeLength = 4;
+//        if (StringUtils.isBlank(text) || !StringUtils.isNumeric(code) || (codeLength = code.length()) < 4) {
+//            return "";
+//        }
+
+        int[] numArray = new int[codeLength];
+        for (int i = 0; i < codeLength; i++) {
+            numArray[i] = Integer.parseInt(code.substring(i, i + 1));
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            result.append(text.charAt(i) << numArray[i % codeLength]);
+        }
+
+        Md5Util md5Util = new Md5Util();
+        return md5Util.smallmd5(result.toString());
+    }
+
+
 }

@@ -5,7 +5,7 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="uid" jdbcType="INTEGER" property="uid" />
     <result column="content" jdbcType="VARCHAR" property="content" />
-    <result column="isread" jdbcType="TINYINT" property="isread" />
+    <result column="read_status" jdbcType="TINYINT" property="readStatus" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -67,7 +67,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, uid, content, isread, create_time
+    id, uid, content, read_status, create_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.MessageExample" resultMap="BaseResultMap">
     select
@@ -100,42 +100,42 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.gljr.jifen.pojo.Message">
-    insert into message (id, uid, content, 
-      isread, create_time)
-    values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, 
-      #{isread,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP})
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into message (uid, content, read_status, 
+      create_time)
+    values (#{uid,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, #{readStatus,jdbcType=TINYINT}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Message">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into message
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="uid != null">
         uid,
       </if>
       <if test="content != null">
         content,
       </if>
-      <if test="isread != null">
-        isread,
+      <if test="readStatus != null">
+        read_status,
       </if>
       <if test="createTime != null">
         create_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="uid != null">
         #{uid,jdbcType=INTEGER},
       </if>
       <if test="content != null">
         #{content,jdbcType=VARCHAR},
       </if>
-      <if test="isread != null">
-        #{isread,jdbcType=TINYINT},
+      <if test="readStatus != null">
+        #{readStatus,jdbcType=TINYINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -160,8 +160,8 @@
       <if test="record.content != null">
         content = #{record.content,jdbcType=VARCHAR},
       </if>
-      <if test="record.isread != null">
-        isread = #{record.isread,jdbcType=TINYINT},
+      <if test="record.readStatus != null">
+        read_status = #{record.readStatus,jdbcType=TINYINT},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -176,7 +176,7 @@
     set id = #{record.id,jdbcType=INTEGER},
       uid = #{record.uid,jdbcType=INTEGER},
       content = #{record.content,jdbcType=VARCHAR},
-      isread = #{record.isread,jdbcType=TINYINT},
+      read_status = #{record.readStatus,jdbcType=TINYINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -191,8 +191,8 @@
       <if test="content != null">
         content = #{content,jdbcType=VARCHAR},
       </if>
-      <if test="isread != null">
-        isread = #{isread,jdbcType=TINYINT},
+      <if test="readStatus != null">
+        read_status = #{readStatus,jdbcType=TINYINT},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -204,7 +204,7 @@
     update message
     set uid = #{uid,jdbcType=INTEGER},
       content = #{content,jdbcType=VARCHAR},
-      isread = #{isread,jdbcType=TINYINT},
+      read_status = #{readStatus,jdbcType=TINYINT},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

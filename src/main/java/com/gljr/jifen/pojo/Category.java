@@ -1,9 +1,5 @@
 package com.gljr.jifen.pojo;
 
-import org.hibernate.validator.constraints.NotBlank;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import java.util.Date;
 
 public class Category {
@@ -33,7 +29,6 @@ public class Category {
         this.id = id;
     }
 
-    @NotNull
     public Byte getType() {
         return type;
     }
@@ -42,7 +37,6 @@ public class Category {
         this.type = type;
     }
 
-    @NotNull
     public Integer getParentCode() {
         return parentCode;
     }
@@ -51,7 +45,6 @@ public class Category {
         this.parentCode = parentCode;
     }
 
-    @Null
     public Integer getCode() {
         return code;
     }
@@ -60,7 +53,6 @@ public class Category {
         this.code = code;
     }
 
-    @NotBlank
     public String getName() {
         return name;
     }
@@ -69,7 +61,6 @@ public class Category {
         this.name = name == null ? null : name.trim();
     }
 
-    @Null
     public String getLogoKey() {
         return logoKey;
     }
@@ -78,7 +69,6 @@ public class Category {
         this.logoKey = logoKey == null ? null : logoKey.trim();
     }
 
-    @NotNull
     public Byte getStatus() {
         return status;
     }
@@ -87,7 +77,6 @@ public class Category {
         this.status = status;
     }
 
-    @NotNull
     public Integer getSort() {
         return sort;
     }
@@ -96,7 +85,6 @@ public class Category {
         this.sort = sort;
     }
 
-    @Null
     public Date getCreateTime() {
         return createTime;
     }

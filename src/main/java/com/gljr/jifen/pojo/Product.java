@@ -1,8 +1,5 @@
 package com.gljr.jifen.pojo;
 
-import org.hibernate.validator.constraints.NotBlank;
-
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class Product {
@@ -42,7 +39,6 @@ public class Product {
         this.id = id;
     }
 
-    @NotBlank
     public String getName() {
         return name;
     }
@@ -67,7 +63,6 @@ public class Product {
         this.siId = siId;
     }
 
-    @NotNull
     public Integer getPrice() {
         return price;
     }
@@ -76,7 +71,6 @@ public class Product {
         this.price = price;
     }
 
-    @NotNull
     public Integer getIntegral() {
         return integral;
     }
@@ -101,7 +95,6 @@ public class Product {
         this.logoKey = logoKey == null ? null : logoKey.trim();
     }
 
-    @NotNull
     public Integer getInvetory() {
         return invetory;
     }
@@ -118,7 +111,6 @@ public class Product {
         this.sales = sales;
     }
 
-    @NotNull
     public String getUnit() {
         return unit;
     }
@@ -143,7 +135,6 @@ public class Product {
         this.createTime = createTime;
     }
 
-    @NotNull
     public String getDescription() {
         return description;
     }

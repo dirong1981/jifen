@@ -23,36 +23,6 @@ public class OnlineOrder {
 
     private Date updateTime;
 
-    private String pName;
-
-    private String createTimeText;
-
-    private String uName;
-
-    public String getuName() {
-        return uName;
-    }
-
-    public void setuName(String uName) {
-        this.uName = uName;
-    }
-
-    public String getCreateTimeText() {
-        return createTimeText;
-    }
-
-    public void setCreateTimeText(String createTimeText) {
-        this.createTimeText = createTimeText;
-    }
-
-    public String getpName() {
-        return pName;
-    }
-
-    public void setpName(String pName) {
-        this.pName = pName;
-    }
-
     public Integer getId() {
         return id;
     }

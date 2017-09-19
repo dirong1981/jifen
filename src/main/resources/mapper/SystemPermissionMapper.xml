@@ -99,17 +99,20 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.gljr.jifen.pojo.SystemPermission">
-    insert into system_permission (id, parent_code, code, 
-      name)
-    values (#{id,jdbcType=INTEGER}, #{parentCode,jdbcType=INTEGER}, #{code,jdbcType=INTEGER}, 
-      #{name,jdbcType=VARCHAR})
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into system_permission (parent_code, code, name
+      )
+    values (#{parentCode,jdbcType=INTEGER}, #{code,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.SystemPermission">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into system_permission
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="parentCode != null">
         parent_code,
       </if>
@@ -121,9 +124,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="parentCode != null">
         #{parentCode,jdbcType=INTEGER},
       </if>

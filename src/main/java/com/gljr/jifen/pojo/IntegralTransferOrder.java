@@ -21,36 +21,6 @@ public class IntegralTransferOrder {
 
     private Date createTime;
 
-    private String createTimeText;
-
-    private String uName;
-    private String gUName;
-
-
-    public String getCreateTimeText() {
-        return createTimeText;
-    }
-
-    public void setCreateTimeText(String createTimeText) {
-        this.createTimeText = createTimeText;
-    }
-
-    public String getuName() {
-        return uName;
-    }
-
-    public void setuName(String uName) {
-        this.uName = uName;
-    }
-
-    public String getgUName() {
-        return gUName;
-    }
-
-    public void setgUName(String gUName) {
-        this.gUName = gUName;
-    }
-
     public Integer getId() {
         return id;
     }

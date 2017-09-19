@@ -104,21 +104,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.gljr.jifen.pojo.Category">
-    insert into category (id, type, parent_code, 
-      code, name, logo_key, 
-      status, sort, create_time
-      )
-    values (#{id,jdbcType=INTEGER}, #{type,jdbcType=TINYINT}, #{parentCode,jdbcType=INTEGER}, 
-      #{code,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{logoKey,jdbcType=VARCHAR}, 
-      #{status,jdbcType=TINYINT}, #{sort,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
-      )
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into category (type, parent_code, code, 
+      name, logo_key, status, 
+      sort, create_time)
+    values (#{type,jdbcType=TINYINT}, #{parentCode,jdbcType=INTEGER}, #{code,jdbcType=INTEGER}, 
+      #{name,jdbcType=VARCHAR}, #{logoKey,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, 
+      #{sort,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Category">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into category
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="type != null">
         type,
       </if>
@@ -145,9 +146,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="type != null">
         #{type,jdbcType=TINYINT},
       </if>

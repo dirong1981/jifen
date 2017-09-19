@@ -1,10 +1,7 @@
 package com.gljr.jifen.pojo;
 
-import org.springframework.stereotype.Component;
-
 import java.util.Date;
 
-@Component
 public class AdminOnline {
     private Integer id;
 

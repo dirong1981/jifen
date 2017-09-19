@@ -45,8 +45,7 @@ public class LoginController {
     @Autowired
     private StrUtil strUtil;
 
-    @Autowired
-    private AdminOnline adminOnline;
+
 
     @Autowired
     private JedisUtil jedisUtil;
@@ -100,6 +99,7 @@ public class LoginController {
                     if(list.size() == 0) {
 
                         //如果在线表中用户不存在，将用户存入online表
+                        AdminOnline adminOnline = new AdminOnline();
                         adminOnline.setAid(selectAdmin.getId());
                         adminOnline.setToken(key);
                         adminOnline.setClientType(new Byte("2"));
@@ -129,15 +129,15 @@ public class LoginController {
 
                     //查询用户权限
                     String permission_codes = "";
-                    List<AdminPermissionAssign> adminPermissionAssigns = adminService.getPermission(selectAdmin.getId());
-                    for (AdminPermissionAssign adminPermissionAssign : adminPermissionAssigns) {
-                        permission_codes += adminPermissionAssign.getPermissionCode() + ",";
-                    }
-
-                    //admin这个管理员具有所有权限
-                    if(selectAdmin.getUsername().equals("admin")){
-                        permission_codes = "1,2,3,4,5,6,7,8,9";
-                    }
+//                    List<AdminPermissionAssign> adminPermissionAssigns = adminService.getPermission(selectAdmin.getId());
+//                    for (AdminPermissionAssign adminPermissionAssign : adminPermissionAssigns) {
+//                        permission_codes += adminPermissionAssign.getPermissionCode() + ",";
+//                    }
+//
+//                    //admin这个管理员具有所有权限
+//                    if(selectAdmin.getUsername().equals("admin")){
+//                        permission_codes = "1,2,3,4,5,6,7,8,9";
+//                    }
                     //把token和用户权限放入session中，方便拦截器调用
 //                    httpSession.setAttribute("token", token);
 //                    httpSession.setAttribute("permission_codes", permission_codes);
