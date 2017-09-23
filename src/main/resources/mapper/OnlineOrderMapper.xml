@@ -9,6 +9,7 @@
     <result column="trx_code" jdbcType="VARCHAR" property="trxCode" />
     <result column="integral" jdbcType="INTEGER" property="integral" />
     <result column="quantity" jdbcType="INTEGER" property="quantity" />
+    <result column="user_address_id" jdbcType="INTEGER" property="userAddressId" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
@@ -72,7 +73,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, uid, pid, trx_id, trx_code, integral, quantity, status, create_time, update_time
+    id, uid, pid, trx_id, trx_code, integral, quantity, user_address_id, status, create_time, 
+    update_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.OnlineOrderExample" resultMap="BaseResultMap">
     select
@@ -110,12 +112,12 @@
     </selectKey>
     insert into online_order (uid, pid, trx_id, 
       trx_code, integral, quantity, 
-      status, create_time, update_time
-      )
+      user_address_id, status, create_time, 
+      update_time)
     values (#{uid,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, #{trxId,jdbcType=INTEGER}, 
       #{trxCode,jdbcType=VARCHAR}, #{integral,jdbcType=INTEGER}, #{quantity,jdbcType=INTEGER}, 
-      #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+      #{userAddressId,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.OnlineOrder">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -140,6 +142,9 @@
       </if>
       <if test="quantity != null">
         quantity,
+      </if>
+      <if test="userAddressId != null">
+        user_address_id,
       </if>
       <if test="status != null">
         status,
@@ -169,6 +174,9 @@
       </if>
       <if test="quantity != null">
         #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="userAddressId != null">
+        #{userAddressId,jdbcType=INTEGER},
       </if>
       <if test="status != null">
         #{status,jdbcType=TINYINT},
@@ -211,6 +219,9 @@
       <if test="record.quantity != null">
         quantity = #{record.quantity,jdbcType=INTEGER},
       </if>
+      <if test="record.userAddressId != null">
+        user_address_id = #{record.userAddressId,jdbcType=INTEGER},
+      </if>
       <if test="record.status != null">
         status = #{record.status,jdbcType=TINYINT},
       </if>
@@ -234,6 +245,7 @@
       trx_code = #{record.trxCode,jdbcType=VARCHAR},
       integral = #{record.integral,jdbcType=INTEGER},
       quantity = #{record.quantity,jdbcType=INTEGER},
+      user_address_id = #{record.userAddressId,jdbcType=INTEGER},
       status = #{record.status,jdbcType=TINYINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
@@ -262,6 +274,9 @@
       <if test="quantity != null">
         quantity = #{quantity,jdbcType=INTEGER},
       </if>
+      <if test="userAddressId != null">
+        user_address_id = #{userAddressId,jdbcType=INTEGER},
+      </if>
       <if test="status != null">
         status = #{status,jdbcType=TINYINT},
       </if>
@@ -282,6 +297,7 @@
       trx_code = #{trxCode,jdbcType=VARCHAR},
       integral = #{integral,jdbcType=INTEGER},
       quantity = #{quantity,jdbcType=INTEGER},
+      user_address_id = #{userAddressId,jdbcType=INTEGER},
       status = #{status,jdbcType=TINYINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}

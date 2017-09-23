@@ -26,7 +26,8 @@ public class GlobalConstants {
 
 
     //找不到页面代码
-    public static final String PAGE_NOT_FOUND = "404";
+    public static final String OBJECT_NOT_FOUND = "404";
+    public static final String OBJECT_NOT_FOUND_MESSAGE = "您所访问的资源不存在";
 
     //错误请求
     public static final String BAD_REQUEST = "400";
@@ -40,6 +41,11 @@ public class GlobalConstants {
     //Token过期
     public static final String TOKEN_EXPIRED = "405";
 
+    //积分不足
+    public static final String INTEGRAL_NOT_ENOUGH = "积分不足！";
+
+    //数据库错误
+    public static final String DATABASE_FAILED = "数据库错误！";
 
 
     //图片上传失败返回码

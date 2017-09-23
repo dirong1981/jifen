@@ -1,6 +1,8 @@
 package com.gljr.jifen.pojo;
 
+
 import java.util.Date;
+
 
 public class Product {
     private Integer id;

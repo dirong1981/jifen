@@ -6,10 +6,7 @@ import com.gljr.jifen.pojo.Message;
 import com.gljr.jifen.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +16,7 @@ import java.util.Map;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Controller
-@RequestMapping(value = "/v1")
+@RequestMapping(value = "/v1/messages")
 public class MessageController {
 
     @Autowired
@@ -32,7 +29,7 @@ public class MessageController {
      * @param httpServletResponse
      * @return 消息列表
      */
-    @RequestMapping(value = "/messages", method = RequestMethod.GET)
+    @GetMapping
     @ResponseBody
     public JsonResult getAllMessage(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
@@ -74,7 +71,7 @@ public class MessageController {
      * @param httpServletRequest
      * @return 状态码
      */
-    @RequestMapping(value = "messages", method = RequestMethod.PUT)
+    @PutMapping
     @ResponseBody
     public JsonResult updateMessage(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();

@@ -8,6 +8,7 @@
     <result column="owner_type" jdbcType="TINYINT" property="ownerType" />
     <result column="owner_id" jdbcType="INTEGER" property="ownerId" />
     <result column="integral" jdbcType="INTEGER" property="integral" />
+    <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -69,7 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, code, type, owner_type, owner_id, integral, create_time
+    id, code, type, owner_type, owner_id, integral, status, create_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.TransactionExample" resultMap="BaseResultMap">
     select
@@ -106,11 +107,11 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into transaction (code, type, owner_type, 
-      owner_id, integral, create_time
-      )
+      owner_id, integral, status, 
+      create_time)
     values (#{code,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{ownerType,jdbcType=TINYINT}, 
-      #{ownerId,jdbcType=INTEGER}, #{integral,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
-      )
+      #{ownerId,jdbcType=INTEGER}, #{integral,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Transaction">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -133,6 +134,9 @@
       <if test="integral != null">
         integral,
       </if>
+      <if test="status != null">
+        status,
+      </if>
       <if test="createTime != null">
         create_time,
       </if>
@@ -152,6 +156,9 @@
       </if>
       <if test="integral != null">
         #{integral,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -185,6 +192,9 @@
       <if test="record.integral != null">
         integral = #{record.integral,jdbcType=INTEGER},
       </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=TINYINT},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -201,6 +211,7 @@
       owner_type = #{record.ownerType,jdbcType=TINYINT},
       owner_id = #{record.ownerId,jdbcType=INTEGER},
       integral = #{record.integral,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=TINYINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -224,6 +235,9 @@
       <if test="integral != null">
         integral = #{integral,jdbcType=INTEGER},
       </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -237,6 +251,7 @@
       owner_type = #{ownerType,jdbcType=TINYINT},
       owner_id = #{ownerId,jdbcType=INTEGER},
       integral = #{integral,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

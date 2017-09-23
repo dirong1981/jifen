@@ -15,6 +15,8 @@ public class Transaction {
 
     private Integer integral;
 
+    private Byte status;
+
     private Date createTime;
 
     public Integer getId() {
@@ -63,6 +65,14 @@ public class Transaction {
 
     public void setIntegral(Integer integral) {
         this.integral = integral;
+    }
+
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
     }
 
     public Date getCreateTime() {

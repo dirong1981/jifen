@@ -47,75 +47,75 @@
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
         <!-- 指定数据库表 -->
-        <table schema="" tableName="admin">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="admin_online">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="admin_permission_assign">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="category">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="integral_transfer_order">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="location">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="message">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
+        <!--<table schema="" tableName="admin">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="admin_online">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="admin_permission_assign">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="category">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="integral_transfer_order">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="location">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="message">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="online_order">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="opt_log">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="product">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="product_photo">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="store_coupon">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="store_ext_info">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="store_info">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="store_offline_order">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="store_photo">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="system_permission">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
         <table schema="" tableName="online_order">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
-        <table schema="" tableName="opt_log">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="product">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="product_photo">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="store_coupon">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="store_ext_info">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="store_info">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="store_offline_order">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="store_photo">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="system_permission">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="transaction">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="user_address">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="user_coupon">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="user_credits">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="user_ext_info">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table schema="" tableName="user_online">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
+        <!--<table schema="" tableName="user_address">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="user_coupon">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="user_credits">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="user_ext_info">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table schema="" tableName="user_online">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
 
 
 

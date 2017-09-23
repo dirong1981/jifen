@@ -1,18 +1,15 @@
 package com.gljr.jifen.service.impl;
 
-import com.gljr.jifen.dao.IntegralTransferOrderMapper;
-import com.gljr.jifen.dao.OnlineOrderMapper;
-import com.gljr.jifen.dao.ProductMapper;
-import com.gljr.jifen.dao.TransactionMapper;
+import com.gljr.jifen.dao.*;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.OnlineOrderService;
-import com.gljr.jifen.util.DateUtils;
+import com.gljr.jifen.service.TransactionService;
+import com.gljr.jifen.service.UserCreditsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.LinkedList;
+
 import java.util.List;
 
 @Service
@@ -20,6 +17,12 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
     @Autowired
     private OnlineOrderMapper onlineOrderMapper;
+
+    @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
+    private UserCreditsService userCreditsService;
 
 
 
@@ -33,9 +36,22 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
         return onlineOrderMapper.selectByExample(onlineOrderExample);
     }
 
+
+    @Transactional
     @Override
-    public int insertOnlineOrder(OnlineOrder onlineOrder) {
-        return onlineOrderMapper.insert(onlineOrder);
+    public int insertOnlineOrder(OnlineOrder onlineOrder, Transaction transaction, UserCredits userCredits) {
+
+        onlineOrderMapper.insert(onlineOrder);
+
+        transactionService.insertTransaction(transaction);
+
+        userCreditsService.updateUserCreditsById(userCredits);
+
+
+        onlineOrder.setTrxId(transaction.getId());
+        updateOnlineOrderById(onlineOrder);
+
+        return 0;
     }
 
     @Override

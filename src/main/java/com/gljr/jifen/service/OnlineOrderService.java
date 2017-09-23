@@ -21,7 +21,7 @@ public interface OnlineOrderService {
      * @param onlineOrder
      * @return
      */
-    int insertOnlineOrder(OnlineOrder onlineOrder);
+    int insertOnlineOrder(OnlineOrder onlineOrder, Transaction transaction, UserCredits userCredits);
 
 
     /**

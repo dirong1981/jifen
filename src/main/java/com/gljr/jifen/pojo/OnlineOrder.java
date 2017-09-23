@@ -17,6 +17,8 @@ public class OnlineOrder {
 
     private Integer quantity;
 
+    private Integer userAddressId;
+
     private Byte status;
 
     private Date createTime;
@@ -77,6 +79,14 @@ public class OnlineOrder {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Integer getUserAddressId() {
+        return userAddressId;
+    }
+
+    public void setUserAddressId(Integer userAddressId) {
+        this.userAddressId = userAddressId;
     }
 
     public Byte getStatus() {

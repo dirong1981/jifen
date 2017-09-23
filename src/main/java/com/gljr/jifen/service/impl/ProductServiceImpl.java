@@ -29,6 +29,13 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    public List<Product> selectAllProduct() {
+        ProductExample productExample = new ProductExample();
+        productExample.setOrderByClause("id desc");
+        return productMapper.selectByExample(productExample);
+    }
+
+    @Override
     public List<Product> selectAllProduct(int sort) {
         ProductExample productExample = new ProductExample();
         ProductExample.Criteria criteria = productExample.createCriteria();

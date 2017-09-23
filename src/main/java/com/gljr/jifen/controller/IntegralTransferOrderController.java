@@ -9,8 +9,10 @@ import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.IntegralTransferOrderService;
 import com.gljr.jifen.service.MessageService;
 import com.gljr.jifen.service.TransactionService;
+import com.gljr.jifen.service.UserCreditsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +29,7 @@ import java.util.Map;
 
 @Controller
 
-@RequestMapping(value = "/v1")
+@RequestMapping(value = "/v1/integral-orders")
 public class IntegralTransferOrderController {
 
     @Autowired
@@ -39,9 +41,10 @@ public class IntegralTransferOrderController {
     @Autowired
     private TransactionService transactionService;
 
-
     @Autowired
-    private StrUtil strUtil;
+    private UserCreditsService userCreditsService;
+
+
 
 
     /**
@@ -52,10 +55,11 @@ public class IntegralTransferOrderController {
      * @param httpServletResponse
      * @return
      */
-    @RequestMapping(value = "/integral-orders", method = RequestMethod.POST)
+    @PostMapping
     @ResponseBody
+
     public JsonResult insertIntegralOrder(@Valid IntegralTransferOrder integralTransferOrder, BindingResult bindingResult,
-                                          HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+                                          HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws RuntimeException{
         JsonResult jsonResult = new JsonResult();
 
         if(bindingResult.hasErrors()){
@@ -69,14 +73,11 @@ public class IntegralTransferOrderController {
             String uid = httpServletRequest.getHeader("uid");
             integralTransferOrder.setUid(Integer.parseInt(uid));
             integralTransferOrder.setStatus(new Byte("0"));
-            integralTransferOrder.setTrxCode(strUtil.randomKey(18));
+            integralTransferOrder.setTrxCode(StrUtil.randomKey(18));
             String title = "xx用户向您赠送" + integralTransferOrder.getIntegral() + "积分";
             integralTransferOrder.setTitle(title);
             integralTransferOrder.setCreateTime(new Timestamp(System.currentTimeMillis()));
             integralTransferOrder.setTrxId(343434);
-
-
-            integralTransferOrderService.insertIntegralOrder(integralTransferOrder);
 
 
             //添加一个交易通用信息
@@ -87,30 +88,73 @@ public class IntegralTransferOrderController {
             transaction.setOwnerId(integralTransferOrder.getUid());
             transaction.setOwnerType(new Byte("1"));
             transaction.setType(3);
+            transaction.setStatus(new Byte("0"));
 
-            transactionService.insertTransaction(transaction);
+            //扣除用户积分
+            UserCredits userCredits = userCreditsService.selectUserCreditsByUid(integralTransferOrder.getUid()).get(0);
+            int integral = userCredits.getIntegral() - transaction.getIntegral();
+            if (integral >= 0) {
+                userCredits.setIntegral(integral);
+            }else{
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                jsonResult.setMessage(GlobalConstants.INTEGRAL_NOT_ENOUGH);
+                return jsonResult;
+            }
 
 
-            //把通用交易信息id更新到积分转增表
-            integralTransferOrder.setTrxId(transaction.getId());
-
-            integralTransferOrderService.updateIntegralOrder(integralTransferOrder);
 
             //创建一个消息
             Message message = new Message();
             message.setReadStatus(new Byte("0"));
-            message.setContent(title);
+            message.setContent(integralTransferOrder.getTitle());
             message.setCreateTime(new Timestamp(System.currentTimeMillis()));
             message.setUid(integralTransferOrder.getgUid());
 
-            messageService.insertMessage(message);
+            integralTransferOrderService.insertIntegralOrder(integralTransferOrder, transaction, userCredits, message);
+
 
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
             jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
 
         }catch (Exception e){
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.DATABASE_FAILED);
+        }
+
+        return jsonResult;
+    }
+
+
+    /**
+     * 获取该用户所有订单
+     * @param httpServletResponse
+     * @param httpServletRequest
+     * @return
+     */
+    @GetMapping
+    @ResponseBody
+    public JsonResult selectIntegralOrder(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+        JsonResult jsonResult = new JsonResult();
+
+        try {
+            String uid = httpServletRequest.getHeader("uid");
+            if (uid == null || uid.equals("")) {
+                jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                return jsonResult;
+            } else {
+
+                List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderService.selectIntegralOrderByuid(Integer.parseInt(uid));
+                Map map = new HashMap();
+                map.put("data", integralTransferOrders);
+
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+                jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+                jsonResult.setItem(map);
+            }
+        }catch (Exception e){
             jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            jsonResult.setErrorCode(GlobalConstants.DATABASE_FAILED);
         }
 
         return jsonResult;
@@ -118,152 +162,4 @@ public class IntegralTransferOrderController {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    /**
-//     * 查询全部线下订单数据
-//     *
-//     * @return
-//     */
-//    @RequestMapping(value = "/integrals", method = RequestMethod.GET)
-//    @ResponseBody
-//    @AuthPassport(permission_code = "5")
-//    public JsonResult selectAllOnlineOrder() {
-//        JsonResult jr = new JsonResult();
-//        try {
-//            jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-//            List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderService.selectAllClass();
-//            Map map = new HashMap();
-//            map.put("data", integralTransferOrders);
-//            jr.setItem(map);
-//            return jr;
-//        } catch (Exception e) {
-//            jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//        }
-//
-//        return jr;
-//    }
-//
-//    /**
-//     * 查询指定id线上订单数据
-//     *
-//     * @return
-//     */
-//    @RequestMapping(value = "/integrals/update/{id}", method = RequestMethod.GET)
-//    @ResponseBody
-//    @AuthPassport(permission_code = "5")
-//    public JsonResult selectOnlineOrder(@PathVariable("id") String id) {
-//        JsonResult jr = new JsonResult();
-//        try {
-//            IntegralTransferOrder integralTransferOrder = integralTransferOrderService.selectClass(Integer.parseInt(id));
-//            Map map = new HashMap();
-//            map.put("integrals", integralTransferOrder);
-//            jr.setItem(map);
-//            jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-//        } catch (Exception e) {
-//            jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//        }
-//
-//        return jr;
-//    }
-//
-//    /**
-//     * 查询指定id线上订单数据
-//     *
-//     * @return
-//     */
-//    @RequestMapping(value = "/integrals/update/status/{id}", method = RequestMethod.GET)
-//    @ResponseBody
-//    @AuthPassport(permission_code = "5")
-//    public JsonResult updateStateOnlineOrder(@PathVariable("id") String id) {
-//        JsonResult jr = new JsonResult();
-//        try {
-//            IntegralTransferOrder integralTransferOrder = integralTransferOrderService.selectClass(Integer.parseInt(id));
-//            integralTransferOrder.setStatus(new Byte("1"));
-//            integralTransferOrderService.updateClass(integralTransferOrder);
-//            jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-//        } catch (Exception e) {
-//            jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//        }
-//
-//        return jr;
-//    }
-//    /**
-//     * 查询带条件参数的线上订单数据
-//     *
-//     * @return
-//     */
-//    @RequestMapping(value = "/integrals/param", method = RequestMethod.GET)
-//    @ResponseBody
-//    @AuthPassport(permission_code = "5")
-//    public JsonResult selectAllParamOnlineOrder(IntegralTransferOrderSearch integralTransferOrderSearch)  {
-//        JsonResult jr = new JsonResult();
-//        try {
-//            ArrayList arrayList = new ArrayList();
-//            List<IntegralTransferOrder> integralTransferOrders = null;
-//            //判断只有是否处理存在
-//            if (!integralTransferOrderSearch.getStatus().equals("") && integralTransferOrderSearch.getStatus() != null) {
-//                 if (integralTransferOrderSearch.getLogmin().contains("-") != false && integralTransferOrderSearch.getLogmin() != null && integralTransferOrderSearch.getLogmax().contains("-") != false && integralTransferOrderSearch.getLogmax() != null) {
-//                    integralTransferOrders = integralTransferOrderService.selectAllParamTimeClass(integralTransferOrderSearch);
-//                    //判断起始时间是否存在
-//                } else if (integralTransferOrderSearch.getLogmin().contains("-") != false && integralTransferOrderSearch.getLogmin() != null) {
-//                    jr.setMessage("结束时间不能为空");
-//                    jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//                    //判断结束时间是否存在
-//                } else if (integralTransferOrderSearch.getLogmax().contains("-") != false && integralTransferOrderSearch.getLogmax() != null) {
-//                    jr.setMessage("起始时间不能为空");
-//                    jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//                    return null;
-//                } else {
-//                    //查询指定状态的
-//                    integralTransferOrders = integralTransferOrderService.selectAllParamStatuClass(integralTransferOrderSearch.getStatus());
-//                }
-//                if (integralTransferOrders.size() > 0) {
-//                    for (int i = 0; i < integralTransferOrders.size(); i++) {
-//                        IntegralTransferOrder integralTransferOrder = integralTransferOrders.get(i);
-//                        arrayList.add(integralTransferOrder);
-//                    }
-//                }
-//            }
-//            Map map = new HashMap();
-//            map.put("data", arrayList);
-//            jr.setItem(map);
-//            jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-//            return jr;
-//        } catch (Exception e) {
-//            jr.setErrorCode(GlobalConstants.OPERATION_FAILED + e.getLocalizedMessage());
-//        }
-//
-//        return jr;
-//    }
-//    /**
-//     * 删除指定id线上订单数据
-//     *
-//     * @return
-//     */
-//    @RequestMapping(value = "/integrals/delete/{id}", method = RequestMethod.GET)
-//    @ResponseBody
-//    @AuthPassport(permission_code = "5")
-//    public JsonResult deleteOnlineOrder(@PathVariable("id") String id) {
-//        JsonResult jr = new JsonResult();
-//        try {
-//            integralTransferOrderService.deleteClass(Integer.parseInt(id));
-//            jr.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-//        } catch (Exception e) {
-//            jr.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//        }
-//
-//        return jr;
-//    }
 }

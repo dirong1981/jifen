@@ -16,7 +16,7 @@ import java.util.Random;
 public class StrUtil {
 
     //生成随机字符串
-    public String randomKey(int length){
+    public static String randomKey(int length){
         String base = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         Random random = new Random();
         StringBuffer sb = new StringBuffer();
@@ -30,7 +30,7 @@ public class StrUtil {
 
     // 在拦截器中的输出
     @ResponseBody
-    public void dealErrorReturn(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object obj){
+    public static void dealErrorReturn(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object obj){
 
         //设置返回数据的响应头
         httpServletResponse.setHeader("Access-Control-Allow-Origin", GlobalConstants.DOMAIN);
@@ -64,7 +64,7 @@ public class StrUtil {
      * @param code 可为任意大于等于四位数的数字
      * @return 返回MD5加密字符串
      */
-    public String encryption4AnyCode(String text, String code) {
+    public static String encryption4AnyCode(String text, String code) {
         int codeLength = 4;
 //        if (StringUtils.isBlank(text) || !StringUtils.isNumeric(code) || (codeLength = code.length()) < 4) {
 //            return "";

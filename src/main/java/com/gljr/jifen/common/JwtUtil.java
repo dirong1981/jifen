@@ -23,7 +23,7 @@ public class JwtUtil {
      * 由字符串生成加密key
      * @return
      */
-    public Key generalKey(String key){
+    public static Key generalKey(String key){
 //        byte[] encodedKey = Base64.decodeBase64(GlobalConstants.SECRET);
 //        SecretKey key = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
 
@@ -42,7 +42,7 @@ public class JwtUtil {
      * @return
      * @throws Exception
      */
-    public String createJWT(String id, String subject, String tokenKey, long ttlMillis) throws Exception {
+    public static String createJWT(String id, String subject, String tokenKey, long ttlMillis) throws Exception {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
@@ -69,7 +69,7 @@ public class JwtUtil {
      * @return
      * @throws Exception
      */
-    public Claims parseJWT(String jwt, String tokenKey) throws Exception{
+    public static Claims parseJWT(String jwt, String tokenKey) throws Exception{
         Key key = generalKey(tokenKey);
         Claims claims = Jwts.parser()
                 .setSigningKey(key)

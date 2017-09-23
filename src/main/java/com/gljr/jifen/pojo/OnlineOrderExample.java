@@ -535,6 +535,66 @@ public class OnlineOrderExample {
             return (Criteria) this;
         }
 
+        public Criteria andUserAddressIdIsNull() {
+            addCriterion("user_address_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdIsNotNull() {
+            addCriterion("user_address_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdEqualTo(Integer value) {
+            addCriterion("user_address_id =", value, "userAddressId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdNotEqualTo(Integer value) {
+            addCriterion("user_address_id <>", value, "userAddressId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdGreaterThan(Integer value) {
+            addCriterion("user_address_id >", value, "userAddressId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("user_address_id >=", value, "userAddressId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdLessThan(Integer value) {
+            addCriterion("user_address_id <", value, "userAddressId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdLessThanOrEqualTo(Integer value) {
+            addCriterion("user_address_id <=", value, "userAddressId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdIn(List<Integer> values) {
+            addCriterion("user_address_id in", values, "userAddressId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdNotIn(List<Integer> values) {
+            addCriterion("user_address_id not in", values, "userAddressId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdBetween(Integer value1, Integer value2) {
+            addCriterion("user_address_id between", value1, value2, "userAddressId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserAddressIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("user_address_id not between", value1, value2, "userAddressId");
+            return (Criteria) this;
+        }
+
         public Criteria andStatusIsNull() {
             addCriterion("status is null");
             return (Criteria) this;

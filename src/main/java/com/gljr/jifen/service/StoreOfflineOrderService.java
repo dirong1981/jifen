@@ -1,14 +1,33 @@
 package com.gljr.jifen.service;
 
-import com.gljr.jifen.pojo.IntegralTransferOrder;
-import com.gljr.jifen.pojo.StoreInfo;
-import com.gljr.jifen.pojo.StoreOfflineOrder;
-import com.gljr.jifen.pojo.Transaction;
+import com.gljr.jifen.pojo.*;
 
 import java.text.ParseException;
 import java.util.List;
 
 public interface StoreOfflineOrderService {
+
+    /**
+     * 添加一个线下订单
+     * @param storeOfflineOrder
+     * @return
+     */
+    int insertOfflineOrder(StoreOfflineOrder storeOfflineOrder, Transaction transaction, UserCredits userCredits);
+
+
+    /**
+     * 修改一条线下订单
+     * @param storeOfflineOrder
+     * @return
+     */
+    int updateOfflineOrder(StoreOfflineOrder storeOfflineOrder);
+
+
+    /**
+     * 查询某个用户的线下订单
+     * @return
+     */
+    List<StoreOfflineOrder> selectAllOfflineOrderByUid(int uid);
 
 
 //    //查询所有父类型

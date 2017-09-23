@@ -11,6 +11,7 @@ public interface ProductService {
     int addProduct(Product product);
 
 
+    List<Product> selectAllProduct();
 
     List<Product> selectAllProduct(int sort);
 
