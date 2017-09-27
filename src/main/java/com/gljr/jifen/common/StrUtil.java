@@ -29,7 +29,6 @@ public class StrUtil {
 
 
     // 在拦截器中的输出
-    @ResponseBody
     public static void dealErrorReturn(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object obj){
 
         //设置返回数据的响应头

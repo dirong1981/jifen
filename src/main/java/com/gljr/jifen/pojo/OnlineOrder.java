@@ -25,6 +25,10 @@ public class OnlineOrder {
 
     private Date updateTime;
 
+    private String name;
+
+    private String description;
+
     public Integer getId() {
         return id;
     }
@@ -111,5 +115,21 @@ public class OnlineOrder {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String productName) {
+        this.name = productName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

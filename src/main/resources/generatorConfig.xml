@@ -47,28 +47,28 @@
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
         <!-- 指定数据库表 -->
-        <!--<table schema="" tableName="admin">-->
+        <table schema="" tableName="location">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <!--<table schema="" tableName="module">-->
             <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->
-        <!--<table schema="" tableName="admin_online">-->
+        <!--<table schema="" tableName="module_aggregation">-->
             <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->
-        <!--<table schema="" tableName="admin_permission_assign">-->
+        <!--<table schema="" tableName="module_aggregation_condition">-->
             <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->
-        <!--<table schema="" tableName="category">-->
+        <!--<table schema="" tableName="module_aggregation_product">-->
             <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->
-        <!--<table schema="" tableName="integral_transfer_order">-->
+        <!--<table schema="" tableName="module_picture">-->
             <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->
-        <!--<table schema="" tableName="location">-->
+        <!--<table schema="" tableName="module_product">-->
             <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->
-        <!--<table schema="" tableName="message">-->
-            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
-        <!--</table>-->
-        <!--<table schema="" tableName="online_order">-->
+        <!--<table schema="" tableName="plate">-->
             <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->
         <!--<table schema="" tableName="opt_log">-->
@@ -98,9 +98,9 @@
         <!--<table schema="" tableName="system_permission">-->
             <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->
-        <table schema="" tableName="online_order">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
+        <!--<table schema="" tableName="online_order">-->
+            <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
+        <!--</table>-->
         <!--<table schema="" tableName="user_address">-->
             <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->

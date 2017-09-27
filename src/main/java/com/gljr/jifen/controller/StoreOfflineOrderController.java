@@ -1,15 +1,14 @@
 package com.gljr.jifen.controller;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.StrUtil;
 import com.gljr.jifen.constants.GlobalConstants;
-import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.*;
+import com.gljr.jifen.service.StoreInfoService;
 import com.gljr.jifen.service.StoreOfflineOrderService;
-import com.gljr.jifen.service.TransactionService;
 import com.gljr.jifen.service.UserCreditsService;
-import com.gljr.jifen.util.DateUtils;
-import com.qiniu.util.Json;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +31,7 @@ public class StoreOfflineOrderController {
     private StoreOfflineOrderService storeOfflineOrderService;
 
     @Autowired
-    private TransactionService transactionService;
+    private StoreInfoService storeInfoService;
 
     @Autowired
     private UserCreditsService userCreditsService;
@@ -92,7 +90,7 @@ public class StoreOfflineOrderController {
                 storeOfflineOrderService.insertOfflineOrder(storeOfflineOrder, transaction, userCredits);
 
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-                jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+                jsonResult.setMessage(storeOfflineOrder.getTrxCode());
 
             }
         }catch (Exception e){
@@ -113,7 +111,10 @@ public class StoreOfflineOrderController {
      */
     @GetMapping
     @ResponseBody
-    public JsonResult allOfflineOrder(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult allOfflineOrder(@RequestParam(value = "page", required = false) Integer page,
+                                      @RequestParam(value = "per_page", required = false) Integer per_page, @RequestParam(value = "sort", required = false) Integer sort,
+                                      @RequestParam(value = "start_time", required = false) String start_time, @RequestParam(value = "end_time", required = false) String end_time,
+                                      HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
 
         try{
@@ -124,9 +125,42 @@ public class StoreOfflineOrderController {
                 return jsonResult;
             }else{
 
-                List<StoreOfflineOrder> storeOfflineOrders = storeOfflineOrderService.selectAllOfflineOrderByUid(Integer.parseInt(uid));
+                //设置各个参数的默认值
+                if(page == null){
+                    page = 1;
+                }
+                if(per_page == null){
+                    per_page = 10;
+                }
+                if(sort == null || sort > 4 || sort < 0){
+                    sort = 0;
+                }
+
+                PageHelper.startPage(page,per_page);
+                List<StoreOfflineOrder> storeOfflineOrders = storeOfflineOrderService.selectAllOfflineOrderByUid(Integer.parseInt(uid), sort, start_time, end_time);
+
+                PageInfo pageInfo = new PageInfo(storeOfflineOrders);
+
+                for (StoreOfflineOrder storeOfflineOrder : storeOfflineOrders){
+                    StoreInfo storeInfo = storeInfoService.selectStoreInfoById(storeOfflineOrder.getSiId());
+                    storeOfflineOrder.setName(storeInfo.getName());
+                    if(storeOfflineOrder.getExtCash() == 0){
+                        storeOfflineOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分");
+                    }else{
+                        storeOfflineOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分，现金支付" + storeOfflineOrder.getExtCash() + "元");
+                    }
+
+                }
+
                 Map map = new HashMap();
                 map.put("data", storeOfflineOrders);
+
+                map.put("pages", pageInfo.getPages());
+
+                map.put("total", pageInfo.getTotal());
+                //当前页
+                map.put("pageNum", pageInfo.getPageNum());
+
                 jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
                 jsonResult.setItem(map);

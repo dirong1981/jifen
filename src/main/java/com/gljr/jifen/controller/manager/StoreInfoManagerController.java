@@ -227,7 +227,7 @@ public class StoreInfoManagerController extends BaseController {
             List<Admin> admins = adminService.selectAdminByUsername(username);
             if (admins.size() != 0){
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                jsonResult.setMessage(GlobalConstants.USER_EXIST_STR);
+                jsonResult.setMessage(GlobalConstants.STORE_ADMIN_EXIST);
                 return jsonResult;
             }else{
                 Admin admin = new Admin();

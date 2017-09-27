@@ -5,28 +5,22 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
-import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.Category;
 import com.gljr.jifen.pojo.Product;
+import com.gljr.jifen.service.AdminService;
 import com.gljr.jifen.service.CategoryService;
 import com.gljr.jifen.service.ProductService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.File;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Controller
@@ -38,6 +32,22 @@ public class CategoryController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private AdminService adminService;
+
+//    @DeleteMapping(value = "/deleteall")
+//    @ResponseBody
+//    public JsonResult deleteAdmins(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+//        JsonResult jsonResult = new JsonResult();
+//
+//        try {
+//            adminService.deleteAdmin();
+//        }catch (Exception e){
+//            System.out.println(e);
+//        }
+//        return jsonResult;
+//    }
 
 
     /**

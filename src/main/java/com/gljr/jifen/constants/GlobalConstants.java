@@ -7,6 +7,7 @@ public class GlobalConstants {
 
 
     //设置返回的请求域名
+//    public static final String DOMAIN = "http://console.iep.dtchain.io";
     public static final String DOMAIN = "http://localhost";
 
 
@@ -36,7 +37,7 @@ public class GlobalConstants {
     public static final String FORBIDDEN_CODE = "403";
 
     //没有登录
-    public static final String NOT_LOGIN = "401";
+    public static final String NOT_LOGIN_CODE = "401";
 
     //Token过期
     public static final String TOKEN_EXPIRED = "405";
@@ -52,18 +53,18 @@ public class GlobalConstants {
     public  static final String UPLOAD_PICTURE_FAILED = "300";
     public  static final String UPLOAD_PICTURE_FAILED_MESSAGE = "上传图片出错，请重新上传！";
 
-    public static final String USER_DOES_NOT_EXIST = "1000";
-    public static final String USER_DOES_NOT_EXIST_STR = "用户名不存在，请重试！";
-    public static final String USER_EXIST_STR = "商户管理员用户名已存在，请更换！";
+    public static final String ADMIN_DOES_NOT_EXIST = "用户名不存在，请重试！";
+    public static final String STORE_ADMIN_EXIST = "商户管理员用户名已存在，请更换！";
 
-    public static final String USER_PASSWORD_ERROR = "1100";
-    public static final String USER_PASSWORD_ERROR_STR = "用户密码错误，请重试！";
+    public static final String ADMIN_PASSWORD_ERROR = "密码错误，请重试！";
 
-    public static final String USER_LOGIN_FAILED = "1200";
-    public static final String USER_LOGIN_FAILED_STR = "登陆失败，请重试";
+    public static final String ADMIN_LOGIN_FAILED = "登陆失败，请重试";
+
+    public static final String AUTH_FAILED = "没有操作权限";
+
+    public static final String ILLEGAL_OPERATION = "非法操作！";
+    public static final String NO_ACTIVATION = "账号未激活！";
+    public static final String IS_DISABLE = "账号已禁用！";
 
 
-    public static final String SESSION_ADMIN = "session_admin";
-
-    public static final String SESSION_ADMIN_ID = "session_admin_id";
 }

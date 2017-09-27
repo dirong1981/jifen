@@ -31,8 +31,14 @@ public interface IntegralTransferOrderService {
      * @param uid
      * @return
      */
-    List<IntegralTransferOrder> selectIntegralOrderByuid(int uid);
+    List<IntegralTransferOrder> selectIntegralOrderByuid(int uid, int sort, String start_time, String end_time);
 
+
+    /**
+     * 查询所有积分转增订单
+     * @return
+     */
+    List<IntegralTransferOrder> selectIntegralOrders();
 
 
 }

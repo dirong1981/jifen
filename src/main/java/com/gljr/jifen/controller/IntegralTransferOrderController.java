@@ -1,10 +1,11 @@
 package com.gljr.jifen.controller;
 
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.StrUtil;
 import com.gljr.jifen.constants.GlobalConstants;
-import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.IntegralTransferOrderService;
 import com.gljr.jifen.service.MessageService;
@@ -12,16 +13,13 @@ import com.gljr.jifen.service.TransactionService;
 import com.gljr.jifen.service.UserCreditsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.text.html.HTML;
 import javax.validation.Valid;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +70,7 @@ public class IntegralTransferOrderController {
             //添加一个积分转增订单
             String uid = httpServletRequest.getHeader("uid");
             integralTransferOrder.setUid(Integer.parseInt(uid));
-            integralTransferOrder.setStatus(new Byte("0"));
+            integralTransferOrder.setStatus(new Byte("1"));
             integralTransferOrder.setTrxCode(StrUtil.randomKey(18));
             String title = "xx用户向您赠送" + integralTransferOrder.getIntegral() + "积分";
             integralTransferOrder.setTitle(title);
@@ -133,7 +131,10 @@ public class IntegralTransferOrderController {
      */
     @GetMapping
     @ResponseBody
-    public JsonResult selectIntegralOrder(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+    public JsonResult selectIntegralOrder(@RequestParam(value = "page", required = false) Integer page,
+                                          @RequestParam(value = "per_page", required = false) Integer per_page, @RequestParam(value = "sort", required = false) Integer sort,
+                                          @RequestParam(value = "start_time", required = false) String start_time, @RequestParam(value = "end_time", required = false) String end_time,
+                                          HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
         try {
@@ -144,9 +145,36 @@ public class IntegralTransferOrderController {
                 return jsonResult;
             } else {
 
-                List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderService.selectIntegralOrderByuid(Integer.parseInt(uid));
+                //设置各个参数的默认值
+                if(page == null){
+                    page = 1;
+                }
+                if(per_page == null){
+                    per_page = 10;
+                }
+                if(sort == null || sort > 4 || sort < 0){
+                    sort = 0;
+                }
+
+                PageHelper.startPage(page,per_page);
+                List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderService.selectIntegralOrderByuid(Integer.parseInt(uid), sort, start_time, end_time);
+
+                PageInfo pageInfo = new PageInfo(integralTransferOrders);
+
+
+                for (IntegralTransferOrder integralTransferOrder : integralTransferOrders){
+                    integralTransferOrder.setName("1899899");
+                    integralTransferOrder.setDescription("您向1899899转账" + integralTransferOrder.getIntegral() + "分");
+                }
+
                 Map map = new HashMap();
                 map.put("data", integralTransferOrders);
+
+                map.put("pages", pageInfo.getPages());
+
+                map.put("total", pageInfo.getTotal());
+                //当前页
+                map.put("pageNum", pageInfo.getPageNum());
 
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
                 jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);

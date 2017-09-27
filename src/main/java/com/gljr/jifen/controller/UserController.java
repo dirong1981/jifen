@@ -26,7 +26,7 @@ import java.util.Map;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Controller
-@RequestMapping(value = "/v1")
+@RequestMapping(value = "/v1/users")
 public class UserController {
 
     @Autowired
@@ -245,22 +245,32 @@ public class UserController {
                 return jsonResult;
             }else {
 
-                //如果地址设置为默认，则取消之前的默认地址
-                if(userAddress.getIsDefault() == 1){
+                //判断修改的是不是用户自己的地址
+                UserAddress selectAddress = userService.selectUserAddressById(id);
+                String _uid = selectAddress.getUid()+"";
+                if(_uid.equals(uid)) {
 
-                    UserAddress defaultUserAddress = userService.selectUserAddressByIsDefault(Integer.parseInt(uid));
-                    if(defaultUserAddress != null) {
-                        defaultUserAddress.setIsDefault(new Byte("0"));
-                        userService.updateUserAddressById(defaultUserAddress);
+                    //如果地址设置为默认，则取消之前的默认地址
+                    if (userAddress.getIsDefault() == 1) {
+
+                        UserAddress defaultUserAddress = userService.selectUserAddressByIsDefault(Integer.parseInt(uid));
+                        if (defaultUserAddress != null) {
+                            defaultUserAddress.setIsDefault(new Byte("0"));
+                            userService.updateUserAddressById(defaultUserAddress);
+                        }
                     }
-                }
 
-                userAddress.setUid(Integer.parseInt(uid));
-                userAddress.setId(id);
-                userAddress.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                userService.updateUserAddressById(userAddress);
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-                jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+                    userAddress.setUid(Integer.parseInt(uid));
+                    userAddress.setId(id);
+                    userAddress.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                    userService.updateUserAddressById(userAddress);
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+                    jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+                }else{
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    jsonResult.setMessage(GlobalConstants.ILLEGAL_OPERATION);
+                    return jsonResult;
+                }
             }
         }catch (Exception e){
             System.out.println(e);
@@ -278,7 +288,7 @@ public class UserController {
      * @param httpServletResponse
      * @return
      */
-    @GetMapping(value = "/users/credits")
+    @GetMapping(value = "/credits")
     @ResponseBody
     public JsonResult selectUserCreditsByUid(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
@@ -334,7 +344,7 @@ public class UserController {
     @Value("${static.gljr.userInfo.url}")
     private String userInfo_url;
 
-    @GetMapping(value = "/users")
+    @GetMapping(value = "/verification")
     @ResponseBody
 
     public JsonResult connectGLJR(@RequestParam(value = "type") String type, @RequestParam(value = "identify",required = false) String identify,
@@ -354,7 +364,6 @@ public class UserController {
             String url = "";
             String text = "";
 
-            System.out.println(userInfo_url);
 
             //0登录，1验证密码，2获取信息
             if (type.equals("0")) {
@@ -410,7 +419,7 @@ public class UserController {
                         UserCredits userCredits = new UserCredits();
                         userCredits.setCreateTime(new Timestamp(System.currentTimeMillis()));
                         userCredits.setFrozenIntegral(0);
-                        userCredits.setIntegral(jsonObject.getInt("validValue"));
+                        userCredits.setIntegral(10000000);
                         userCredits.setOwnerId(jsonObject.getInt("id"));
                         userCredits.setOwnerType(new Byte("1"));
                         userCredits.setWalletAddress("xxxxxx");
@@ -425,8 +434,17 @@ public class UserController {
                     jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
                 }
             } else {
+                if(type.equals("0")){
+                    jsonResult.setMessage("登录失败，请重试！");
+                }else if(type.equals("1")){
+                    jsonResult.setMessage("密码错误，请重试！");
+                }else if(type.equals("2")){
+                    jsonResult.setMessage("没有该用户，请检查电话号码！");
+                }else {
+                    jsonResult.setMessage("操作失败，请重试！");
+                }
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                jsonResult.setMessage("密码错误，请重试！");
+
             }
         }
 

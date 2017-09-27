@@ -13,6 +13,7 @@ public class JedisUtil {
     public static Jedis getJedis(){
 
         Jedis jedis = new Jedis("localhost");
+//        Jedis jedis = new Jedis("redis");
         return jedis;
     }
 }

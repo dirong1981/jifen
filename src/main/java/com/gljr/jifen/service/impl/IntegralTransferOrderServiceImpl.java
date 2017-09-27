@@ -65,7 +65,7 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
     }
 
     @Override
-    public List<IntegralTransferOrder> selectIntegralOrderByuid(int uid) {
+    public List<IntegralTransferOrder> selectIntegralOrderByuid(int uid, int sort, String start_time, String end_time) {
         IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
         IntegralTransferOrderExample.Criteria criteria = integralTransferOrderExample.or();
         criteria.andUidEqualTo(uid);
@@ -73,6 +73,12 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
         return integralTransferOrderMapper.selectByExample(integralTransferOrderExample);
     }
 
+    @Override
+    public List<IntegralTransferOrder> selectIntegralOrders() {
+        IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
+        integralTransferOrderExample.setOrderByClause("id desc");
+        return integralTransferOrderMapper.selectByExample(integralTransferOrderExample);
+    }
 
 
 }

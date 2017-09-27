@@ -4,12 +4,10 @@ import com.gljr.jifen.common.JedisUtil;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.controller.BaseController;
-import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.Product;
 import com.gljr.jifen.pojo.ProductPhoto;
 import com.gljr.jifen.service.ProductService;
 import com.gljr.jifen.service.StorageService;
-import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -21,7 +19,6 @@ import redis.clients.jedis.Jedis;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -250,7 +247,6 @@ public class ProductManagerController extends BaseController {
      */
     @PutMapping
     @ResponseBody
-    @AuthPassport(permission_code = "2")
     public JsonResult updateProduct(@Valid Product product, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile,
                                     @RequestParam(value="pic",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();

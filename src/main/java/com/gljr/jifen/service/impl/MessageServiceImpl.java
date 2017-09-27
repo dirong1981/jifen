@@ -21,6 +21,7 @@ public class MessageServiceImpl implements MessageService {
         MessageExample messageExample = new MessageExample();
         MessageExample.Criteria criteria = messageExample.or();
         criteria.andUidEqualTo(uid);
+        messageExample.setOrderByClause("id desc");
         return messageMapper.selectByExample(messageExample);
     }
 

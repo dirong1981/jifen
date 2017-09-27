@@ -1,35 +1,19 @@
 package com.gljr.jifen.controller;
 
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.gljr.jifen.common.JedisUtil;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
-import com.gljr.jifen.filter.AuthPassport;
-import com.gljr.jifen.pojo.Category;
 import com.gljr.jifen.pojo.Product;
 import com.gljr.jifen.pojo.ProductPhoto;
-import com.gljr.jifen.service.CategoryService;
 import com.gljr.jifen.service.ProductService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
-import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
-import java.io.File;
-import java.sql.Timestamp;
 import java.util.*;
 
 

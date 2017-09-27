@@ -27,7 +27,14 @@ public interface StoreOfflineOrderService {
      * 查询某个用户的线下订单
      * @return
      */
-    List<StoreOfflineOrder> selectAllOfflineOrderByUid(int uid);
+    List<StoreOfflineOrder> selectAllOfflineOrderByUid(int uid, int sort, String start_time, String end_time);
+
+
+    /**
+     * 查询所有线下订单
+     * @return
+     */
+    List<StoreOfflineOrder> selectOfflineOrders();
 
 
 //    //查询所有父类型

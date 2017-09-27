@@ -1,5 +1,6 @@
 package com.gljr.jifen.filter;
 
+import com.gljr.jifen.common.ClientType;
 import com.gljr.jifen.common.JedisUtil;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.StrUtil;
@@ -13,15 +14,11 @@ import redis.clients.jedis.Jedis;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 
 public class AuthInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private StrUtil strUtil;
-
-    @Autowired
-    private JedisUtil jedisUtil;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
@@ -29,52 +26,61 @@ public class AuthInterceptor implements HandlerInterceptor {
             //从传入的handler中检查是否有AuthCheck的声明
         if (handler instanceof HandlerMethod) {
 
-//            String userAgent = httpServletRequest.getHeader("user-agent");
-            String device = httpServletRequest.getHeader("device");
-//            if(userAgent.indexOf("Android") != -1 || userAgent.indexOf("iPhone") != -1 || userAgent.indexOf("iPad") != -1){
-            if(device.equals("mobile")){
-                return true;
-            }else{
-                HandlerMethod method = (HandlerMethod) handler;
-                AuthPassport authPassport = method.getMethodAnnotation(AuthPassport.class);
+            JsonResult jsonResult = new JsonResult();
+            jsonResult.setMessage(GlobalConstants.AUTH_FAILED);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
 
-                String id = httpServletRequest.getHeader("id");
-                String permission_codes = "";
+            try {
 
 
-                Jedis jedis = jedisUtil.getJedis();
-                permission_codes = jedis.get("permission_codes"+id);
+                String device = httpServletRequest.getHeader("device");
 
-                //没有声明需要权限,或者声明不验证权限
-                if (authPassport == null || authPassport.validate() == false) {
-                    return true;
-                } else {
+                int clientType = ClientType.checkClientType(device);
 
-                    try {
-                        //通过id查询用户的权限
-                        String permission_code = authPassport.permission_code();
+                //获取路径
+                String requestUri = httpServletRequest.getRequestURI();
 
-                        //如果不包含权限，则不允许访问
-                        if (permission_codes.contains(permission_code)) {
-                            return true;
-                        } else {
-                            JsonResult jsonResult = new JsonResult();
-                            jsonResult.setErrorCode(GlobalConstants.FORBIDDEN_CODE);
-                            strUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+                if (requestUri.contains("/manager/")) {
+                    if (clientType == 2) {
+
+                        String aid = httpServletRequest.getHeader("aid");
+                        String permission = httpServletRequest.getHeader("permission");
+
+                        Jedis jedis = JedisUtil.getJedis();
+
+                        List admin = jedis.hmget("admin" + aid, "username", "permission");
+
+
+                        if (permission == null || permission.equals("") || permission.equals("NULL")) {
+                            StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
                             return false;
                         }
-                    }catch (Exception e){
+
+                        //获取服务器端管理员信息
+
+                        String permissions = (String)admin.get(1);
+
+
+                        if(permissions.contains(permission)){
+                            return true;
+                        }
+
+
+
+                        StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+                        return false;
+
+                    } else {
+                        StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
                         return false;
                     }
                 }
+            }catch (Exception e){
+                StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+                return false;
             }
-        }else{
-
-            //不能被转化为方法，直接通过
-            return true;
         }
-
-
+        return true;
 
     }
 
