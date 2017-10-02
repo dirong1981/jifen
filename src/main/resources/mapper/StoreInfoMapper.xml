@@ -10,9 +10,9 @@
     <result column="address" jdbcType="VARCHAR" property="address" />
     <result column="contact_phone" jdbcType="VARCHAR" property="contactPhone" />
     <result column="logo_key" jdbcType="VARCHAR" property="logoKey" />
-    <result column="pay_status" jdbcType="TINYINT" property="payStatus" />
+    <result column="pay_status" jdbcType="INTEGER" property="payStatus" />
     <result column="aid" jdbcType="INTEGER" property="aid" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.gljr.jifen.pojo.StoreInfo">
@@ -142,8 +142,8 @@
       )
     values (#{serialCode,jdbcType=VARCHAR}, #{categoryCode,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
       #{locationCode,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, 
-      #{logoKey,jdbcType=VARCHAR}, #{payStatus,jdbcType=TINYINT}, #{aid,jdbcType=INTEGER}, 
-      #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
+      #{logoKey,jdbcType=VARCHAR}, #{payStatus,jdbcType=INTEGER}, #{aid,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.StoreInfo">
@@ -212,13 +212,13 @@
         #{logoKey,jdbcType=VARCHAR},
       </if>
       <if test="payStatus != null">
-        #{payStatus,jdbcType=TINYINT},
+        #{payStatus,jdbcType=INTEGER},
       </if>
       <if test="aid != null">
         #{aid,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -262,13 +262,13 @@
         logo_key = #{record.logoKey,jdbcType=VARCHAR},
       </if>
       <if test="record.payStatus != null">
-        pay_status = #{record.payStatus,jdbcType=TINYINT},
+        pay_status = #{record.payStatus,jdbcType=INTEGER},
       </if>
       <if test="record.aid != null">
         aid = #{record.aid,jdbcType=INTEGER},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=TINYINT},
+        status = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -291,9 +291,9 @@
       address = #{record.address,jdbcType=VARCHAR},
       contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
       logo_key = #{record.logoKey,jdbcType=VARCHAR},
-      pay_status = #{record.payStatus,jdbcType=TINYINT},
+      pay_status = #{record.payStatus,jdbcType=INTEGER},
       aid = #{record.aid,jdbcType=INTEGER},
-      status = #{record.status,jdbcType=TINYINT},
+      status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       description = #{record.description,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
@@ -310,9 +310,9 @@
       address = #{record.address,jdbcType=VARCHAR},
       contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
       logo_key = #{record.logoKey,jdbcType=VARCHAR},
-      pay_status = #{record.payStatus,jdbcType=TINYINT},
+      pay_status = #{record.payStatus,jdbcType=INTEGER},
       aid = #{record.aid,jdbcType=INTEGER},
-      status = #{record.status,jdbcType=TINYINT},
+      status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -343,13 +343,13 @@
         logo_key = #{logoKey,jdbcType=VARCHAR},
       </if>
       <if test="payStatus != null">
-        pay_status = #{payStatus,jdbcType=TINYINT},
+        pay_status = #{payStatus,jdbcType=INTEGER},
       </if>
       <if test="aid != null">
         aid = #{aid,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -369,9 +369,9 @@
       address = #{address,jdbcType=VARCHAR},
       contact_phone = #{contactPhone,jdbcType=VARCHAR},
       logo_key = #{logoKey,jdbcType=VARCHAR},
-      pay_status = #{payStatus,jdbcType=TINYINT},
+      pay_status = #{payStatus,jdbcType=INTEGER},
       aid = #{aid,jdbcType=INTEGER},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
@@ -385,9 +385,9 @@
       address = #{address,jdbcType=VARCHAR},
       contact_phone = #{contactPhone,jdbcType=VARCHAR},
       logo_key = #{logoKey,jdbcType=VARCHAR},
-      pay_status = #{payStatus,jdbcType=TINYINT},
+      pay_status = #{payStatus,jdbcType=INTEGER},
       aid = #{aid,jdbcType=INTEGER},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

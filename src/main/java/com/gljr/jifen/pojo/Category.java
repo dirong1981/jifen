@@ -5,7 +5,7 @@ import java.util.Date;
 public class Category {
     private Integer id;
 
-    private Byte type;
+    private Integer type;
 
     private Integer parentCode;
 
@@ -15,7 +15,7 @@ public class Category {
 
     private String logoKey;
 
-    private Byte status;
+    private Integer status;
 
     private Integer sort;
 
@@ -29,11 +29,11 @@ public class Category {
         this.id = id;
     }
 
-    public Byte getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(Byte type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
@@ -69,11 +69,11 @@ public class Category {
         this.logoKey = logoKey == null ? null : logoKey.trim();
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

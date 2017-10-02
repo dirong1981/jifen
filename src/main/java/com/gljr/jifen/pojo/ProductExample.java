@@ -725,6 +725,66 @@ public class ProductExample {
             return (Criteria) this;
         }
 
+        public Criteria andMaxPurchasesIsNull() {
+            addCriterion("max_purchases is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesIsNotNull() {
+            addCriterion("max_purchases is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesEqualTo(Integer value) {
+            addCriterion("max_purchases =", value, "maxPurchases");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesNotEqualTo(Integer value) {
+            addCriterion("max_purchases <>", value, "maxPurchases");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesGreaterThan(Integer value) {
+            addCriterion("max_purchases >", value, "maxPurchases");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesGreaterThanOrEqualTo(Integer value) {
+            addCriterion("max_purchases >=", value, "maxPurchases");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesLessThan(Integer value) {
+            addCriterion("max_purchases <", value, "maxPurchases");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesLessThanOrEqualTo(Integer value) {
+            addCriterion("max_purchases <=", value, "maxPurchases");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesIn(List<Integer> values) {
+            addCriterion("max_purchases in", values, "maxPurchases");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesNotIn(List<Integer> values) {
+            addCriterion("max_purchases not in", values, "maxPurchases");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesBetween(Integer value1, Integer value2) {
+            addCriterion("max_purchases between", value1, value2, "maxPurchases");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxPurchasesNotBetween(Integer value1, Integer value2) {
+            addCriterion("max_purchases not between", value1, value2, "maxPurchases");
+            return (Criteria) this;
+        }
+
         public Criteria andUnitIsNull() {
             addCriterion("unit is null");
             return (Criteria) this;
@@ -805,52 +865,52 @@ public class ProductExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatusEqualTo(Byte value) {
+        public Criteria andStatusEqualTo(Integer value) {
             addCriterion("status =", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotEqualTo(Byte value) {
+        public Criteria andStatusNotEqualTo(Integer value) {
             addCriterion("status <>", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThan(Byte value) {
+        public Criteria andStatusGreaterThan(Integer value) {
             addCriterion("status >", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThanOrEqualTo(Byte value) {
+        public Criteria andStatusGreaterThanOrEqualTo(Integer value) {
             addCriterion("status >=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThan(Byte value) {
+        public Criteria andStatusLessThan(Integer value) {
             addCriterion("status <", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThanOrEqualTo(Byte value) {
+        public Criteria andStatusLessThanOrEqualTo(Integer value) {
             addCriterion("status <=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusIn(List<Byte> values) {
+        public Criteria andStatusIn(List<Integer> values) {
             addCriterion("status in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotIn(List<Byte> values) {
+        public Criteria andStatusNotIn(List<Integer> values) {
             addCriterion("status not in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusBetween(Byte value1, Byte value2) {
+        public Criteria andStatusBetween(Integer value1, Integer value2) {
             addCriterion("status between", value1, value2, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotBetween(Byte value1, Byte value2) {
+        public Criteria andStatusNotBetween(Integer value1, Integer value2) {
             addCriterion("status not between", value1, value2, "status");
             return (Criteria) this;
         }

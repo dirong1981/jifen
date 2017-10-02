@@ -442,52 +442,52 @@ public class StoreCouponExample {
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeEqualTo(Byte value) {
+        public Criteria andValidityTypeEqualTo(Integer value) {
             addCriterion("validity_type =", value, "validityType");
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeNotEqualTo(Byte value) {
+        public Criteria andValidityTypeNotEqualTo(Integer value) {
             addCriterion("validity_type <>", value, "validityType");
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeGreaterThan(Byte value) {
+        public Criteria andValidityTypeGreaterThan(Integer value) {
             addCriterion("validity_type >", value, "validityType");
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeGreaterThanOrEqualTo(Byte value) {
+        public Criteria andValidityTypeGreaterThanOrEqualTo(Integer value) {
             addCriterion("validity_type >=", value, "validityType");
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeLessThan(Byte value) {
+        public Criteria andValidityTypeLessThan(Integer value) {
             addCriterion("validity_type <", value, "validityType");
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeLessThanOrEqualTo(Byte value) {
+        public Criteria andValidityTypeLessThanOrEqualTo(Integer value) {
             addCriterion("validity_type <=", value, "validityType");
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeIn(List<Byte> values) {
+        public Criteria andValidityTypeIn(List<Integer> values) {
             addCriterion("validity_type in", values, "validityType");
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeNotIn(List<Byte> values) {
+        public Criteria andValidityTypeNotIn(List<Integer> values) {
             addCriterion("validity_type not in", values, "validityType");
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeBetween(Byte value1, Byte value2) {
+        public Criteria andValidityTypeBetween(Integer value1, Integer value2) {
             addCriterion("validity_type between", value1, value2, "validityType");
             return (Criteria) this;
         }
 
-        public Criteria andValidityTypeNotBetween(Byte value1, Byte value2) {
+        public Criteria andValidityTypeNotBetween(Integer value1, Integer value2) {
             addCriterion("validity_type not between", value1, value2, "validityType");
             return (Criteria) this;
         }
@@ -682,52 +682,52 @@ public class StoreCouponExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatusEqualTo(Byte value) {
+        public Criteria andStatusEqualTo(Integer value) {
             addCriterion("status =", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotEqualTo(Byte value) {
+        public Criteria andStatusNotEqualTo(Integer value) {
             addCriterion("status <>", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThan(Byte value) {
+        public Criteria andStatusGreaterThan(Integer value) {
             addCriterion("status >", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThanOrEqualTo(Byte value) {
+        public Criteria andStatusGreaterThanOrEqualTo(Integer value) {
             addCriterion("status >=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThan(Byte value) {
+        public Criteria andStatusLessThan(Integer value) {
             addCriterion("status <", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThanOrEqualTo(Byte value) {
+        public Criteria andStatusLessThanOrEqualTo(Integer value) {
             addCriterion("status <=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusIn(List<Byte> values) {
+        public Criteria andStatusIn(List<Integer> values) {
             addCriterion("status in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotIn(List<Byte> values) {
+        public Criteria andStatusNotIn(List<Integer> values) {
             addCriterion("status not in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusBetween(Byte value1, Byte value2) {
+        public Criteria andStatusBetween(Integer value1, Integer value2) {
             addCriterion("status between", value1, value2, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotBetween(Byte value1, Byte value2) {
+        public Criteria andStatusNotBetween(Integer value1, Integer value2) {
             addCriterion("status not between", value1, value2, "status");
             return (Criteria) this;
         }

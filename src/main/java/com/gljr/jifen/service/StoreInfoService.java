@@ -1,5 +1,6 @@
 package com.gljr.jifen.service;
 
+import com.gljr.jifen.pojo.Admin;
 import com.gljr.jifen.pojo.StoreExtInfo;
 import com.gljr.jifen.pojo.StoreInfo;
 import com.gljr.jifen.pojo.StorePhoto;
@@ -13,27 +14,22 @@ public interface StoreInfoService
 
     StoreInfo selectStoreInfoById(Integer id);
 
-    int addStoreInfo(StoreInfo storeInfo);
+    int addStoreInfo(StoreInfo storeInfo, Admin admin, Integer random);
 
-    int deleteStoreInfoById(Integer id);
+    int deleteStoreInfoById(StoreInfo storeInfo, Admin admin);
 
-    List<StoreInfo> selectAllShowStoreInfo(Integer sort);
+    List<StoreInfo> selectAllShowStoreInfo(Integer code, Integer sort);
 
     List<StoreInfo> selectAllStoreInfo();
 
-
-    int updataStoreExt(StoreExtInfo storeExt);
-
-    StoreExtInfo getStoreExt(Integer id);
-
-    int addStoreExt(StoreExtInfo storeExt);
+    List<StoreInfo> selectStroreInfoByKeyword(String keyword);
 
     int insertStorePhoto(StorePhoto storePhoto);
 
     List<StorePhoto> selectStorePhotoById(Integer id);
 
-    int updateStroePhoto(StorePhoto storePhoto);
-
     StoreInfo selectStoreInfoByAid(Integer id);
+
+    Long selectStorePhotoCountBySiId(Integer siid);
 
 }

@@ -8,7 +8,7 @@
     <result column="contact_phone" jdbcType="VARCHAR" property="contactPhone" />
     <result column="location_code" jdbcType="INTEGER" property="locationCode" />
     <result column="address" jdbcType="VARCHAR" property="address" />
-    <result column="is_default" jdbcType="TINYINT" property="isDefault" />
+    <result column="is_default" jdbcType="INTEGER" property="isDefault" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -110,7 +110,7 @@
       location_code, address, is_default, 
       create_time)
     values (#{uid,jdbcType=INTEGER}, #{contactName,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, 
-      #{locationCode,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, #{isDefault,jdbcType=TINYINT}, 
+      #{locationCode,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, #{isDefault,jdbcType=INTEGER}, 
       #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.UserAddress">
@@ -158,7 +158,7 @@
         #{address,jdbcType=VARCHAR},
       </if>
       <if test="isDefault != null">
-        #{isDefault,jdbcType=TINYINT},
+        #{isDefault,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -193,7 +193,7 @@
         address = #{record.address,jdbcType=VARCHAR},
       </if>
       <if test="record.isDefault != null">
-        is_default = #{record.isDefault,jdbcType=TINYINT},
+        is_default = #{record.isDefault,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -211,7 +211,7 @@
       contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
       location_code = #{record.locationCode,jdbcType=INTEGER},
       address = #{record.address,jdbcType=VARCHAR},
-      is_default = #{record.isDefault,jdbcType=TINYINT},
+      is_default = #{record.isDefault,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -236,7 +236,7 @@
         address = #{address,jdbcType=VARCHAR},
       </if>
       <if test="isDefault != null">
-        is_default = #{isDefault,jdbcType=TINYINT},
+        is_default = #{isDefault,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -251,7 +251,7 @@
       contact_phone = #{contactPhone,jdbcType=VARCHAR},
       location_code = #{locationCode,jdbcType=INTEGER},
       address = #{address,jdbcType=VARCHAR},
-      is_default = #{isDefault,jdbcType=TINYINT},
+      is_default = #{isDefault,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

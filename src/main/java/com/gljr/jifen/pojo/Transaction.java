@@ -9,13 +9,13 @@ public class Transaction {
 
     private Integer type;
 
-    private Byte ownerType;
+    private Integer ownerType;
 
     private Integer ownerId;
 
     private Integer integral;
 
-    private Byte status;
+    private Integer status;
 
     private Date createTime;
 
@@ -43,11 +43,11 @@ public class Transaction {
         this.type = type;
     }
 
-    public Byte getOwnerType() {
+    public Integer getOwnerType() {
         return ownerType;
     }
 
-    public void setOwnerType(Byte ownerType) {
+    public void setOwnerType(Integer ownerType) {
         this.ownerType = ownerType;
     }
 
@@ -67,11 +67,11 @@ public class Transaction {
         this.integral = integral;
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

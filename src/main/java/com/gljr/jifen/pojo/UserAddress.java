@@ -15,7 +15,7 @@ public class UserAddress {
 
     private String address;
 
-    private Byte isDefault;
+    private Integer isDefault;
 
     private Date createTime;
 
@@ -67,11 +67,11 @@ public class UserAddress {
         this.address = address == null ? null : address.trim();
     }
 
-    public Byte getIsDefault() {
+    public Integer getIsDefault() {
         return isDefault;
     }
 
-    public void setIsDefault(Byte isDefault) {
+    public void setIsDefault(Integer isDefault) {
         this.isDefault = isDefault;
     }
 

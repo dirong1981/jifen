@@ -1,19 +1,16 @@
 package com.gljr.jifen.controller.manager;
 
-import com.gljr.jifen.common.JedisUtil;
-import com.gljr.jifen.common.JsonResult;
-import com.gljr.jifen.common.Md5Util;
-import com.gljr.jifen.common.StrUtil;
+import com.gljr.jifen.common.*;
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.controller.BaseController;
 import com.gljr.jifen.pojo.Admin;
-import com.gljr.jifen.pojo.ProductPhoto;
 import com.gljr.jifen.pojo.StoreInfo;
 import com.gljr.jifen.pojo.StorePhoto;
 import com.gljr.jifen.service.AdminService;
+import com.gljr.jifen.service.SerialNumberService;
 import com.gljr.jifen.service.StorageService;
 import com.gljr.jifen.service.StoreInfoService;
-import com.gljr.jifen.util.YukiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -25,12 +22,10 @@ import redis.clients.jedis.Jedis;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -47,17 +42,18 @@ public class StoreInfoManagerController extends BaseController {
     @Autowired
     private StorageService storageService;
 
+    @Autowired
+    private SerialNumberService serialNumberService;
+
 
 
     /**
      * 获取所有商户信息，包括未审核通过商户
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return 商户列表
      */
     @GetMapping("/all")
     @ResponseBody
-    public JsonResult getAllStores(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public JsonResult getAllStores() {
 
 
         JsonResult jsonResult = new JsonResult();
@@ -70,12 +66,10 @@ public class StoreInfoManagerController extends BaseController {
             map.put("data", storeInfos);
 
             jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+            CommonResult.success(jsonResult);
 
         } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
         return jsonResult;
@@ -85,37 +79,42 @@ public class StoreInfoManagerController extends BaseController {
 
     /**
      * 审核通过商户信息
-     * @param id 商户uid
-     * @param httpServletRequest
-     * @param httpServletResponse
+     * @param id 商户id
      * @return 状态码
      */
     @GetMapping(value = "/{id}/acceptance")
     @ResponseBody
-    public JsonResult startStore(@PathVariable("id") Integer id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public JsonResult startStore(@PathVariable("id") Integer id) {
         JsonResult jsonResult = new JsonResult();
 
+        if(StringUtils.isEmpty(id)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
 
         try {
             StoreInfo storeInfo = storeInfoService.selectStoreInfoById(id);
 
-            storeInfo.setStatus(new Byte("1"));
+            if(ValidCheck.validPojo(storeInfo)){
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+
+            storeInfo.setStatus(DBConstants.MerchantStatus.ACTIVED.getCode());
 
             storeInfoService.updataStoreInfo(storeInfo);
 
             //更新商户管理员的状态
-            Admin admin = adminService.selectAdminById(storeInfo.getAid());
+//            Admin admin = adminService.selectAdminById(storeInfo.getAid());
+//
+//            admin.setStatus(DBConstants.AdminAccountStatus.ACTIVED.getCode());
+//
+//            adminService.updateAdminById(admin);
 
-            admin.setStatus(new Byte("1"));
-
-            adminService.updateAdminById(admin);
-
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+            CommonResult.success(jsonResult);
 
         } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
 
@@ -126,36 +125,41 @@ public class StoreInfoManagerController extends BaseController {
     /**
      * 下线商户
      * @param id 商户id
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return 状态码
      */
     @GetMapping(value = "/{id}/rejection")
     @ResponseBody
-    public JsonResult stopStore(@PathVariable("id") Integer id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public JsonResult stopStore(@PathVariable("id") Integer id) {
         JsonResult jsonResult = new JsonResult();
 
+        if(StringUtils.isEmpty(id)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
 
         try {
             StoreInfo storeInfo = storeInfoService.selectStoreInfoById(id);
 
-            storeInfo.setStatus(new Byte("2"));
+            if(ValidCheck.validPojo(storeInfo)){
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+
+            storeInfo.setStatus(DBConstants.MerchantStatus.OFFLINE.getCode());
 
             storeInfoService.updataStoreInfo(storeInfo);
 
             //更新商户管理员的状态
-            Admin admin = adminService.selectAdminById(storeInfo.getAid());
+//            Admin admin = adminService.selectAdminById(storeInfo.getAid());
+//
+//            admin.setStatus(DBConstants.AdminAccountStatus.DISABLED.getCode());
+//
+//            adminService.updateAdminById(admin);
 
-            admin.setStatus(new Byte("2"));
-
-            adminService.updateAdminById(admin);
-
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+            CommonResult.success(jsonResult);
 
         } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
 
@@ -166,31 +170,43 @@ public class StoreInfoManagerController extends BaseController {
     /**
      * 删除一个商户
      * @param id 商户id
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return 状态码
      */
     @DeleteMapping(value = "/{id}")
     @ResponseBody
-    public JsonResult deleteStore(@PathVariable("id") Integer id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public JsonResult deleteStore(@PathVariable("id") Integer id) {
         JsonResult jsonResult = new JsonResult();
 
+        if(StringUtils.isEmpty(id)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
 
         try {
             StoreInfo storeInfo = storeInfoService.selectStoreInfoById(id);
 
-            //删除管理员记录
-            adminService.deleteAdminById(storeInfo.getAid());
+            if(ValidCheck.validPojo(storeInfo)){
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
 
-            storeInfoService.deleteStoreInfoById(id);
+            Admin admin = adminService.selectAdminById(storeInfo.getAid());
+
+            if(ValidCheck.validPojo(admin)){
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+
+            storeInfo.setStatus(DBConstants.MerchantStatus.DELETED.getCode());
+            admin.setStatus(DBConstants.AdminAccountStatus.DISABLED.getCode());
+
+            storeInfoService.deleteStoreInfoById(storeInfo, admin);
 
 
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+            CommonResult.success(jsonResult);
 
         } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
 
@@ -203,14 +219,12 @@ public class StoreInfoManagerController extends BaseController {
      * @param storeInfo 商户模型
      * @param bindingResult 验证类
      * @param file 图片
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return 状态码
      */
     @PostMapping
     @ResponseBody
-    public JsonResult addAdminAjax(@Valid StoreInfo storeInfo, BindingResult bindingResult, @RequestParam(value = "username") String username, @RequestParam(value = "pic", required = false) MultipartFile file,
-                                   HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public JsonResult addAdminAjax(@Valid StoreInfo storeInfo, BindingResult bindingResult, @RequestParam(value = "username") String username,
+                                   @RequestParam(value = "pic", required = false) MultipartFile file, @RequestParam(value = "random") Integer random) {
 
         JsonResult jsonResult = new JsonResult();
 
@@ -221,94 +235,55 @@ public class StoreInfoManagerController extends BaseController {
             return jsonResult;
         }
 
-
-        //添加商户管理员账号
-        try {
-            List<Admin> admins = adminService.selectAdminByUsername(username);
-            if (admins.size() != 0){
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                jsonResult.setMessage(GlobalConstants.STORE_ADMIN_EXIST);
-                return jsonResult;
-            }else{
-                Admin admin = new Admin();
-                admin.setUsername(username);
-                admin.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                admin.setAccountType(new Byte("2"));
-                admin.setStatus(new Byte("0"));
-                String salt = StrUtil.randomKey(32);
-                admin.setSalt(salt);
-                admin.setPassword(Md5Util.md5("admin"+salt));
-
-                adminService.insertAdmin(admin);
-
-                storeInfo.setAid(admin.getId());
-            }
-        }catch (Exception e){
-            System.out.println(e);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        //获取一个随机数，更新上传的图片id
+        if(StringUtils.isEmpty(random)){
+            CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
 
-        //补充
-        storeInfo.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        storeInfo.setLocationCode(450200);//默认来柳州市的....这个该不会是要写一个联动的地区选择吧?
-        storeInfo.setSerialCode(StrUtil.randomKey(16));
+        //添加商户管理员账号
+        List<Admin> admins = adminService.selectAdminByUsername(username);
+        if(!ValidCheck.validList(admins)){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage("管理员账号已存在，请更换！");
+            return jsonResult;
+        }
+
+        Admin admin = new Admin();
+        admin.setUsername(username);
+        admin.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        admin.setAccountType(DBConstants.AdminAccountType.STORE_ADMIN.getCode());
+        admin.setStatus(DBConstants.AdminAccountStatus.INACTIVE.getCode());
+        String salt = StrUtil.randomKey(32);
+        admin.setSalt(salt);
+        admin.setPassword(Md5Util.md5("admin"+salt));
 
 
 
         //上传图片
-        //获得物理路径webapp所在路径
-        String pathRoot = httpServletRequest.getSession().getServletContext().getRealPath("");
-        String path = "";
-
-        try {
-
-            if (file != null && !file.isEmpty()) {
-                String _key = storageService.uploadToPublicBucket("store", file);
-                if (StringUtils.isEmpty(_key)) {
-                    jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
-                    jsonResult.setMessage(GlobalConstants.UPLOAD_PICTURE_FAILED_MESSAGE);
-                    return jsonResult;
-                }
-                storeInfo.setLogoKey(_key);
-            } else {
-                storeInfo.setLogoKey("store/default.png");
+        if (file != null && !file.isEmpty()) {
+            String _key = storageService.uploadToPublicBucket("store", file);
+            if (StringUtils.isEmpty(_key)) {
+                CommonResult.uploadFailed(jsonResult);
+                return jsonResult;
             }
-        } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
+            storeInfo.setLogoKey(_key);
+        } else {
+            storeInfo.setLogoKey("store/default.png");
         }
 
         try {
+            storeInfo.setStatus(DBConstants.MerchantStatus.INACTIVE.getCode());
+            storeInfo.setSerialCode(serialNumberService.gextNextStoreSerialCode(450204));
+            storeInfo.setLocationCode(450204);
+            storeInfo.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
-            storeInfoService.addStoreInfo(storeInfo);
+            storeInfoService.addStoreInfo(storeInfo, admin, random);
 
-
-
-            //查询存入商品的id
-            int sid = storeInfo.getId();
-
-            Jedis jedis = JedisUtil.getJedis();
-            String sId = jedis.get("sId");
-
-            //判断是不是有已经上传的商品图片，如果有，获取到保存以后的商品id，同时更新上传的图片里面的商品id
-            if(!sId.equals("null")) {
-                List<StorePhoto> storePhotos = storeInfoService.selectStorePhotoById(Integer.parseInt(sId));
-                for (StorePhoto storePhoto : storePhotos) {
-                    storePhoto.setSiId(sid);
-                    storeInfoService.updateStroePhoto(storePhoto);
-                }
-                jedis.del("sId");
-            }
-
-
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+            CommonResult.success(jsonResult);
         } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//            jr.setMessage("添加失败!");
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
         return jsonResult;
@@ -321,14 +296,12 @@ public class StoreInfoManagerController extends BaseController {
      * @param bindingResult 验证类
      * @param uploadfile 原图片
      * @param file 新上传的图片
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return 状态码
      */
     @PutMapping
     @ResponseBody
     public JsonResult updateStore(@Valid StoreInfo storeInfo, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile,
-                                  @RequestParam(value = "pic", required = false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+                                  @RequestParam(value = "pic", required = false) MultipartFile file) {
 
         JsonResult jsonResult = new JsonResult();
 
@@ -340,9 +313,6 @@ public class StoreInfoManagerController extends BaseController {
 
 
         //上传图片
-        //获得物理路径webapp所在路径
-        String pathRoot = httpServletRequest.getSession().getServletContext().getRealPath("");
-        String path = "";
 
         try {
 
@@ -379,59 +349,91 @@ public class StoreInfoManagerController extends BaseController {
     /**
      * 用于多图上传
      * @param file
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return
      */
     @RequestMapping(value = "/uploadFiles", method = RequestMethod.POST)
     @ResponseBody
-    public JsonResult uploadImages(@RequestParam(value="file",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult uploadImages(@RequestParam(value="file",required=false) MultipartFile file, @RequestParam(value = "random") Integer random){
         JsonResult jsonResult = new JsonResult();
 
         //上传图片
 
+        if(StringUtils.isEmpty(random)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
 
-        //获得物理路径webapp所在路径
-        String pathRoot = httpServletRequest.getSession().getServletContext().getRealPath("");
-        String path="";
 
         try {
+            long num = storeInfoService.selectStorePhotoCountBySiId(random);
+
+            if(num >= 5){
+                jsonResult.setMessage("最多上传5张图片！");
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                return jsonResult;
+            }
+
+
             if (file != null && !file.isEmpty()) {
 
                 String _key = storageService.uploadToPublicBucket("store", file);
                 if (StringUtils.isEmpty(_key)) {
-                    jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
-                    jsonResult.setMessage(GlobalConstants.UPLOAD_PICTURE_FAILED_MESSAGE);
+                    CommonResult.uploadFailed(jsonResult);
                     return jsonResult;
                 }
 
-                //上传多张图片的时候先用一个随机数作为临时的商品id，待添加商品的时候再更新相同临时id
-                Jedis jedis = JedisUtil.getJedis();
-                String sId = jedis.get("sId");
-                int sid = (int)(Math.random()*10000000);
-                if(sId == null || sId.equals("null")){
-                    jedis.set("sId", sid+"");
-                    //productId = "10000";
-                }else{
-                    sid = Integer.parseInt(jedis.get("sId"));
-                }
                 StorePhoto storePhoto = new StorePhoto();
                 storePhoto.setImgKey(_key);
                 storePhoto.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                storePhoto.setSiId(sid);
-                storePhoto.setSort(1);
+                storePhoto.setSiId(random);
+                storePhoto.setSort(99);
                 storePhoto.setImgTitle("pic");
-                storePhoto.setType(new Byte("1"));
+                storePhoto.setType(1);
                 storeInfoService.insertStorePhoto(storePhoto);
 
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+                CommonResult.success(jsonResult);
             }else{
             }
         }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
-            System.out.println(e);
-            return  jsonResult;
+            CommonResult.uploadFailed(jsonResult);
         }
+        return jsonResult;
+    }
+
+
+    /**
+     * 根据关键字查询商户
+     * @param keyword
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return
+     */
+    @PostMapping("/keywords")
+    @ResponseBody
+    public JsonResult selectStoreInfoByKeyword(@RequestParam(value = "keyword") String keyword, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
+        if(StringUtils.isEmpty(keyword)){
+            CommonResult.notNull(jsonResult);
+            return jsonResult;
+        }
+
+        try {
+            List<StoreInfo> storeInfos = storeInfoService.selectStroreInfoByKeyword(keyword);
+            if(ValidCheck.validList(storeInfos)){
+                jsonResult.setErrorCode("500");
+                jsonResult.setMessage("没有找到商铺信息，请更换关键字！");
+                return jsonResult;
+            }
+            Map map = new HashMap();
+            map.put("data", storeInfos);
+
+            jsonResult.setItem(map);
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+
+
         return jsonResult;
     }
 

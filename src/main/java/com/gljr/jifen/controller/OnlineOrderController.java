@@ -2,15 +2,17 @@ package com.gljr.jifen.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.StrUtil;
+import com.gljr.jifen.common.ValidCheck;
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.*;
-import com.gljr.jifen.service.OnlineOrderService;
-import com.gljr.jifen.service.ProductService;
-import com.gljr.jifen.service.UserCreditsService;
+import com.gljr.jifen.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,16 +29,14 @@ public class OnlineOrderController {
     @Autowired
     private OnlineOrderService onlineOrderService;
 
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private UserCreditsService userCreditsService;
-
 
     /**
-     * 查询所有订单，uid为0，查询所有订单，uid不为0，查询该用户订单
-     * @param httpServletResponse
+     * 查询用户所有在线订单
+     * @param page
+     * @param per_page
+     * @param sort
+     * @param start_time
+     * @param end_time
      * @param httpServletRequest
      * @return
      */
@@ -45,75 +45,42 @@ public class OnlineOrderController {
     public JsonResult selectAllOnlineOrder(@RequestParam(value = "page", required = false) Integer page,
                                            @RequestParam(value = "per_page", required = false) Integer per_page, @RequestParam(value = "sort", required = false) Integer sort,
                                            @RequestParam(value = "start_time", required = false) String start_time, @RequestParam(value = "end_time", required = false) String end_time,
-                                           HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
+                                           HttpServletRequest httpServletRequest) {
 
         JsonResult jsonResult = new JsonResult();
 
-        try {
+        String uid = httpServletRequest.getHeader("uid");
 
-//            onlineOrderService.deleteOnlineOrder();
-            int uid;
-            //获取头部商城用户id，如果不存在查询所有订单
-            String uId = httpServletRequest.getHeader("uid");
-            if(uId == null || uId.equals("")){
-                uid = 0;
-            }else{
-                uid = Integer.parseInt(uId);
-            }
-
-            //设置各个参数的默认值
-            if(page == null){
-                page = 1;
-            }
-            if(per_page == null){
-                per_page = 10;
-            }
-            if(sort == null || sort > 4 || sort < 0){
-                sort = 0;
-            }
-
-            PageHelper.startPage(page,per_page);
-            List<OnlineOrder> onlineOrders = onlineOrderService.selectOnlineOrdersByUid(uid, sort, start_time, end_time);
-
-            PageInfo pageInfo = new PageInfo(onlineOrders);
-
-            for (OnlineOrder onlineOrder : onlineOrders){
-                Product product = productService.selectProductById(onlineOrder.getPid());
-                onlineOrder.setName(product.getName());
-                onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + product.getUnit());
-            }
-
-            Map  map = new HashMap();
-            map.put("data", onlineOrders);
-
-            map.put("pages", pageInfo.getPages());
-
-            map.put("total", pageInfo.getTotal());
-            //当前页
-            map.put("pageNum", pageInfo.getPageNum());
-
-            jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-
-        } catch (Exception e) {
-            System.out.println(e);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.DATABASE_FAILED);
+        if(StringUtils.isEmpty(uid)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
         }
+
+        if(StringUtils.isEmpty(start_time)){
+            start_time = "0";
+        }
+
+        if(StringUtils.isEmpty(end_time)){
+            end_time = "0";
+        }
+
+        if(StringUtils.isEmpty(sort) || sort > 4 || sort < 0){
+            sort = 0;
+        }
+
+        jsonResult = onlineOrderService.selectOnlineOrdersByUid(uid, sort, start_time, end_time, jsonResult);
 
         return jsonResult;
     }
 
 
     /**
-     * 查询未付款订单
+     * 查询用户未付款订单
      * @param page
      * @param per_page
      * @param sort
      * @param start_time
      * @param end_time
-     * @param httpServletResponse
      * @param httpServletRequest
      * @return
      */
@@ -122,172 +89,114 @@ public class OnlineOrderController {
     public JsonResult selectAllOnlineOrderNoPay(@RequestParam(value = "page", required = false) Integer page,
                                            @RequestParam(value = "per_page", required = false) Integer per_page, @RequestParam(value = "sort", required = false) Integer sort,
                                            @RequestParam(value = "start_time", required = false) String start_time, @RequestParam(value = "end_time", required = false) String end_time,
-                                           HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
+                                           HttpServletRequest httpServletRequest) {
 
         JsonResult jsonResult = new JsonResult();
 
-        try {
+        String uid = httpServletRequest.getHeader("uid");
 
-            int uid;
-            //获取头部商城用户id，如果不存在查询所有订单
-            String uId = httpServletRequest.getHeader("uid");
-            if(uId == null || uId.equals("")){
-                uid = 0;
-            }else{
-                uid = Integer.parseInt(uId);
-            }
-
-            //设置各个参数的默认值
-            if(page == null){
-                page = 1;
-            }
-            if(per_page == null){
-                per_page = 10;
-            }
-            if(sort == null || sort > 4 || sort < 0){
-                sort = 0;
-            }
-
-            PageHelper.startPage(page,per_page);
-            List<OnlineOrder> onlineOrders = onlineOrderService.selectOnlineOrdersByUidNotPay(uid, sort, start_time, end_time);
-
-            PageInfo pageInfo = new PageInfo(onlineOrders);
-
-            for (OnlineOrder onlineOrder : onlineOrders){
-                Product product = productService.selectProductById(onlineOrder.getPid());
-                onlineOrder.setName(product.getName());
-                onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + product.getUnit());
-            }
-
-            Map  map = new HashMap();
-            map.put("data", onlineOrders);
-
-            map.put("pages", pageInfo.getPages());
-
-            map.put("total", pageInfo.getTotal());
-            //当前页
-            map.put("pageNum", pageInfo.getPageNum());
-
-            jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-
-        } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.DATABASE_FAILED);
+        if (StringUtils.isEmpty(uid)) {
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
         }
+
+        if(StringUtils.isEmpty(start_time)){
+            start_time = "0";
+        }
+
+        if(StringUtils.isEmpty(end_time)){
+            end_time = "0";
+        }
+
+        if(StringUtils.isEmpty(sort) || sort > 4 || sort < 0){
+            sort = 0;
+        }
+
+        onlineOrderService.selectOnlineOrdersByUidNotPay(uid, sort, start_time, end_time, jsonResult);
 
         return jsonResult;
     }
 
 
 
-
     /**
-     * 添加一条在线订单
+     * 添加一条在线订单，尚未付款
      * @param onlineOrder
-     * @param httpServletResponse
      * @param httpServletRequest
      * @return
      */
     @PostMapping
     @ResponseBody
-    public JsonResult insetOnlineOrder(OnlineOrder onlineOrder, HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+    public JsonResult insetOnlineOrder(OnlineOrder onlineOrder, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
-        try {
-            String uid = httpServletRequest.getHeader("uid");
-            if(uid == null || uid.equals("")){
-                jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                return jsonResult;
-            }else{
-                onlineOrder.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                onlineOrder.setUid(Integer.parseInt(uid));
-                onlineOrder.setStatus(new Byte("0"));
-                onlineOrder.setTrxCode(StrUtil.randomKey(18));
-                onlineOrder.setTrxId(111);
+        String uid = httpServletRequest.getHeader("uid");
 
-
-                //添加一条通用交易信息
-                Transaction transaction = new Transaction();
-                transaction.setType(2);
-                transaction.setOwnerType(new Byte("1"));
-                transaction.setOwnerId(Integer.parseInt(uid));
-                transaction.setIntegral(onlineOrder.getIntegral());
-                transaction.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                transaction.setCode(onlineOrder.getTrxCode());
-                transaction.setStatus(new Byte("0"));
-
-
-                //扣除用户积分
-                UserCredits userCredits = userCreditsService.selectUserCreditsByUid(onlineOrder.getUid()).get(0);
-                int integral = userCredits.getIntegral() - transaction.getIntegral();
-                if (integral >= 0) {
-                    userCredits.setIntegral(integral);
-                }else{
-                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                    jsonResult.setMessage(GlobalConstants.INTEGRAL_NOT_ENOUGH);
-                    return jsonResult;
-                }
-
-
-                onlineOrderService.insertOnlineOrder(onlineOrder, transaction, userCredits);
-
-
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-                jsonResult.setMessage(onlineOrder.getTrxCode());
-
-            }
-        }catch (Exception e){
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-            jsonResult.setErrorCode(GlobalConstants.DATABASE_FAILED);
+        if(StringUtils.isEmpty(uid)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
         }
+
+        jsonResult = onlineOrderService.insertOnlineOrder(onlineOrder, uid, jsonResult);
 
         return jsonResult;
     }
 
 
     /**
-     * 修改订单状态 1，已付款
-     * @param id
+     * 判断订单状态是否为未付款，更新订单和通用交易状态为已付款，并修改用户积分
+     * @param trxCode
      * @param httpServletRequest
-     * @param httpServletResponse
      * @return
      */
-    @PutMapping(value = "/{id}/status/{status}")
+    @PutMapping(value = "/{trxCode}")
     @ResponseBody
-    public JsonResult updateOnlineOrder(@PathVariable(value = "id") String id, @PathVariable(value = "status") int status, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult updateOnlineOrder(@PathVariable(value = "trxCode") String trxCode, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
         String uid = httpServletRequest.getHeader("uid");
 
-        try {
-            if (uid.equals("NULL") || uid == null || uid.equals("")) {
-                jsonResult.setMessage(GlobalConstants.OPERATION_FAILED);
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED_MESSAGE);
-                return jsonResult;
-            } else {
-                if(status == 1) {
-                    OnlineOrder onlineOrder = onlineOrderService.selectOnlineOrderById(id, Integer.parseInt(uid));
-
-                    onlineOrder.setStatus((byte)status);
-                    onlineOrderService.updateOnlineOrderById(onlineOrder);
-                    jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-                    jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-                }else{
-                    jsonResult.setMessage(GlobalConstants.OPERATION_FAILED);
-                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED_MESSAGE);
-                    return jsonResult;
-                }
-            }
-        }catch (Exception e){
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        if(StringUtils.isEmpty(uid)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
         }
+        if(StringUtils.isEmpty(trxCode)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
+        jsonResult = onlineOrderService.updateOnlineOrderByTrxCode(trxCode, uid, jsonResult);
 
         return jsonResult;
     }
 
+
+    /**
+     * 取消一个订单，更新订单，通用交易表，恢复商品库存和销量
+     * @param trxCode
+     * @param httpServletRequest
+     * @return
+     */
+    @PutMapping(value = "/{trxCode}/cancel")
+    @ResponseBody
+    public JsonResult cancelOnlineOrder(@PathVariable(value = "trxCode") String trxCode, HttpServletRequest httpServletRequest){
+        JsonResult jsonResult = new JsonResult();
+
+        String uid = httpServletRequest.getHeader("uid");
+        if(StringUtils.isEmpty(uid)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
+        }
+
+        if(StringUtils.isEmpty(trxCode)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
+        jsonResult = onlineOrderService.cancelOnlineOrderByTrxCode(trxCode, uid, jsonResult);
+
+
+        return jsonResult;
+    }
 
 }

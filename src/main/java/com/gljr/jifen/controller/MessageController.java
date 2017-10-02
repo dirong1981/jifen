@@ -86,7 +86,7 @@ public class MessageController {
                 List<Message> messages = messageService.selectAllMessageByUid(Integer.parseInt(uid));
 
                 for(Message message : messages){
-                    message.setReadStatus(new Byte("1"));
+                    message.setReadStatus(1);
                     messageService.updateAllMessageById(message);
                 }
 

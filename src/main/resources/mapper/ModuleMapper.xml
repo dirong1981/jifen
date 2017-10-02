@@ -5,10 +5,10 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="description" jdbcType="VARCHAR" property="description" />
-    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="type" jdbcType="INTEGER" property="type" />
     <result column="thumb_key" jdbcType="VARCHAR" property="thumbKey" />
-    <result column="ext_type" jdbcType="TINYINT" property="extType" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="ext_type" jdbcType="INTEGER" property="extType" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="manager_id" jdbcType="INTEGER" property="managerId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -110,8 +110,8 @@
     insert into module (title, description, type, 
       thumb_key, ext_type, status, 
       manager_id, create_time)
-    values (#{title,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT}, 
-      #{thumbKey,jdbcType=VARCHAR}, #{extType,jdbcType=TINYINT}, #{status,jdbcType=TINYINT}, 
+    values (#{title,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
+      #{thumbKey,jdbcType=VARCHAR}, #{extType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
       #{managerId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Module">
@@ -153,16 +153,16 @@
         #{description,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
-        #{type,jdbcType=TINYINT},
+        #{type,jdbcType=INTEGER},
       </if>
       <if test="thumbKey != null">
         #{thumbKey,jdbcType=VARCHAR},
       </if>
       <if test="extType != null">
-        #{extType,jdbcType=TINYINT},
+        #{extType,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="managerId != null">
         #{managerId,jdbcType=INTEGER},
@@ -191,16 +191,16 @@
         description = #{record.description,jdbcType=VARCHAR},
       </if>
       <if test="record.type != null">
-        type = #{record.type,jdbcType=TINYINT},
+        type = #{record.type,jdbcType=INTEGER},
       </if>
       <if test="record.thumbKey != null">
         thumb_key = #{record.thumbKey,jdbcType=VARCHAR},
       </if>
       <if test="record.extType != null">
-        ext_type = #{record.extType,jdbcType=TINYINT},
+        ext_type = #{record.extType,jdbcType=INTEGER},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=TINYINT},
+        status = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.managerId != null">
         manager_id = #{record.managerId,jdbcType=INTEGER},
@@ -218,10 +218,10 @@
     set id = #{record.id,jdbcType=INTEGER},
       title = #{record.title,jdbcType=VARCHAR},
       description = #{record.description,jdbcType=VARCHAR},
-      type = #{record.type,jdbcType=TINYINT},
+      type = #{record.type,jdbcType=INTEGER},
       thumb_key = #{record.thumbKey,jdbcType=VARCHAR},
-      ext_type = #{record.extType,jdbcType=TINYINT},
-      status = #{record.status,jdbcType=TINYINT},
+      ext_type = #{record.extType,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
       manager_id = #{record.managerId,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -238,16 +238,16 @@
         description = #{description,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
-        type = #{type,jdbcType=TINYINT},
+        type = #{type,jdbcType=INTEGER},
       </if>
       <if test="thumbKey != null">
         thumb_key = #{thumbKey,jdbcType=VARCHAR},
       </if>
       <if test="extType != null">
-        ext_type = #{extType,jdbcType=TINYINT},
+        ext_type = #{extType,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="managerId != null">
         manager_id = #{managerId,jdbcType=INTEGER},
@@ -262,10 +262,10 @@
     update module
     set title = #{title,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
-      type = #{type,jdbcType=TINYINT},
+      type = #{type,jdbcType=INTEGER},
       thumb_key = #{thumbKey,jdbcType=VARCHAR},
-      ext_type = #{extType,jdbcType=TINYINT},
-      status = #{status,jdbcType=TINYINT},
+      ext_type = #{extType,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
       manager_id = #{managerId,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

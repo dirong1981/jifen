@@ -3,12 +3,12 @@
 <mapper namespace="com.gljr.jifen.dao.CategoryMapper">
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.Category">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="type" jdbcType="INTEGER" property="type" />
     <result column="parent_code" jdbcType="INTEGER" property="parentCode" />
     <result column="code" jdbcType="INTEGER" property="code" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="logo_key" jdbcType="VARCHAR" property="logoKey" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="sort" jdbcType="INTEGER" property="sort" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -110,8 +110,8 @@
     insert into category (type, parent_code, code, 
       name, logo_key, status, 
       sort, create_time)
-    values (#{type,jdbcType=TINYINT}, #{parentCode,jdbcType=INTEGER}, #{code,jdbcType=INTEGER}, 
-      #{name,jdbcType=VARCHAR}, #{logoKey,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, 
+    values (#{type,jdbcType=INTEGER}, #{parentCode,jdbcType=INTEGER}, #{code,jdbcType=INTEGER}, 
+      #{name,jdbcType=VARCHAR}, #{logoKey,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
       #{sort,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Category">
@@ -147,7 +147,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="type != null">
-        #{type,jdbcType=TINYINT},
+        #{type,jdbcType=INTEGER},
       </if>
       <if test="parentCode != null">
         #{parentCode,jdbcType=INTEGER},
@@ -162,7 +162,7 @@
         #{logoKey,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="sort != null">
         #{sort,jdbcType=INTEGER},
@@ -185,7 +185,7 @@
         id = #{record.id,jdbcType=INTEGER},
       </if>
       <if test="record.type != null">
-        type = #{record.type,jdbcType=TINYINT},
+        type = #{record.type,jdbcType=INTEGER},
       </if>
       <if test="record.parentCode != null">
         parent_code = #{record.parentCode,jdbcType=INTEGER},
@@ -200,7 +200,7 @@
         logo_key = #{record.logoKey,jdbcType=VARCHAR},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=TINYINT},
+        status = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.sort != null">
         sort = #{record.sort,jdbcType=INTEGER},
@@ -216,12 +216,12 @@
   <update id="updateByExample" parameterType="map">
     update category
     set id = #{record.id,jdbcType=INTEGER},
-      type = #{record.type,jdbcType=TINYINT},
+      type = #{record.type,jdbcType=INTEGER},
       parent_code = #{record.parentCode,jdbcType=INTEGER},
       code = #{record.code,jdbcType=INTEGER},
       name = #{record.name,jdbcType=VARCHAR},
       logo_key = #{record.logoKey,jdbcType=VARCHAR},
-      status = #{record.status,jdbcType=TINYINT},
+      status = #{record.status,jdbcType=INTEGER},
       sort = #{record.sort,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -232,7 +232,7 @@
     update category
     <set>
       <if test="type != null">
-        type = #{type,jdbcType=TINYINT},
+        type = #{type,jdbcType=INTEGER},
       </if>
       <if test="parentCode != null">
         parent_code = #{parentCode,jdbcType=INTEGER},
@@ -247,7 +247,7 @@
         logo_key = #{logoKey,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="sort != null">
         sort = #{sort,jdbcType=INTEGER},
@@ -260,12 +260,12 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.Category">
     update category
-    set type = #{type,jdbcType=TINYINT},
+    set type = #{type,jdbcType=INTEGER},
       parent_code = #{parentCode,jdbcType=INTEGER},
       code = #{code,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
       logo_key = #{logoKey,jdbcType=VARCHAR},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       sort = #{sort,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

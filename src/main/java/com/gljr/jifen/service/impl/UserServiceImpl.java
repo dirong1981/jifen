@@ -1,11 +1,14 @@
 package com.gljr.jifen.service.impl;
 
 import com.gljr.jifen.dao.UserAddressMapper;
-import com.gljr.jifen.pojo.UserAddress;
-import com.gljr.jifen.pojo.UserAddressExample;
+import com.gljr.jifen.dao.UserCreditsMapper;
+import com.gljr.jifen.dao.UserExtInfoMapper;
+import com.gljr.jifen.dao.UserOnlineMapper;
+import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,6 +18,15 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserAddressMapper userAddressMapper;
+
+    @Autowired
+    private UserOnlineMapper userOnlineMapper;
+
+    @Autowired
+    private UserCreditsMapper userCreditsMapper;
+
+    @Autowired
+    private UserExtInfoMapper userExtInfoMapper;
 
 
     @Override
@@ -35,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public UserAddress selectUserAddressByIsDefault(Integer uid) {
         UserAddressExample userAddressExample = new UserAddressExample();
         UserAddressExample.Criteria criteria = userAddressExample.or();
-        criteria.andIsDefaultEqualTo(new Byte("1"));
+        criteria.andIsDefaultEqualTo(1);
         criteria.andUidEqualTo(uid);
         List<UserAddress> userAddresses = userAddressMapper.selectByExample(userAddressExample);
         //如果不存在返回最新地址
@@ -66,5 +78,51 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserAddress selectUserAddressById(Integer id) {
         return userAddressMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    @Transactional
+    public int insertUserInfo(UserCredits userCredits, UserExtInfo userExtInfo, UserOnline userOnline) {
+        userCreditsMapper.insert(userCredits);
+
+        userExtInfoMapper.insert(userExtInfo);
+
+        userOnlineMapper.insert(userOnline);
+        return 0;
+    }
+
+    @Override
+    public List<UserOnline> selectUserOnlineByUid(Integer uid) {
+        UserOnlineExample userOnlineExample = new UserOnlineExample();
+        UserOnlineExample.Criteria criteria = userOnlineExample.or();
+        criteria.andUidEqualTo(uid);
+        return userOnlineMapper.selectByExample(userOnlineExample);
+    }
+
+    @Override
+    @Transactional
+    public int updateUserInfo(UserCredits userCredits, UserOnline userOnline) {
+        userCreditsMapper.updateByPrimaryKey(userCredits);
+
+        userOnlineMapper.updateByPrimaryKey(userOnline);
+        return 0;
+    }
+
+    @Override
+    public int insertUserOnline(UserOnline userOnline) {
+        return userOnlineMapper.insert(userOnline);
+    }
+
+    @Override
+    public List<UserExtInfo> selectUserExtInfoByUid(Integer uid) {
+        UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
+        UserExtInfoExample.Criteria criteria = userExtInfoExample.or();
+        criteria.andUidEqualTo(uid);
+        return userExtInfoMapper.selectByExample(userExtInfoExample);
+    }
+
+    @Override
+    public int insertUserExtInfo(UserExtInfo userExtInfo) {
+        return userExtInfoMapper.insert(userExtInfo);
     }
 }

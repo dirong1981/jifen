@@ -305,52 +305,52 @@ public class MessageExample {
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusEqualTo(Byte value) {
+        public Criteria andReadStatusEqualTo(Integer value) {
             addCriterion("read_status =", value, "readStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusNotEqualTo(Byte value) {
+        public Criteria andReadStatusNotEqualTo(Integer value) {
             addCriterion("read_status <>", value, "readStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusGreaterThan(Byte value) {
+        public Criteria andReadStatusGreaterThan(Integer value) {
             addCriterion("read_status >", value, "readStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusGreaterThanOrEqualTo(Byte value) {
+        public Criteria andReadStatusGreaterThanOrEqualTo(Integer value) {
             addCriterion("read_status >=", value, "readStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusLessThan(Byte value) {
+        public Criteria andReadStatusLessThan(Integer value) {
             addCriterion("read_status <", value, "readStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusLessThanOrEqualTo(Byte value) {
+        public Criteria andReadStatusLessThanOrEqualTo(Integer value) {
             addCriterion("read_status <=", value, "readStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusIn(List<Byte> values) {
+        public Criteria andReadStatusIn(List<Integer> values) {
             addCriterion("read_status in", values, "readStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusNotIn(List<Byte> values) {
+        public Criteria andReadStatusNotIn(List<Integer> values) {
             addCriterion("read_status not in", values, "readStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusBetween(Byte value1, Byte value2) {
+        public Criteria andReadStatusBetween(Integer value1, Integer value2) {
             addCriterion("read_status between", value1, value2, "readStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReadStatusNotBetween(Byte value1, Byte value2) {
+        public Criteria andReadStatusNotBetween(Integer value1, Integer value2) {
             addCriterion("read_status not between", value1, value2, "readStatus");
             return (Criteria) this;
         }

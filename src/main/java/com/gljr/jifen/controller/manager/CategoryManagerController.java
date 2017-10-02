@@ -1,6 +1,9 @@
 package com.gljr.jifen.controller.manager;
 
+import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
+import com.gljr.jifen.common.ValidCheck;
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.controller.BaseController;
 import com.gljr.jifen.pojo.Category;
@@ -33,6 +36,12 @@ public class CategoryManagerController extends BaseController {
     @Autowired
     private StorageService storageService;
 
+    @Autowired
+    private HttpServletResponse httpServletResponse;
+
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
     /**
      * 添加分类
      *
@@ -45,23 +54,18 @@ public class CategoryManagerController extends BaseController {
     @PostMapping
     @ResponseBody
     public JsonResult addCategory(@Valid Category category, BindingResult bindingResult,
-                                  @RequestParam(value = "pic", required = false) MultipartFile file) throws Exception {
+                                  @RequestParam(value = "pic", required = false) MultipartFile file){
         JsonResult jsonResult = new JsonResult();
-        int code = (int)(Math.random()*100000000);
-
-        category.setCode(code);
-        category.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
         if (bindingResult.hasErrors()) {
-            jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
+            CommonResult.notNull(jsonResult);
             return jsonResult;
         }
 
         if (file != null && !file.isEmpty()) {
             String _key = storageService.uploadToPublicBucket("category", file);
             if (StringUtils.isEmpty(_key)) {
-                jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
-                jsonResult.setMessage(GlobalConstants.UPLOAD_PICTURE_FAILED_MESSAGE);
+                CommonResult.uploadFailed(jsonResult);
                 return jsonResult;
             }
             category.setLogoKey(_key);
@@ -71,12 +75,9 @@ public class CategoryManagerController extends BaseController {
 
         try {
             categoryService.insertClass(category);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+            CommonResult.success(jsonResult);
         } catch (Exception e) {
-            System.out.println(e);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
         return jsonResult;
@@ -93,27 +94,26 @@ public class CategoryManagerController extends BaseController {
     public JsonResult approveCategory(@PathVariable("id") Integer id) {
         JsonResult jsonResult = new JsonResult();
 
+        if(StringUtils.isEmpty(id)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
         try {
             //通过id查询该分类
             Category category = categoryService.selectClass(id);
-            if (null == category) {
-                jsonResult.setErrorCode(GlobalConstants.OBJECT_NOT_FOUND);
-                jsonResult.setMessage(GlobalConstants.OBJECT_NOT_FOUND_MESSAGE);
+
+            if(ValidCheck.validPojo(category)){
+                CommonResult.noObject(jsonResult);
                 return jsonResult;
             }
 
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-
-            if (category.getStatus() - 1 == 0) {
-                return jsonResult;
-            }
-
-            category.setStatus(new Byte("1"));
+            category.setStatus(DBConstants.CategoryStatus.ACTIVED.getCode());
             categoryService.updateClass(category);
+
+            CommonResult.success(jsonResult);
         } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
         return jsonResult;
@@ -130,30 +130,25 @@ public class CategoryManagerController extends BaseController {
     public JsonResult stopCategories(@PathVariable("id") Integer id) {
         JsonResult jsonResult = new JsonResult();
 
+        if(StringUtils.isEmpty(id)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
         try {
             //通过id查询该分类
             Category category = categoryService.selectClass(id);
-
-            if (null == category) {
-                jsonResult.setErrorCode(GlobalConstants.OBJECT_NOT_FOUND);
-                jsonResult.setMessage(GlobalConstants.OBJECT_NOT_FOUND_MESSAGE);
+            if(ValidCheck.validPojo(category)){
+                CommonResult.noObject(jsonResult);
                 return jsonResult;
             }
 
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+            category.setStatus(DBConstants.CategoryStatus.INACTIVE.getCode());
 
-            if (category.getStatus() == 0) {
-                return jsonResult;
-            }
-
-            category.setStatus(new Byte("0"));
-
-            //删除该分类下的子分类
             categoryService.updateClass(category);
+            CommonResult.success(jsonResult);
         } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
         return jsonResult;
@@ -170,20 +165,48 @@ public class CategoryManagerController extends BaseController {
     public JsonResult deleteCategories(@PathVariable("id") Integer id) {
         JsonResult jsonResult = new JsonResult();
 
+        if(StringUtils.isEmpty(id)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
         try {
+
             //通过id查询该分类
             Category category = categoryService.selectClass(id);
-            //通过id删除该分类
-            categoryService.deleteClass(id);
+            if(ValidCheck.validPojo(category)){
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
 
-            //删除该分类下的子分类
-            categoryService.deleteSonClass(category.getCode());
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+            //判断该分类有没有子分类被使用
+            List<Category> categories = categoryService.selectShowSonClass(category.getCode());
+            if(!ValidCheck.validList(categories)){
+                CommonResult.objIsUsed(jsonResult);
+                return jsonResult;
+            }
+
+            //查询该分类有没有添加商品
+            long count = categoryService.selectProductCountByCode(category.getCode());
+            if(count > 0){
+                CommonResult.objIsUsed(jsonResult);
+                return jsonResult;
+            }
+
+            count = categoryService.selectStoreCountByCode(category.getCode());
+            if(count > 0){
+                CommonResult.objIsUsed(jsonResult);
+                return jsonResult;
+            }
+
+
+            //通过code删除该分类和该分类下的子分类
+            categoryService.deleteClass(category.getCode());
+
+            CommonResult.success(jsonResult);
 
         } catch (Exception e) {
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
         return jsonResult;
@@ -194,29 +217,34 @@ public class CategoryManagerController extends BaseController {
      * 给一个分类排序
      * @param id 分类id
      * @param sort 排序值
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return 返回状态码
      */
     @GetMapping(value = "/{id}/order/{sort}")
     @ResponseBody
-    public JsonResult sortCategories(@PathVariable("id") Integer id, @PathVariable("sort") Integer sort, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult sortCategories(@PathVariable("id") Integer id, @PathVariable("sort") Integer sort){
         JsonResult jsonResult = new JsonResult();
+
+        if(StringUtils.isEmpty(id) || StringUtils.isEmpty(sort)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
 
         try{
             //通过id查询该分类
             Category category = categoryService.selectClass(id);
 
+            if(ValidCheck.validPojo(category)){
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+
             category.setSort(sort);
 
-            //删除该分类下的子分类
             categoryService.updateClass(category);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+            CommonResult.success(jsonResult);
 
         }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            CommonResult.sqlFailed(jsonResult);
         }
 
         return  jsonResult;
@@ -231,13 +259,12 @@ public class CategoryManagerController extends BaseController {
      * @param bindingResult 验证类
      * @param uploadfile 原分类图片名称
      * @param file 新上传的图片
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return 返回状态值
      */
     @PutMapping
     @ResponseBody
-    public JsonResult updateClass(@Valid Category category, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile, @RequestParam(value="pic",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult updateClass(@Valid Category category, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile,
+                                  @RequestParam(value="pic",required=false) MultipartFile file){
         JsonResult jsonResult = new JsonResult();
 
 
@@ -295,13 +322,11 @@ public class CategoryManagerController extends BaseController {
 
     /**
      * 查询所有分类，包括未审核通过分类
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return
      */
     @GetMapping(value = "/all")
     @ResponseBody
-    public JsonResult allCategories(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult allCategories(){
         JsonResult jsonResult = new JsonResult();
         Map map = new HashMap();
 
@@ -315,10 +340,10 @@ public class CategoryManagerController extends BaseController {
             map.put("sons", list);
 
             jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            CommonResult.success(jsonResult);
 
         }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            CommonResult.sqlFailed(jsonResult);
         }
 
         return  jsonResult;
@@ -327,13 +352,11 @@ public class CategoryManagerController extends BaseController {
 
     /**
      * 查询所有商户分类，包括未审核分类
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return
      */
     @GetMapping(value = "/all/store")
     @ResponseBody
-    public JsonResult allStoreCategories(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult allStoreCategories(){
         JsonResult jsonResult = new JsonResult();
         Map map = new HashMap();
 
@@ -347,10 +370,10 @@ public class CategoryManagerController extends BaseController {
             map.put("sons", list);
 
             jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            CommonResult.success(jsonResult);
 
         }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            CommonResult.sqlFailed(jsonResult);
         }
 
         return  jsonResult;

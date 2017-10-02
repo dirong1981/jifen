@@ -5,7 +5,7 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="uid" jdbcType="INTEGER" property="uid" />
     <result column="content" jdbcType="VARCHAR" property="content" />
-    <result column="read_status" jdbcType="TINYINT" property="readStatus" />
+    <result column="read_status" jdbcType="INTEGER" property="readStatus" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -105,7 +105,7 @@
     </selectKey>
     insert into message (uid, content, read_status, 
       create_time)
-    values (#{uid,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, #{readStatus,jdbcType=TINYINT}, 
+    values (#{uid,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, #{readStatus,jdbcType=INTEGER}, 
       #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Message">
@@ -135,7 +135,7 @@
         #{content,jdbcType=VARCHAR},
       </if>
       <if test="readStatus != null">
-        #{readStatus,jdbcType=TINYINT},
+        #{readStatus,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -161,7 +161,7 @@
         content = #{record.content,jdbcType=VARCHAR},
       </if>
       <if test="record.readStatus != null">
-        read_status = #{record.readStatus,jdbcType=TINYINT},
+        read_status = #{record.readStatus,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -176,7 +176,7 @@
     set id = #{record.id,jdbcType=INTEGER},
       uid = #{record.uid,jdbcType=INTEGER},
       content = #{record.content,jdbcType=VARCHAR},
-      read_status = #{record.readStatus,jdbcType=TINYINT},
+      read_status = #{record.readStatus,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -192,7 +192,7 @@
         content = #{content,jdbcType=VARCHAR},
       </if>
       <if test="readStatus != null">
-        read_status = #{readStatus,jdbcType=TINYINT},
+        read_status = #{readStatus,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -204,7 +204,7 @@
     update message
     set uid = #{uid,jdbcType=INTEGER},
       content = #{content,jdbcType=VARCHAR},
-      read_status = #{readStatus,jdbcType=TINYINT},
+      read_status = #{readStatus,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

@@ -1,10 +1,11 @@
 package com.gljr.jifen.filter;
 
 import com.gljr.jifen.common.ClientType;
-import com.gljr.jifen.common.JedisUtil;
+
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.StrUtil;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -15,10 +16,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 
 public class AuthInterceptor implements HandlerInterceptor {
 
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
@@ -42,14 +46,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 
                 if (requestUri.contains("/manager/")) {
                     if (clientType == 2) {
-
                         String aid = httpServletRequest.getHeader("aid");
                         String permission = httpServletRequest.getHeader("permission");
 
-                        Jedis jedis = JedisUtil.getJedis();
-
-                        List admin = jedis.hmget("admin" + aid, "username", "permission");
-
+                        Map<String, String> tokenMap = this.redisService.getMap("admin_" + aid, String.class);
+                        if (null == tokenMap || !tokenMap.containsKey("permission")) {
+                            StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+                            return false;
+                        }
 
                         if (permission == null || permission.equals("") || permission.equals("NULL")) {
                             StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
@@ -58,7 +62,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
                         //获取服务器端管理员信息
 
-                        String permissions = (String)admin.get(1);
+                        String permissions = tokenMap.get("permission");
 
 
                         if(permissions.contains(permission)){

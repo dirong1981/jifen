@@ -9,13 +9,15 @@ public class ModuleAggregation {
 
     private String title;
 
-    private Byte type;
+    private Integer type;
 
-    private Byte status;
+    private Integer status;
 
     private Integer managerId;
 
     private Date createTime;
+
+    private String admin;
 
     public Integer getId() {
         return id;
@@ -41,19 +43,19 @@ public class ModuleAggregation {
         this.title = title == null ? null : title.trim();
     }
 
-    public Byte getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(Byte type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -71,5 +73,13 @@ public class ModuleAggregation {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(String admin) {
+        this.admin = admin;
     }
 }

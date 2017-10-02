@@ -7,9 +7,11 @@ import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.Category;
 import com.gljr.jifen.pojo.Product;
+import com.gljr.jifen.pojo.StoreInfo;
 import com.gljr.jifen.service.AdminService;
 import com.gljr.jifen.service.CategoryService;
 import com.gljr.jifen.service.ProductService;
+import com.gljr.jifen.service.StoreInfoService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class CategoryController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private StoreInfoService storeInfoService;
 
     @Autowired
     private AdminService adminService;
@@ -65,10 +70,10 @@ public class CategoryController {
         try{
             List<Category> list = null;
 
-            list = categoryService.selectShowParentClass();
+            list = categoryService.selectAllShowParentCategory();
             map.put("parents", list);
 
-            list = categoryService.selectShowSonClass();
+            list = categoryService.selectAllShowSonCategory();
             map.put("sons", list);
 
             jsonResult.setItem(map);
@@ -219,7 +224,58 @@ public class CategoryController {
 
 
 
+    @GetMapping(value = "/{code}/stores")
+    @ResponseBody
+    @ApiOperation(value = "根据分类code获取商品", httpMethod = "GET", notes = "code,page,per_page,sort", response = JsonResult.class)
+    public JsonResult categoryStore(@ApiParam(required = true, name = "code", value = "分类代码") @PathVariable("code") Integer code,
+                                      @ApiParam(required = false, name = "page", value = "分当前页") @RequestParam(value = "page", required = false) Integer page,
+                                      @ApiParam(required = false, name = "per_page", value = "每页显示数量") @RequestParam(value = "per_page", required = false) Integer per_page,
+                                      @ApiParam(required = false, name = "sort", value = "排序方式") @RequestParam(value = "sort", required = false) Integer sort,
+                                      HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+        JsonResult jsonResult = new JsonResult();
 
+
+
+        try{
+
+            //设置各个参数的默认值
+            if(page == null){
+                page = 1;
+            }
+            if(per_page == null){
+                per_page = 10;
+            }
+            if(sort == null || sort > 4 || sort < 0){
+                sort = 0;
+            }
+
+            PageHelper.startPage(page,per_page);
+            //查询分类下的商品，按照sort排序
+            List<StoreInfo> storeInfos = storeInfoService.selectAllShowStoreInfo(code, sort);
+
+            PageInfo pageInfo = new PageInfo(storeInfos);
+            Map  map = new HashMap();
+            map.put("data", storeInfos);
+            //设置总页面
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
+
+
+            jsonResult.setItem(map);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+
+            return jsonResult;
+        }catch (Exception e){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        }
+
+        return jsonResult;
+    }
 
 
 }

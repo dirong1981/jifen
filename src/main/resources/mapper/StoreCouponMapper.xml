@@ -7,11 +7,11 @@
     <result column="max_generated" jdbcType="INTEGER" property="maxGenerated" />
     <result column="integral" jdbcType="INTEGER" property="integral" />
     <result column="equal_money" jdbcType="INTEGER" property="equalMoney" />
-    <result column="validity_type" jdbcType="TINYINT" property="validityType" />
+    <result column="validity_type" jdbcType="INTEGER" property="validityType" />
     <result column="valid_from" jdbcType="DATE" property="validFrom" />
     <result column="valid_to" jdbcType="DATE" property="validTo" />
     <result column="valid_days" jdbcType="INTEGER" property="validDays" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -115,8 +115,8 @@
       valid_to, valid_days, status, 
       create_time)
     values (#{siId,jdbcType=INTEGER}, #{maxGenerated,jdbcType=INTEGER}, #{integral,jdbcType=INTEGER}, 
-      #{equalMoney,jdbcType=INTEGER}, #{validityType,jdbcType=TINYINT}, #{validFrom,jdbcType=DATE}, 
-      #{validTo,jdbcType=DATE}, #{validDays,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, 
+      #{equalMoney,jdbcType=INTEGER}, #{validityType,jdbcType=INTEGER}, #{validFrom,jdbcType=DATE}, 
+      #{validTo,jdbcType=DATE}, #{validDays,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
       #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.StoreCoupon">
@@ -170,7 +170,7 @@
         #{equalMoney,jdbcType=INTEGER},
       </if>
       <if test="validityType != null">
-        #{validityType,jdbcType=TINYINT},
+        #{validityType,jdbcType=INTEGER},
       </if>
       <if test="validFrom != null">
         #{validFrom,jdbcType=DATE},
@@ -182,7 +182,7 @@
         #{validDays,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -214,7 +214,7 @@
         equal_money = #{record.equalMoney,jdbcType=INTEGER},
       </if>
       <if test="record.validityType != null">
-        validity_type = #{record.validityType,jdbcType=TINYINT},
+        validity_type = #{record.validityType,jdbcType=INTEGER},
       </if>
       <if test="record.validFrom != null">
         valid_from = #{record.validFrom,jdbcType=DATE},
@@ -226,7 +226,7 @@
         valid_days = #{record.validDays,jdbcType=INTEGER},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=TINYINT},
+        status = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -243,11 +243,11 @@
       max_generated = #{record.maxGenerated,jdbcType=INTEGER},
       integral = #{record.integral,jdbcType=INTEGER},
       equal_money = #{record.equalMoney,jdbcType=INTEGER},
-      validity_type = #{record.validityType,jdbcType=TINYINT},
+      validity_type = #{record.validityType,jdbcType=INTEGER},
       valid_from = #{record.validFrom,jdbcType=DATE},
       valid_to = #{record.validTo,jdbcType=DATE},
       valid_days = #{record.validDays,jdbcType=INTEGER},
-      status = #{record.status,jdbcType=TINYINT},
+      status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -269,7 +269,7 @@
         equal_money = #{equalMoney,jdbcType=INTEGER},
       </if>
       <if test="validityType != null">
-        validity_type = #{validityType,jdbcType=TINYINT},
+        validity_type = #{validityType,jdbcType=INTEGER},
       </if>
       <if test="validFrom != null">
         valid_from = #{validFrom,jdbcType=DATE},
@@ -281,7 +281,7 @@
         valid_days = #{validDays,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -295,11 +295,11 @@
       max_generated = #{maxGenerated,jdbcType=INTEGER},
       integral = #{integral,jdbcType=INTEGER},
       equal_money = #{equalMoney,jdbcType=INTEGER},
-      validity_type = #{validityType,jdbcType=TINYINT},
+      validity_type = #{validityType,jdbcType=INTEGER},
       valid_from = #{validFrom,jdbcType=DATE},
       valid_to = #{validTo,jdbcType=DATE},
       valid_days = #{validDays,jdbcType=INTEGER},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

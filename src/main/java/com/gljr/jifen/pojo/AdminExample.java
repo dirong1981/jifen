@@ -175,52 +175,52 @@ public class AdminExample {
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeEqualTo(Byte value) {
+        public Criteria andAccountTypeEqualTo(Integer value) {
             addCriterion("account_type =", value, "accountType");
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeNotEqualTo(Byte value) {
+        public Criteria andAccountTypeNotEqualTo(Integer value) {
             addCriterion("account_type <>", value, "accountType");
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeGreaterThan(Byte value) {
+        public Criteria andAccountTypeGreaterThan(Integer value) {
             addCriterion("account_type >", value, "accountType");
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeGreaterThanOrEqualTo(Byte value) {
+        public Criteria andAccountTypeGreaterThanOrEqualTo(Integer value) {
             addCriterion("account_type >=", value, "accountType");
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeLessThan(Byte value) {
+        public Criteria andAccountTypeLessThan(Integer value) {
             addCriterion("account_type <", value, "accountType");
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeLessThanOrEqualTo(Byte value) {
+        public Criteria andAccountTypeLessThanOrEqualTo(Integer value) {
             addCriterion("account_type <=", value, "accountType");
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeIn(List<Byte> values) {
+        public Criteria andAccountTypeIn(List<Integer> values) {
             addCriterion("account_type in", values, "accountType");
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeNotIn(List<Byte> values) {
+        public Criteria andAccountTypeNotIn(List<Integer> values) {
             addCriterion("account_type not in", values, "accountType");
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeBetween(Byte value1, Byte value2) {
+        public Criteria andAccountTypeBetween(Integer value1, Integer value2) {
             addCriterion("account_type between", value1, value2, "accountType");
             return (Criteria) this;
         }
 
-        public Criteria andAccountTypeNotBetween(Byte value1, Byte value2) {
+        public Criteria andAccountTypeNotBetween(Integer value1, Integer value2) {
             addCriterion("account_type not between", value1, value2, "accountType");
             return (Criteria) this;
         }
@@ -445,52 +445,52 @@ public class AdminExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatusEqualTo(Byte value) {
+        public Criteria andStatusEqualTo(Integer value) {
             addCriterion("status =", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotEqualTo(Byte value) {
+        public Criteria andStatusNotEqualTo(Integer value) {
             addCriterion("status <>", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThan(Byte value) {
+        public Criteria andStatusGreaterThan(Integer value) {
             addCriterion("status >", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThanOrEqualTo(Byte value) {
+        public Criteria andStatusGreaterThanOrEqualTo(Integer value) {
             addCriterion("status >=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThan(Byte value) {
+        public Criteria andStatusLessThan(Integer value) {
             addCriterion("status <", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThanOrEqualTo(Byte value) {
+        public Criteria andStatusLessThanOrEqualTo(Integer value) {
             addCriterion("status <=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusIn(List<Byte> values) {
+        public Criteria andStatusIn(List<Integer> values) {
             addCriterion("status in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotIn(List<Byte> values) {
+        public Criteria andStatusNotIn(List<Integer> values) {
             addCriterion("status not in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusBetween(Byte value1, Byte value2) {
+        public Criteria andStatusBetween(Integer value1, Integer value2) {
             addCriterion("status between", value1, value2, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotBetween(Byte value1, Byte value2) {
+        public Criteria andStatusNotBetween(Integer value1, Integer value2) {
             addCriterion("status not between", value1, value2, "status");
             return (Criteria) this;
         }

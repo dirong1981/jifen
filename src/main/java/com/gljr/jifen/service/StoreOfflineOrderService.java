@@ -1,6 +1,8 @@
 package com.gljr.jifen.service;
 
+import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.pojo.*;
+import com.qiniu.util.Json;
 
 import java.text.ParseException;
 import java.util.List;
@@ -12,71 +14,22 @@ public interface StoreOfflineOrderService {
      * @param storeOfflineOrder
      * @return
      */
-    int insertOfflineOrder(StoreOfflineOrder storeOfflineOrder, Transaction transaction, UserCredits userCredits);
+    JsonResult insertOfflineOrder(StoreOfflineOrder storeOfflineOrder, String uid, JsonResult jsonResult);
 
-
-    /**
-     * 修改一条线下订单
-     * @param storeOfflineOrder
-     * @return
-     */
-    int updateOfflineOrder(StoreOfflineOrder storeOfflineOrder);
 
 
     /**
      * 查询某个用户的线下订单
      * @return
      */
-    List<StoreOfflineOrder> selectAllOfflineOrderByUid(int uid, int sort, String start_time, String end_time);
+    JsonResult selectOfflineOrderByUid(String uid, int sort, String start_time, String end_time, JsonResult jsonResult);
 
 
     /**
      * 查询所有线下订单
      * @return
      */
-    List<StoreOfflineOrder> selectOfflineOrders();
+    JsonResult selectOfflineOrders(JsonResult jsonResult);
 
 
-//    //查询所有父类型
-//    List<StoreOfflineOrder> selectParentClass();
-//
-//    //插入一个分类
-//    int insertClass(StoreOfflineOrder storeOfflineOrder);
-//
-//    //查询所有子类型
-//    List<StoreOfflineOrder> selectSonClass();
-//
-//    //删除一个分类
-//    int deleteClass(Integer id);
-//
-//    //查询所有分类
-//    List<StoreOfflineOrder> selectAllClass();
-//
-//    //更新一个分类状态
-//    int updateClass(StoreOfflineOrder storeOfflineOrder);
-//
-//    //查找一个分类
-//    StoreOfflineOrder selectClass(Integer id);
-//
-//    //更新一个分类的排序
-//    int updateClassSort(String sort, String id);
-//
-//
-//    void insertIntegralTransferOrderClass(IntegralTransferOrder integralTO);
-//
-//    List<StoreOfflineOrder> selectAllParamStatuClass(Byte status);
-//
-//    List<StoreOfflineOrder> selectAllParamTimeClass(StoreOfflineOrderSearch storeOfflineOrderSearch) throws ParseException;
-//
-//    List<StoreOfflineOrder> selectAllParamContextClass(StoreOfflineOrderSearch storeOfflineOrderSearch) throws ParseException;
-//
-//    StoreInfo selectStoreInfoClass(Integer siId);
-//
-//    Transaction insertTransactionClass(Transaction transaction);
-//
-//    IntegralTransferOrder selectIntegralTransferOrderClass(Integer trxId);
-//
-//    void updateIntegralTransferOrderClass(IntegralTransferOrder integralTransferOrder);
-//
-//    void deleteIntegralTransferOrderClass(Integer id);
 }

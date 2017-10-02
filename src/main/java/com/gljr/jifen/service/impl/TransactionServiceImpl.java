@@ -19,4 +19,9 @@ public class TransactionServiceImpl implements TransactionService {
     public int insertTransaction(Transaction transaction) throws RuntimeException  {
         return transactionMapper.insert(transaction);
     }
+
+    @Override
+    public Transaction selectTransactionById(Integer id) {
+        return transactionMapper.selectByPrimaryKey(id);
+    }
 }

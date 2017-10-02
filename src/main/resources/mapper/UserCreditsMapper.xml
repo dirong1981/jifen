@@ -3,7 +3,7 @@
 <mapper namespace="com.gljr.jifen.dao.UserCreditsMapper">
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.UserCredits">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="owner_type" jdbcType="TINYINT" property="ownerType" />
+    <result column="owner_type" jdbcType="INTEGER" property="ownerType" />
     <result column="owner_id" jdbcType="INTEGER" property="ownerId" />
     <result column="wallet_address" jdbcType="VARCHAR" property="walletAddress" />
     <result column="integral" jdbcType="INTEGER" property="integral" />
@@ -108,7 +108,7 @@
     insert into user_credits (owner_type, owner_id, wallet_address, 
       integral, frozen_integral, create_time
       )
-    values (#{ownerType,jdbcType=TINYINT}, #{ownerId,jdbcType=INTEGER}, #{walletAddress,jdbcType=VARCHAR}, 
+    values (#{ownerType,jdbcType=INTEGER}, #{ownerId,jdbcType=INTEGER}, #{walletAddress,jdbcType=VARCHAR}, 
       #{integral,jdbcType=INTEGER}, #{frozenIntegral,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -139,7 +139,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="ownerType != null">
-        #{ownerType,jdbcType=TINYINT},
+        #{ownerType,jdbcType=INTEGER},
       </if>
       <if test="ownerId != null">
         #{ownerId,jdbcType=INTEGER},
@@ -171,7 +171,7 @@
         id = #{record.id,jdbcType=INTEGER},
       </if>
       <if test="record.ownerType != null">
-        owner_type = #{record.ownerType,jdbcType=TINYINT},
+        owner_type = #{record.ownerType,jdbcType=INTEGER},
       </if>
       <if test="record.ownerId != null">
         owner_id = #{record.ownerId,jdbcType=INTEGER},
@@ -196,7 +196,7 @@
   <update id="updateByExample" parameterType="map">
     update user_credits
     set id = #{record.id,jdbcType=INTEGER},
-      owner_type = #{record.ownerType,jdbcType=TINYINT},
+      owner_type = #{record.ownerType,jdbcType=INTEGER},
       owner_id = #{record.ownerId,jdbcType=INTEGER},
       wallet_address = #{record.walletAddress,jdbcType=VARCHAR},
       integral = #{record.integral,jdbcType=INTEGER},
@@ -210,7 +210,7 @@
     update user_credits
     <set>
       <if test="ownerType != null">
-        owner_type = #{ownerType,jdbcType=TINYINT},
+        owner_type = #{ownerType,jdbcType=INTEGER},
       </if>
       <if test="ownerId != null">
         owner_id = #{ownerId,jdbcType=INTEGER},
@@ -232,7 +232,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.UserCredits">
     update user_credits
-    set owner_type = #{ownerType,jdbcType=TINYINT},
+    set owner_type = #{ownerType,jdbcType=INTEGER},
       owner_id = #{ownerId,jdbcType=INTEGER},
       wallet_address = #{walletAddress,jdbcType=VARCHAR},
       integral = #{integral,jdbcType=INTEGER},

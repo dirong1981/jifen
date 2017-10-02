@@ -25,12 +25,6 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-
-
-
-
-
-
     /**
      * 查询一个具体的商品
      * @param id 商品id

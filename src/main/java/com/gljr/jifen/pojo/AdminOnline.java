@@ -7,7 +7,7 @@ public class AdminOnline {
 
     private Integer aid;
 
-    private Byte clientType;
+    private Integer clientType;
 
     private String token;
 
@@ -29,11 +29,11 @@ public class AdminOnline {
         this.aid = aid;
     }
 
-    public Byte getClientType() {
+    public Integer getClientType() {
         return clientType;
     }
 
-    public void setClientType(Byte clientType) {
+    public void setClientType(Integer clientType) {
         this.clientType = clientType;
     }
 

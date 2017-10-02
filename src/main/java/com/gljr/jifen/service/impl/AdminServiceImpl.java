@@ -64,7 +64,7 @@ public class AdminServiceImpl implements AdminService {
         AdminOnlineExample adminOnlineExample = new AdminOnlineExample();
         AdminOnlineExample.Criteria criteria = adminOnlineExample.createCriteria();
         criteria.andAidEqualTo(aid);
-        criteria.andClientTypeEqualTo((byte)clientType);
+        criteria.andClientTypeEqualTo(clientType);
         return adminOnlineMapper.selectByExample(adminOnlineExample);
     }
 
@@ -219,7 +219,7 @@ public class AdminServiceImpl implements AdminService {
     public List<Admin> selectAdminsByType(int type) {
         AdminExample adminExample = new AdminExample();
         AdminExample.Criteria criteria = adminExample.createCriteria();
-        criteria.andAccountTypeEqualTo((byte)type);
+        criteria.andAccountTypeEqualTo(type);
         criteria.andUsernameNotEqualTo("admin");
         return adminMapper.selectByExample(adminExample);
     }

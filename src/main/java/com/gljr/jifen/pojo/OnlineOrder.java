@@ -19,7 +19,7 @@ public class OnlineOrder {
 
     private Integer userAddressId;
 
-    private Byte status;
+    private Integer status;
 
     private Date createTime;
 
@@ -28,6 +28,10 @@ public class OnlineOrder {
     private String name;
 
     private String description;
+
+    private String userName;
+
+    private String storeName;
 
     public Integer getId() {
         return id;
@@ -93,11 +97,11 @@ public class OnlineOrder {
         this.userAddressId = userAddressId;
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -117,19 +121,35 @@ public class OnlineOrder {
         this.updateTime = updateTime;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String productName) {
-        this.name = productName;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }

@@ -315,52 +315,52 @@ public class ModuleExample {
             return (Criteria) this;
         }
 
-        public Criteria andTypeEqualTo(Byte value) {
+        public Criteria andTypeEqualTo(Integer value) {
             addCriterion("type =", value, "type");
             return (Criteria) this;
         }
 
-        public Criteria andTypeNotEqualTo(Byte value) {
+        public Criteria andTypeNotEqualTo(Integer value) {
             addCriterion("type <>", value, "type");
             return (Criteria) this;
         }
 
-        public Criteria andTypeGreaterThan(Byte value) {
+        public Criteria andTypeGreaterThan(Integer value) {
             addCriterion("type >", value, "type");
             return (Criteria) this;
         }
 
-        public Criteria andTypeGreaterThanOrEqualTo(Byte value) {
+        public Criteria andTypeGreaterThanOrEqualTo(Integer value) {
             addCriterion("type >=", value, "type");
             return (Criteria) this;
         }
 
-        public Criteria andTypeLessThan(Byte value) {
+        public Criteria andTypeLessThan(Integer value) {
             addCriterion("type <", value, "type");
             return (Criteria) this;
         }
 
-        public Criteria andTypeLessThanOrEqualTo(Byte value) {
+        public Criteria andTypeLessThanOrEqualTo(Integer value) {
             addCriterion("type <=", value, "type");
             return (Criteria) this;
         }
 
-        public Criteria andTypeIn(List<Byte> values) {
+        public Criteria andTypeIn(List<Integer> values) {
             addCriterion("type in", values, "type");
             return (Criteria) this;
         }
 
-        public Criteria andTypeNotIn(List<Byte> values) {
+        public Criteria andTypeNotIn(List<Integer> values) {
             addCriterion("type not in", values, "type");
             return (Criteria) this;
         }
 
-        public Criteria andTypeBetween(Byte value1, Byte value2) {
+        public Criteria andTypeBetween(Integer value1, Integer value2) {
             addCriterion("type between", value1, value2, "type");
             return (Criteria) this;
         }
 
-        public Criteria andTypeNotBetween(Byte value1, Byte value2) {
+        public Criteria andTypeNotBetween(Integer value1, Integer value2) {
             addCriterion("type not between", value1, value2, "type");
             return (Criteria) this;
         }
@@ -445,52 +445,52 @@ public class ModuleExample {
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeEqualTo(Byte value) {
+        public Criteria andExtTypeEqualTo(Integer value) {
             addCriterion("ext_type =", value, "extType");
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeNotEqualTo(Byte value) {
+        public Criteria andExtTypeNotEqualTo(Integer value) {
             addCriterion("ext_type <>", value, "extType");
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeGreaterThan(Byte value) {
+        public Criteria andExtTypeGreaterThan(Integer value) {
             addCriterion("ext_type >", value, "extType");
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeGreaterThanOrEqualTo(Byte value) {
+        public Criteria andExtTypeGreaterThanOrEqualTo(Integer value) {
             addCriterion("ext_type >=", value, "extType");
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeLessThan(Byte value) {
+        public Criteria andExtTypeLessThan(Integer value) {
             addCriterion("ext_type <", value, "extType");
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeLessThanOrEqualTo(Byte value) {
+        public Criteria andExtTypeLessThanOrEqualTo(Integer value) {
             addCriterion("ext_type <=", value, "extType");
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeIn(List<Byte> values) {
+        public Criteria andExtTypeIn(List<Integer> values) {
             addCriterion("ext_type in", values, "extType");
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeNotIn(List<Byte> values) {
+        public Criteria andExtTypeNotIn(List<Integer> values) {
             addCriterion("ext_type not in", values, "extType");
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeBetween(Byte value1, Byte value2) {
+        public Criteria andExtTypeBetween(Integer value1, Integer value2) {
             addCriterion("ext_type between", value1, value2, "extType");
             return (Criteria) this;
         }
 
-        public Criteria andExtTypeNotBetween(Byte value1, Byte value2) {
+        public Criteria andExtTypeNotBetween(Integer value1, Integer value2) {
             addCriterion("ext_type not between", value1, value2, "extType");
             return (Criteria) this;
         }
@@ -505,52 +505,52 @@ public class ModuleExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatusEqualTo(Byte value) {
+        public Criteria andStatusEqualTo(Integer value) {
             addCriterion("status =", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotEqualTo(Byte value) {
+        public Criteria andStatusNotEqualTo(Integer value) {
             addCriterion("status <>", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThan(Byte value) {
+        public Criteria andStatusGreaterThan(Integer value) {
             addCriterion("status >", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThanOrEqualTo(Byte value) {
+        public Criteria andStatusGreaterThanOrEqualTo(Integer value) {
             addCriterion("status >=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThan(Byte value) {
+        public Criteria andStatusLessThan(Integer value) {
             addCriterion("status <", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThanOrEqualTo(Byte value) {
+        public Criteria andStatusLessThanOrEqualTo(Integer value) {
             addCriterion("status <=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusIn(List<Byte> values) {
+        public Criteria andStatusIn(List<Integer> values) {
             addCriterion("status in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotIn(List<Byte> values) {
+        public Criteria andStatusNotIn(List<Integer> values) {
             addCriterion("status not in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusBetween(Byte value1, Byte value2) {
+        public Criteria andStatusBetween(Integer value1, Integer value2) {
             addCriterion("status between", value1, value2, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotBetween(Byte value1, Byte value2) {
+        public Criteria andStatusNotBetween(Integer value1, Integer value2) {
             addCriterion("status not between", value1, value2, "status");
             return (Criteria) this;
         }

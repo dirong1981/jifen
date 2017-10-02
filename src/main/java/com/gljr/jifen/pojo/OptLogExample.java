@@ -235,52 +235,52 @@ public class OptLogExample {
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeEqualTo(Byte value) {
+        public Criteria andOptTypeEqualTo(Integer value) {
             addCriterion("opt_type =", value, "optType");
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeNotEqualTo(Byte value) {
+        public Criteria andOptTypeNotEqualTo(Integer value) {
             addCriterion("opt_type <>", value, "optType");
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeGreaterThan(Byte value) {
+        public Criteria andOptTypeGreaterThan(Integer value) {
             addCriterion("opt_type >", value, "optType");
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeGreaterThanOrEqualTo(Byte value) {
+        public Criteria andOptTypeGreaterThanOrEqualTo(Integer value) {
             addCriterion("opt_type >=", value, "optType");
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeLessThan(Byte value) {
+        public Criteria andOptTypeLessThan(Integer value) {
             addCriterion("opt_type <", value, "optType");
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeLessThanOrEqualTo(Byte value) {
+        public Criteria andOptTypeLessThanOrEqualTo(Integer value) {
             addCriterion("opt_type <=", value, "optType");
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeIn(List<Byte> values) {
+        public Criteria andOptTypeIn(List<Integer> values) {
             addCriterion("opt_type in", values, "optType");
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeNotIn(List<Byte> values) {
+        public Criteria andOptTypeNotIn(List<Integer> values) {
             addCriterion("opt_type not in", values, "optType");
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeBetween(Byte value1, Byte value2) {
+        public Criteria andOptTypeBetween(Integer value1, Integer value2) {
             addCriterion("opt_type between", value1, value2, "optType");
             return (Criteria) this;
         }
 
-        public Criteria andOptTypeNotBetween(Byte value1, Byte value2) {
+        public Criteria andOptTypeNotBetween(Integer value1, Integer value2) {
             addCriterion("opt_type not between", value1, value2, "optType");
             return (Criteria) this;
         }

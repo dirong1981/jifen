@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.AdminOnline">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="aid" jdbcType="INTEGER" property="aid" />
-    <result column="client_type" jdbcType="TINYINT" property="clientType" />
+    <result column="client_type" jdbcType="INTEGER" property="clientType" />
     <result column="token" jdbcType="VARCHAR" property="token" />
     <result column="login_time" jdbcType="TIMESTAMP" property="loginTime" />
   </resultMap>
@@ -105,7 +105,7 @@
     </selectKey>
     insert into admin_online (aid, client_type, token, 
       login_time)
-    values (#{aid,jdbcType=INTEGER}, #{clientType,jdbcType=TINYINT}, #{token,jdbcType=VARCHAR}, 
+    values (#{aid,jdbcType=INTEGER}, #{clientType,jdbcType=INTEGER}, #{token,jdbcType=VARCHAR}, 
       #{loginTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.AdminOnline">
@@ -132,7 +132,7 @@
         #{aid,jdbcType=INTEGER},
       </if>
       <if test="clientType != null">
-        #{clientType,jdbcType=TINYINT},
+        #{clientType,jdbcType=INTEGER},
       </if>
       <if test="token != null">
         #{token,jdbcType=VARCHAR},
@@ -158,7 +158,7 @@
         aid = #{record.aid,jdbcType=INTEGER},
       </if>
       <if test="record.clientType != null">
-        client_type = #{record.clientType,jdbcType=TINYINT},
+        client_type = #{record.clientType,jdbcType=INTEGER},
       </if>
       <if test="record.token != null">
         token = #{record.token,jdbcType=VARCHAR},
@@ -175,7 +175,7 @@
     update admin_online
     set id = #{record.id,jdbcType=INTEGER},
       aid = #{record.aid,jdbcType=INTEGER},
-      client_type = #{record.clientType,jdbcType=TINYINT},
+      client_type = #{record.clientType,jdbcType=INTEGER},
       token = #{record.token,jdbcType=VARCHAR},
       login_time = #{record.loginTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -189,7 +189,7 @@
         aid = #{aid,jdbcType=INTEGER},
       </if>
       <if test="clientType != null">
-        client_type = #{clientType,jdbcType=TINYINT},
+        client_type = #{clientType,jdbcType=INTEGER},
       </if>
       <if test="token != null">
         token = #{token,jdbcType=VARCHAR},
@@ -203,7 +203,7 @@
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.AdminOnline">
     update admin_online
     set aid = #{aid,jdbcType=INTEGER},
-      client_type = #{clientType,jdbcType=TINYINT},
+      client_type = #{clientType,jdbcType=INTEGER},
       token = #{token,jdbcType=VARCHAR},
       login_time = #{loginTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

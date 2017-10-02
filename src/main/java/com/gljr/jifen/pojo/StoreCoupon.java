@@ -13,7 +13,7 @@ public class StoreCoupon {
 
     private Integer equalMoney;
 
-    private Byte validityType;
+    private Integer validityType;
 
     private Date validFrom;
 
@@ -21,7 +21,7 @@ public class StoreCoupon {
 
     private Integer validDays;
 
-    private Byte status;
+    private Integer status;
 
     private Date createTime;
 
@@ -65,11 +65,11 @@ public class StoreCoupon {
         this.equalMoney = equalMoney;
     }
 
-    public Byte getValidityType() {
+    public Integer getValidityType() {
         return validityType;
     }
 
-    public void setValidityType(Byte validityType) {
+    public void setValidityType(Integer validityType) {
         this.validityType = validityType;
     }
 
@@ -97,11 +97,11 @@ public class StoreCoupon {
         this.validDays = validDays;
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

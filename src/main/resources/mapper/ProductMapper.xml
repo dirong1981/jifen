@@ -12,8 +12,9 @@
     <result column="logo_key" jdbcType="VARCHAR" property="logoKey" />
     <result column="invetory" jdbcType="INTEGER" property="invetory" />
     <result column="sales" jdbcType="INTEGER" property="sales" />
+    <result column="max_purchases" jdbcType="INTEGER" property="maxPurchases" />
     <result column="unit" jdbcType="VARCHAR" property="unit" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.gljr.jifen.pojo.Product">
@@ -79,7 +80,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, name, category_code, si_id, price, integral, discounts, logo_key, invetory, sales, 
-    unit, status, create_time
+    max_purchases, unit, status, create_time
   </sql>
   <sql id="Blob_Column_List">
     description
@@ -139,13 +140,13 @@
     insert into product (name, category_code, si_id, 
       price, integral, discounts, 
       logo_key, invetory, sales, 
-      unit, status, create_time, 
-      description)
+      max_purchases, unit, status, 
+      create_time, description)
     values (#{name,jdbcType=VARCHAR}, #{categoryCode,jdbcType=INTEGER}, #{siId,jdbcType=INTEGER}, 
       #{price,jdbcType=INTEGER}, #{integral,jdbcType=INTEGER}, #{discounts,jdbcType=INTEGER}, 
       #{logoKey,jdbcType=VARCHAR}, #{invetory,jdbcType=INTEGER}, #{sales,jdbcType=INTEGER}, 
-      #{unit,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{description,jdbcType=LONGVARCHAR})
+      #{maxPurchases,jdbcType=INTEGER}, #{unit,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Product">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -179,6 +180,9 @@
       </if>
       <if test="sales != null">
         sales,
+      </if>
+      <if test="maxPurchases != null">
+        max_purchases,
       </if>
       <if test="unit != null">
         unit,
@@ -221,11 +225,14 @@
       <if test="sales != null">
         #{sales,jdbcType=INTEGER},
       </if>
+      <if test="maxPurchases != null">
+        #{maxPurchases,jdbcType=INTEGER},
+      </if>
       <if test="unit != null">
         #{unit,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -274,11 +281,14 @@
       <if test="record.sales != null">
         sales = #{record.sales,jdbcType=INTEGER},
       </if>
+      <if test="record.maxPurchases != null">
+        max_purchases = #{record.maxPurchases,jdbcType=INTEGER},
+      </if>
       <if test="record.unit != null">
         unit = #{record.unit,jdbcType=VARCHAR},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=TINYINT},
+        status = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -303,8 +313,9 @@
       logo_key = #{record.logoKey,jdbcType=VARCHAR},
       invetory = #{record.invetory,jdbcType=INTEGER},
       sales = #{record.sales,jdbcType=INTEGER},
+      max_purchases = #{record.maxPurchases,jdbcType=INTEGER},
       unit = #{record.unit,jdbcType=VARCHAR},
-      status = #{record.status,jdbcType=TINYINT},
+      status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       description = #{record.description,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
@@ -323,8 +334,9 @@
       logo_key = #{record.logoKey,jdbcType=VARCHAR},
       invetory = #{record.invetory,jdbcType=INTEGER},
       sales = #{record.sales,jdbcType=INTEGER},
+      max_purchases = #{record.maxPurchases,jdbcType=INTEGER},
       unit = #{record.unit,jdbcType=VARCHAR},
-      status = #{record.status,jdbcType=TINYINT},
+      status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -360,11 +372,14 @@
       <if test="sales != null">
         sales = #{sales,jdbcType=INTEGER},
       </if>
+      <if test="maxPurchases != null">
+        max_purchases = #{maxPurchases,jdbcType=INTEGER},
+      </if>
       <if test="unit != null">
         unit = #{unit,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -386,8 +401,9 @@
       logo_key = #{logoKey,jdbcType=VARCHAR},
       invetory = #{invetory,jdbcType=INTEGER},
       sales = #{sales,jdbcType=INTEGER},
+      max_purchases = #{maxPurchases,jdbcType=INTEGER},
       unit = #{unit,jdbcType=VARCHAR},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
@@ -403,8 +419,9 @@
       logo_key = #{logoKey,jdbcType=VARCHAR},
       invetory = #{invetory,jdbcType=INTEGER},
       sales = #{sales,jdbcType=INTEGER},
+      max_purchases = #{maxPurchases,jdbcType=INTEGER},
       unit = #{unit,jdbcType=VARCHAR},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

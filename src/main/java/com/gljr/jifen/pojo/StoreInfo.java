@@ -19,11 +19,11 @@ public class StoreInfo {
 
     private String logoKey;
 
-    private Byte payStatus;
+    private Integer payStatus;
 
     private Integer aid;
 
-    private Byte status;
+    private Integer status;
 
     private Date createTime;
 
@@ -93,11 +93,11 @@ public class StoreInfo {
         this.logoKey = logoKey == null ? null : logoKey.trim();
     }
 
-    public Byte getPayStatus() {
+    public Integer getPayStatus() {
         return payStatus;
     }
 
-    public void setPayStatus(Byte payStatus) {
+    public void setPayStatus(Integer payStatus) {
         this.payStatus = payStatus;
     }
 
@@ -109,11 +109,11 @@ public class StoreInfo {
         this.aid = aid;
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

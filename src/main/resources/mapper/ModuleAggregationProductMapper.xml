@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.ModuleAggregationProduct">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="aggregation_id" jdbcType="INTEGER" property="aggregationId" />
-    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="type" jdbcType="INTEGER" property="type" />
     <result column="product_id" jdbcType="INTEGER" property="productId" />
     <result column="store_id" jdbcType="INTEGER" property="storeId" />
     <result column="sort" jdbcType="INTEGER" property="sort" />
@@ -108,7 +108,7 @@
     insert into module_aggregation_product (aggregation_id, type, product_id, 
       store_id, sort, create_time
       )
-    values (#{aggregationId,jdbcType=INTEGER}, #{type,jdbcType=TINYINT}, #{productId,jdbcType=INTEGER}, 
+    values (#{aggregationId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{productId,jdbcType=INTEGER}, 
       #{storeId,jdbcType=INTEGER}, #{sort,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -142,7 +142,7 @@
         #{aggregationId,jdbcType=INTEGER},
       </if>
       <if test="type != null">
-        #{type,jdbcType=TINYINT},
+        #{type,jdbcType=INTEGER},
       </if>
       <if test="productId != null">
         #{productId,jdbcType=INTEGER},
@@ -174,7 +174,7 @@
         aggregation_id = #{record.aggregationId,jdbcType=INTEGER},
       </if>
       <if test="record.type != null">
-        type = #{record.type,jdbcType=TINYINT},
+        type = #{record.type,jdbcType=INTEGER},
       </if>
       <if test="record.productId != null">
         product_id = #{record.productId,jdbcType=INTEGER},
@@ -197,7 +197,7 @@
     update module_aggregation_product
     set id = #{record.id,jdbcType=INTEGER},
       aggregation_id = #{record.aggregationId,jdbcType=INTEGER},
-      type = #{record.type,jdbcType=TINYINT},
+      type = #{record.type,jdbcType=INTEGER},
       product_id = #{record.productId,jdbcType=INTEGER},
       store_id = #{record.storeId,jdbcType=INTEGER},
       sort = #{record.sort,jdbcType=INTEGER},
@@ -213,7 +213,7 @@
         aggregation_id = #{aggregationId,jdbcType=INTEGER},
       </if>
       <if test="type != null">
-        type = #{type,jdbcType=TINYINT},
+        type = #{type,jdbcType=INTEGER},
       </if>
       <if test="productId != null">
         product_id = #{productId,jdbcType=INTEGER},
@@ -233,7 +233,7 @@
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.ModuleAggregationProduct">
     update module_aggregation_product
     set aggregation_id = #{aggregationId,jdbcType=INTEGER},
-      type = #{type,jdbcType=TINYINT},
+      type = #{type,jdbcType=INTEGER},
       product_id = #{productId,jdbcType=INTEGER},
       store_id = #{storeId,jdbcType=INTEGER},
       sort = #{sort,jdbcType=INTEGER},

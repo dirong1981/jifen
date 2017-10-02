@@ -5,10 +5,10 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="code" jdbcType="VARCHAR" property="code" />
     <result column="type" jdbcType="INTEGER" property="type" />
-    <result column="owner_type" jdbcType="TINYINT" property="ownerType" />
+    <result column="owner_type" jdbcType="INTEGER" property="ownerType" />
     <result column="owner_id" jdbcType="INTEGER" property="ownerId" />
     <result column="integral" jdbcType="INTEGER" property="integral" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -109,8 +109,8 @@
     insert into transaction (code, type, owner_type, 
       owner_id, integral, status, 
       create_time)
-    values (#{code,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{ownerType,jdbcType=TINYINT}, 
-      #{ownerId,jdbcType=INTEGER}, #{integral,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, 
+    values (#{code,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{ownerType,jdbcType=INTEGER}, 
+      #{ownerId,jdbcType=INTEGER}, #{integral,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
       #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Transaction">
@@ -149,7 +149,7 @@
         #{type,jdbcType=INTEGER},
       </if>
       <if test="ownerType != null">
-        #{ownerType,jdbcType=TINYINT},
+        #{ownerType,jdbcType=INTEGER},
       </if>
       <if test="ownerId != null">
         #{ownerId,jdbcType=INTEGER},
@@ -158,7 +158,7 @@
         #{integral,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -184,7 +184,7 @@
         type = #{record.type,jdbcType=INTEGER},
       </if>
       <if test="record.ownerType != null">
-        owner_type = #{record.ownerType,jdbcType=TINYINT},
+        owner_type = #{record.ownerType,jdbcType=INTEGER},
       </if>
       <if test="record.ownerId != null">
         owner_id = #{record.ownerId,jdbcType=INTEGER},
@@ -193,7 +193,7 @@
         integral = #{record.integral,jdbcType=INTEGER},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=TINYINT},
+        status = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -208,10 +208,10 @@
     set id = #{record.id,jdbcType=INTEGER},
       code = #{record.code,jdbcType=VARCHAR},
       type = #{record.type,jdbcType=INTEGER},
-      owner_type = #{record.ownerType,jdbcType=TINYINT},
+      owner_type = #{record.ownerType,jdbcType=INTEGER},
       owner_id = #{record.ownerId,jdbcType=INTEGER},
       integral = #{record.integral,jdbcType=INTEGER},
-      status = #{record.status,jdbcType=TINYINT},
+      status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -227,7 +227,7 @@
         type = #{type,jdbcType=INTEGER},
       </if>
       <if test="ownerType != null">
-        owner_type = #{ownerType,jdbcType=TINYINT},
+        owner_type = #{ownerType,jdbcType=INTEGER},
       </if>
       <if test="ownerId != null">
         owner_id = #{ownerId,jdbcType=INTEGER},
@@ -236,7 +236,7 @@
         integral = #{integral,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -248,10 +248,10 @@
     update transaction
     set code = #{code,jdbcType=VARCHAR},
       type = #{type,jdbcType=INTEGER},
-      owner_type = #{ownerType,jdbcType=TINYINT},
+      owner_type = #{ownerType,jdbcType=INTEGER},
       owner_id = #{ownerId,jdbcType=INTEGER},
       integral = #{integral,jdbcType=INTEGER},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

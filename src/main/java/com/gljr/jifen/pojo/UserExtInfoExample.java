@@ -244,53 +244,113 @@ public class UserExtInfoExample {
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeEqualTo(Byte value) {
+        public Criteria andViewTypeEqualTo(Integer value) {
             addCriterion("view_type =", value, "viewType");
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeNotEqualTo(Byte value) {
+        public Criteria andViewTypeNotEqualTo(Integer value) {
             addCriterion("view_type <>", value, "viewType");
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeGreaterThan(Byte value) {
+        public Criteria andViewTypeGreaterThan(Integer value) {
             addCriterion("view_type >", value, "viewType");
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeGreaterThanOrEqualTo(Byte value) {
+        public Criteria andViewTypeGreaterThanOrEqualTo(Integer value) {
             addCriterion("view_type >=", value, "viewType");
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeLessThan(Byte value) {
+        public Criteria andViewTypeLessThan(Integer value) {
             addCriterion("view_type <", value, "viewType");
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeLessThanOrEqualTo(Byte value) {
+        public Criteria andViewTypeLessThanOrEqualTo(Integer value) {
             addCriterion("view_type <=", value, "viewType");
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeIn(List<Byte> values) {
+        public Criteria andViewTypeIn(List<Integer> values) {
             addCriterion("view_type in", values, "viewType");
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeNotIn(List<Byte> values) {
+        public Criteria andViewTypeNotIn(List<Integer> values) {
             addCriterion("view_type not in", values, "viewType");
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeBetween(Byte value1, Byte value2) {
+        public Criteria andViewTypeBetween(Integer value1, Integer value2) {
             addCriterion("view_type between", value1, value2, "viewType");
             return (Criteria) this;
         }
 
-        public Criteria andViewTypeNotBetween(Byte value1, Byte value2) {
+        public Criteria andViewTypeNotBetween(Integer value1, Integer value2) {
             addCriterion("view_type not between", value1, value2, "viewType");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidIsNull() {
+            addCriterion("uid is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidIsNotNull() {
+            addCriterion("uid is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidEqualTo(Integer value) {
+            addCriterion("uid =", value, "uid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidNotEqualTo(Integer value) {
+            addCriterion("uid <>", value, "uid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidGreaterThan(Integer value) {
+            addCriterion("uid >", value, "uid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidGreaterThanOrEqualTo(Integer value) {
+            addCriterion("uid >=", value, "uid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidLessThan(Integer value) {
+            addCriterion("uid <", value, "uid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidLessThanOrEqualTo(Integer value) {
+            addCriterion("uid <=", value, "uid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidIn(List<Integer> values) {
+            addCriterion("uid in", values, "uid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidNotIn(List<Integer> values) {
+            addCriterion("uid not in", values, "uid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidBetween(Integer value1, Integer value2) {
+            addCriterion("uid between", value1, value2, "uid");
+            return (Criteria) this;
+        }
+
+        public Criteria andUidNotBetween(Integer value1, Integer value2) {
+            addCriterion("uid not between", value1, value2, "uid");
             return (Criteria) this;
         }
     }

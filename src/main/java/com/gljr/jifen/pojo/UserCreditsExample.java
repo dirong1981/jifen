@@ -175,52 +175,52 @@ public class UserCreditsExample {
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeEqualTo(Byte value) {
+        public Criteria andOwnerTypeEqualTo(Integer value) {
             addCriterion("owner_type =", value, "ownerType");
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeNotEqualTo(Byte value) {
+        public Criteria andOwnerTypeNotEqualTo(Integer value) {
             addCriterion("owner_type <>", value, "ownerType");
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeGreaterThan(Byte value) {
+        public Criteria andOwnerTypeGreaterThan(Integer value) {
             addCriterion("owner_type >", value, "ownerType");
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeGreaterThanOrEqualTo(Byte value) {
+        public Criteria andOwnerTypeGreaterThanOrEqualTo(Integer value) {
             addCriterion("owner_type >=", value, "ownerType");
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeLessThan(Byte value) {
+        public Criteria andOwnerTypeLessThan(Integer value) {
             addCriterion("owner_type <", value, "ownerType");
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeLessThanOrEqualTo(Byte value) {
+        public Criteria andOwnerTypeLessThanOrEqualTo(Integer value) {
             addCriterion("owner_type <=", value, "ownerType");
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeIn(List<Byte> values) {
+        public Criteria andOwnerTypeIn(List<Integer> values) {
             addCriterion("owner_type in", values, "ownerType");
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeNotIn(List<Byte> values) {
+        public Criteria andOwnerTypeNotIn(List<Integer> values) {
             addCriterion("owner_type not in", values, "ownerType");
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeBetween(Byte value1, Byte value2) {
+        public Criteria andOwnerTypeBetween(Integer value1, Integer value2) {
             addCriterion("owner_type between", value1, value2, "ownerType");
             return (Criteria) this;
         }
 
-        public Criteria andOwnerTypeNotBetween(Byte value1, Byte value2) {
+        public Criteria andOwnerTypeNotBetween(Integer value1, Integer value2) {
             addCriterion("owner_type not between", value1, value2, "ownerType");
             return (Criteria) this;
         }

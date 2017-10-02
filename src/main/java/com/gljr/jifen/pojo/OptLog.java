@@ -7,7 +7,7 @@ public class OptLog {
 
     private Integer aid;
 
-    private Byte optType;
+    private Integer optType;
 
     private String tableName;
 
@@ -31,11 +31,11 @@ public class OptLog {
         this.aid = aid;
     }
 
-    public Byte getOptType() {
+    public Integer getOptType() {
         return optType;
     }
 
-    public void setOptType(Byte optType) {
+    public void setOptType(Integer optType) {
         this.optType = optType;
     }
 

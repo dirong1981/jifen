@@ -65,6 +65,13 @@ public class GlobalConstants {
     public static final String ILLEGAL_OPERATION = "非法操作！";
     public static final String NO_ACTIVATION = "账号未激活！";
     public static final String IS_DISABLE = "账号已禁用！";
+    public static final String NOTHING_SELECT = "请选择内容再提交！";
+    public static final String SQL_FAILED = "数据库错误！";
+    public static final String NO_SELECTED = "没有添加商品或商户！";
+    public static final String GREAT_THAN = "添加的数量和限定值不符，请重试！";
+    public static final String NOT_ALLOWED_OPERATION = "不允许该操作！";
+    public static final String OBJ_IS_USED = "该对象正在被使用！";
+    public static final String USER_NO_EXIST = "获取用户数据失败！";
 
 
 }

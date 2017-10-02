@@ -235,52 +235,52 @@ public class AdminOnlineExample {
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeEqualTo(Byte value) {
+        public Criteria andClientTypeEqualTo(Integer value) {
             addCriterion("client_type =", value, "clientType");
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeNotEqualTo(Byte value) {
+        public Criteria andClientTypeNotEqualTo(Integer value) {
             addCriterion("client_type <>", value, "clientType");
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeGreaterThan(Byte value) {
+        public Criteria andClientTypeGreaterThan(Integer value) {
             addCriterion("client_type >", value, "clientType");
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeGreaterThanOrEqualTo(Byte value) {
+        public Criteria andClientTypeGreaterThanOrEqualTo(Integer value) {
             addCriterion("client_type >=", value, "clientType");
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeLessThan(Byte value) {
+        public Criteria andClientTypeLessThan(Integer value) {
             addCriterion("client_type <", value, "clientType");
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeLessThanOrEqualTo(Byte value) {
+        public Criteria andClientTypeLessThanOrEqualTo(Integer value) {
             addCriterion("client_type <=", value, "clientType");
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeIn(List<Byte> values) {
+        public Criteria andClientTypeIn(List<Integer> values) {
             addCriterion("client_type in", values, "clientType");
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeNotIn(List<Byte> values) {
+        public Criteria andClientTypeNotIn(List<Integer> values) {
             addCriterion("client_type not in", values, "clientType");
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeBetween(Byte value1, Byte value2) {
+        public Criteria andClientTypeBetween(Integer value1, Integer value2) {
             addCriterion("client_type between", value1, value2, "clientType");
             return (Criteria) this;
         }
 
-        public Criteria andClientTypeNotBetween(Byte value1, Byte value2) {
+        public Criteria andClientTypeNotBetween(Integer value1, Integer value2) {
             addCriterion("client_type not between", value1, value2, "clientType");
             return (Criteria) this;
         }

@@ -5,8 +5,8 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="link_code" jdbcType="VARCHAR" property="linkCode" />
     <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="type" jdbcType="TINYINT" property="type" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="manager_id" jdbcType="INTEGER" property="managerId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -108,8 +108,8 @@
     insert into module_aggregation (link_code, title, type, 
       status, manager_id, create_time
       )
-    values (#{linkCode,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT}, 
-      #{status,jdbcType=TINYINT}, #{managerId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
+    values (#{linkCode,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{managerId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.ModuleAggregation">
@@ -145,10 +145,10 @@
         #{title,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
-        #{type,jdbcType=TINYINT},
+        #{type,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="managerId != null">
         #{managerId,jdbcType=INTEGER},
@@ -177,10 +177,10 @@
         title = #{record.title,jdbcType=VARCHAR},
       </if>
       <if test="record.type != null">
-        type = #{record.type,jdbcType=TINYINT},
+        type = #{record.type,jdbcType=INTEGER},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=TINYINT},
+        status = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.managerId != null">
         manager_id = #{record.managerId,jdbcType=INTEGER},
@@ -198,8 +198,8 @@
     set id = #{record.id,jdbcType=INTEGER},
       link_code = #{record.linkCode,jdbcType=VARCHAR},
       title = #{record.title,jdbcType=VARCHAR},
-      type = #{record.type,jdbcType=TINYINT},
-      status = #{record.status,jdbcType=TINYINT},
+      type = #{record.type,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
       manager_id = #{record.managerId,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -216,10 +216,10 @@
         title = #{title,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
-        type = #{type,jdbcType=TINYINT},
+        type = #{type,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="managerId != null">
         manager_id = #{managerId,jdbcType=INTEGER},
@@ -234,8 +234,8 @@
     update module_aggregation
     set link_code = #{linkCode,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},
-      type = #{type,jdbcType=TINYINT},
-      status = #{status,jdbcType=TINYINT},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
       manager_id = #{managerId,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

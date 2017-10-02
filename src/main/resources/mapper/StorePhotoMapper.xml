@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.StorePhoto">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="si_id" jdbcType="INTEGER" property="siId" />
-    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="type" jdbcType="INTEGER" property="type" />
     <result column="img_key" jdbcType="VARCHAR" property="imgKey" />
     <result column="img_title" jdbcType="VARCHAR" property="imgTitle" />
     <result column="sort" jdbcType="INTEGER" property="sort" />
@@ -108,7 +108,7 @@
     insert into store_photo (si_id, type, img_key, 
       img_title, sort, create_time
       )
-    values (#{siId,jdbcType=INTEGER}, #{type,jdbcType=TINYINT}, #{imgKey,jdbcType=VARCHAR}, 
+    values (#{siId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{imgKey,jdbcType=VARCHAR}, 
       #{imgTitle,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -142,7 +142,7 @@
         #{siId,jdbcType=INTEGER},
       </if>
       <if test="type != null">
-        #{type,jdbcType=TINYINT},
+        #{type,jdbcType=INTEGER},
       </if>
       <if test="imgKey != null">
         #{imgKey,jdbcType=VARCHAR},
@@ -174,7 +174,7 @@
         si_id = #{record.siId,jdbcType=INTEGER},
       </if>
       <if test="record.type != null">
-        type = #{record.type,jdbcType=TINYINT},
+        type = #{record.type,jdbcType=INTEGER},
       </if>
       <if test="record.imgKey != null">
         img_key = #{record.imgKey,jdbcType=VARCHAR},
@@ -197,7 +197,7 @@
     update store_photo
     set id = #{record.id,jdbcType=INTEGER},
       si_id = #{record.siId,jdbcType=INTEGER},
-      type = #{record.type,jdbcType=TINYINT},
+      type = #{record.type,jdbcType=INTEGER},
       img_key = #{record.imgKey,jdbcType=VARCHAR},
       img_title = #{record.imgTitle,jdbcType=VARCHAR},
       sort = #{record.sort,jdbcType=INTEGER},
@@ -213,7 +213,7 @@
         si_id = #{siId,jdbcType=INTEGER},
       </if>
       <if test="type != null">
-        type = #{type,jdbcType=TINYINT},
+        type = #{type,jdbcType=INTEGER},
       </if>
       <if test="imgKey != null">
         img_key = #{imgKey,jdbcType=VARCHAR},
@@ -233,7 +233,7 @@
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.StorePhoto">
     update store_photo
     set si_id = #{siId,jdbcType=INTEGER},
-      type = #{type,jdbcType=TINYINT},
+      type = #{type,jdbcType=INTEGER},
       img_key = #{imgKey,jdbcType=VARCHAR},
       img_title = #{imgTitle,jdbcType=VARCHAR},
       sort = #{sort,jdbcType=INTEGER},

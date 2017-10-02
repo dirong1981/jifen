@@ -3,27 +3,19 @@ package com.gljr.jifen.filter;
 import com.gljr.jifen.common.*;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.AdminOnline;
-import com.gljr.jifen.pojo.OnlineOrder;
 import com.gljr.jifen.service.AdminService;
+import com.gljr.jifen.service.RedisService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import redis.clients.jedis.Jedis;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.PrintWriter;
-import java.sql.Struct;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 public class TokenIntecepter implements HandlerInterceptor {
@@ -31,6 +23,9 @@ public class TokenIntecepter implements HandlerInterceptor {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private RedisService redisService;
 
 
     @Override
@@ -55,10 +50,9 @@ public class TokenIntecepter implements HandlerInterceptor {
 
         //判断客户端类型
         if (clientType == 1 || clientType == 2) {
-
             //电脑用户，管理员管理后台
             try {
-                if (clientType == 2) {
+                if (clientType == 2){
                     String token = httpServletRequest.getHeader("token");
                     String aid = httpServletRequest.getHeader("aid");
                     if (StringUtils.isEmpty(token) || StringUtils.isEmpty(aid)) {
@@ -66,17 +60,21 @@ public class TokenIntecepter implements HandlerInterceptor {
                         return false;
                     } else {
                         //获取服务器端管理员信息
-                        Jedis jedis = JedisUtil.getJedis();
-                        List<String> _admin = jedis.hmget("admin" + aid, "token", "aid", "permission", "type");
+                        Map<String, String> tokenMap = this.redisService.getMap("admin_" + aid, String.class);
+                        if (null == tokenMap || !tokenMap.containsKey("permission")
+                                || !tokenMap.containsKey("type") || !tokenMap.containsKey("aid")) {
+                            StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+                            return false;
+                        }
 
                         //判断是不是系统管理员登录
-                        if(!_admin.get(3).equals("1")){
+                        if (!"1".equals(tokenMap.get("type"))) {
                             StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
                             return false;
                         }
 
                         //查询在线表中管理员信息
-                        List<AdminOnline> adminOnlines = adminService.selectAdminOnlinesByAid(Integer.parseInt(_admin.get(1)), clientType);
+                        List<AdminOnline> adminOnlines = adminService.selectAdminOnlinesByAid(Integer.parseInt(tokenMap.get("aid")), clientType);
 
                         String tokenKey = "";
                         //如果管理员存在，获取tokenkey，否则重新登录

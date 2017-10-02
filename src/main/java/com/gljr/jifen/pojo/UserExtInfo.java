@@ -5,7 +5,9 @@ public class UserExtInfo {
 
     private String cellphone;
 
-    private Byte viewType;
+    private Integer viewType;
+
+    private Integer uid;
 
     public Integer getId() {
         return id;
@@ -23,11 +25,19 @@ public class UserExtInfo {
         this.cellphone = cellphone == null ? null : cellphone.trim();
     }
 
-    public Byte getViewType() {
+    public Integer getViewType() {
         return viewType;
     }
 
-    public void setViewType(Byte viewType) {
+    public void setViewType(Integer viewType) {
         this.viewType = viewType;
+    }
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
     }
 }

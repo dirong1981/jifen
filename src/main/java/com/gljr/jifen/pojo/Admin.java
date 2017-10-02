@@ -5,7 +5,7 @@ import java.util.Date;
 public class Admin {
     private Integer id;
 
-    private Byte accountType;
+    private Integer accountType;
 
     private String username;
 
@@ -13,7 +13,7 @@ public class Admin {
 
     private String salt;
 
-    private Byte status;
+    private Integer status;
 
     private Date createTime;
 
@@ -27,11 +27,11 @@ public class Admin {
         this.id = id;
     }
 
-    public Byte getAccountType() {
+    public Integer getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(Byte accountType) {
+    public void setAccountType(Integer accountType) {
         this.accountType = accountType;
     }
 
@@ -59,11 +59,11 @@ public class Admin {
         this.salt = salt == null ? null : salt.trim();
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

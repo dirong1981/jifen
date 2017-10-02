@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.OptLog">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="aid" jdbcType="INTEGER" property="aid" />
-    <result column="opt_type" jdbcType="TINYINT" property="optType" />
+    <result column="opt_type" jdbcType="INTEGER" property="optType" />
     <result column="table_name" jdbcType="VARCHAR" property="tableName" />
     <result column="opt_time" jdbcType="TIMESTAMP" property="optTime" />
   </resultMap>
@@ -129,7 +129,7 @@
     </selectKey>
     insert into opt_log (aid, opt_type, table_name, 
       opt_time, content)
-    values (#{aid,jdbcType=INTEGER}, #{optType,jdbcType=TINYINT}, #{tableName,jdbcType=VARCHAR}, 
+    values (#{aid,jdbcType=INTEGER}, #{optType,jdbcType=INTEGER}, #{tableName,jdbcType=VARCHAR}, 
       #{optTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.OptLog">
@@ -159,7 +159,7 @@
         #{aid,jdbcType=INTEGER},
       </if>
       <if test="optType != null">
-        #{optType,jdbcType=TINYINT},
+        #{optType,jdbcType=INTEGER},
       </if>
       <if test="tableName != null">
         #{tableName,jdbcType=VARCHAR},
@@ -188,7 +188,7 @@
         aid = #{record.aid,jdbcType=INTEGER},
       </if>
       <if test="record.optType != null">
-        opt_type = #{record.optType,jdbcType=TINYINT},
+        opt_type = #{record.optType,jdbcType=INTEGER},
       </if>
       <if test="record.tableName != null">
         table_name = #{record.tableName,jdbcType=VARCHAR},
@@ -208,7 +208,7 @@
     update opt_log
     set id = #{record.id,jdbcType=INTEGER},
       aid = #{record.aid,jdbcType=INTEGER},
-      opt_type = #{record.optType,jdbcType=TINYINT},
+      opt_type = #{record.optType,jdbcType=INTEGER},
       table_name = #{record.tableName,jdbcType=VARCHAR},
       opt_time = #{record.optTime,jdbcType=TIMESTAMP},
       content = #{record.content,jdbcType=LONGVARCHAR}
@@ -220,7 +220,7 @@
     update opt_log
     set id = #{record.id,jdbcType=INTEGER},
       aid = #{record.aid,jdbcType=INTEGER},
-      opt_type = #{record.optType,jdbcType=TINYINT},
+      opt_type = #{record.optType,jdbcType=INTEGER},
       table_name = #{record.tableName,jdbcType=VARCHAR},
       opt_time = #{record.optTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -234,7 +234,7 @@
         aid = #{aid,jdbcType=INTEGER},
       </if>
       <if test="optType != null">
-        opt_type = #{optType,jdbcType=TINYINT},
+        opt_type = #{optType,jdbcType=INTEGER},
       </if>
       <if test="tableName != null">
         table_name = #{tableName,jdbcType=VARCHAR},
@@ -251,7 +251,7 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.gljr.jifen.pojo.OptLog">
     update opt_log
     set aid = #{aid,jdbcType=INTEGER},
-      opt_type = #{optType,jdbcType=TINYINT},
+      opt_type = #{optType,jdbcType=INTEGER},
       table_name = #{tableName,jdbcType=VARCHAR},
       opt_time = #{optTime,jdbcType=TIMESTAMP},
       content = #{content,jdbcType=LONGVARCHAR}
@@ -260,7 +260,7 @@
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.OptLog">
     update opt_log
     set aid = #{aid,jdbcType=INTEGER},
-      opt_type = #{optType,jdbcType=TINYINT},
+      opt_type = #{optType,jdbcType=INTEGER},
       table_name = #{tableName,jdbcType=VARCHAR},
       opt_time = #{optTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

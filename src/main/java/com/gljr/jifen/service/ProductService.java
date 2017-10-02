@@ -8,9 +8,18 @@ import java.util.List;
 
 public interface ProductService {
 
-    int addProduct(Product product);
+    /**
+     * 添加商品，更新上传图片的临时id为商品id
+     * @param product
+     * @return
+     */
+    int addProduct(Product product, Integer random);
 
 
+    /**
+     * 查找素有商品，包括未审核，但不显示删除商品
+     * @return
+     */
     List<Product> selectAllProduct();
 
     List<Product> selectAllProduct(int sort);
@@ -27,7 +36,14 @@ public interface ProductService {
 
 
 
-    int deleteProduct(int id);
+    int deleteProduct(Product product);
+
+    /**
+     * 根据商品id查询图片数量
+     * @param pid
+     * @return
+     */
+    Long selectProductPhotoCountByPid(Integer pid);
 
 
 

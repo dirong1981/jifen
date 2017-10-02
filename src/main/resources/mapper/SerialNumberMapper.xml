@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gljr.jifen.dao.SerialNumberMapper">
+
+    <select id="getNextSystemPermissionCode" resultType="Integer">
+        SELECT IFNULL(max(code) + 1, 10 + #{parentCode} * 100) AS next_code
+        FROM system_permission
+        WHERE parent_code = #{parentCode}
+    </select>
+
+    <select id="isStoreSerialCodeExist" resultType="Boolean">
+        select count(0) > 0 from store_info where serial_code = #{serialCode}
+    </select>
+
+    <select id="isValidLocation" resultType="Boolean">
+        SELECT count(0) > 0 FROM `location` WHERE code = #{locationCode}
+    </select>
+
+    <select id="getNextCategoryCode" resultType="Integer">
+        SELECT IFNULL(max(`code`) + 1, 10 + #{parentCode} * 100) AS next_code
+        FROM category
+        WHERE parent_code = #{parentCode}
+    </select>
+
+    <select id="isTrxCodeExist" resultType="Boolean">
+        select count(0) > 0 from `transaction` where `code` = #{trxCode}
+    </select>
+</mapper>

@@ -2,7 +2,9 @@ package com.gljr.jifen.controller.manager;
 
 
 import com.gljr.jifen.common.*;
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.controller.BaseController;
+import com.gljr.jifen.service.RedisService;
 import com.gljr.jifen.service.StoreInfoService;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.*;
@@ -33,6 +35,9 @@ public class AdminManagerController extends BaseController {
 
     @Autowired
     private StoreInfoService storeInfoService;
+
+    @Autowired
+    private RedisService redisService;
 
 
     /**
@@ -184,8 +189,8 @@ public class AdminManagerController extends BaseController {
                 return jsonResult;
             }else{
                 admin.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                admin.setAccountType((byte)1);
-                admin.setStatus((byte)1);
+                admin.setAccountType(DBConstants.AdminAccountType.SYS_ADMIN.getCode());
+                admin.setStatus(DBConstants.AdminAccountStatus.ACTIVED.getCode());
                 String salt = StrUtil.randomKey(32);
                 admin.setSalt(salt);
                 admin.setPassword(Md5Util.md5("admin"+salt));
@@ -253,7 +258,7 @@ public class AdminManagerController extends BaseController {
         try {
             Admin admin = adminService.selectAdminById(id);
 
-            admin.setStatus((byte)2);
+            admin.setStatus(DBConstants.AdminAccountStatus.DISABLED.getCode());
             adminService.updateAdminById(admin);
 
             jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
@@ -282,7 +287,7 @@ public class AdminManagerController extends BaseController {
         try {
             Admin admin = adminService.selectAdminById(id);
 
-            admin.setStatus((byte)1);
+            admin.setStatus(DBConstants.AdminAccountStatus.ACTIVED.getCode());
             adminService.updateAdminById(admin);
 
             jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
@@ -341,9 +346,7 @@ public class AdminManagerController extends BaseController {
             jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
 
         }else{
-            Jedis jedis = JedisUtil.getJedis();
-
-            jedis.del("admin" + aid);
+            this.redisService.evict("admin_" + aid);
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
             jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
         }
@@ -455,7 +458,7 @@ public class AdminManagerController extends BaseController {
                         AdminOnline adminOnline = new AdminOnline();
 
                         adminOnline.setAid(selectAdmin.getId());
-                        adminOnline.setClientType((byte) clientType);
+                        adminOnline.setClientType(clientType);
                         adminOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
                         adminOnline.setToken(key);
 
@@ -470,8 +473,7 @@ public class AdminManagerController extends BaseController {
                     map.put("type", selectAdmin.getAccountType()+"");
 
                     //把用户信息存入jedis
-                    Jedis jedis = JedisUtil.getJedis();
-                    jedis.hmset("admin" + selectAdmin.getId(), map);
+                    this.redisService.put("admin_" + selectAdmin.getId(), JsonUtil.toJson(map));
 
 //                    System.out.println(jedis.hmget("admin"+selectAdmin.getId(), "aid"));
 //                    System.out.println(jedis.hmget("admin"+selectAdmin.getId(), "username"));

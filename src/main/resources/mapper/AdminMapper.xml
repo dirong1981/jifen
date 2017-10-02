@@ -3,11 +3,11 @@
 <mapper namespace="com.gljr.jifen.dao.AdminMapper">
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.Admin">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="account_type" jdbcType="TINYINT" property="accountType" />
+    <result column="account_type" jdbcType="INTEGER" property="accountType" />
     <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="password" jdbcType="VARCHAR" property="password" />
     <result column="salt" jdbcType="VARCHAR" property="salt" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -108,8 +108,8 @@
     insert into admin (account_type, username, password, 
       salt, status, create_time
       )
-    values (#{accountType,jdbcType=TINYINT}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{salt,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}
+    values (#{accountType,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{salt,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Admin">
@@ -139,7 +139,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="accountType != null">
-        #{accountType,jdbcType=TINYINT},
+        #{accountType,jdbcType=INTEGER},
       </if>
       <if test="username != null">
         #{username,jdbcType=VARCHAR},
@@ -151,7 +151,7 @@
         #{salt,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -171,7 +171,7 @@
         id = #{record.id,jdbcType=INTEGER},
       </if>
       <if test="record.accountType != null">
-        account_type = #{record.accountType,jdbcType=TINYINT},
+        account_type = #{record.accountType,jdbcType=INTEGER},
       </if>
       <if test="record.username != null">
         username = #{record.username,jdbcType=VARCHAR},
@@ -183,7 +183,7 @@
         salt = #{record.salt,jdbcType=VARCHAR},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=TINYINT},
+        status = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -196,11 +196,11 @@
   <update id="updateByExample" parameterType="map">
     update admin
     set id = #{record.id,jdbcType=INTEGER},
-      account_type = #{record.accountType,jdbcType=TINYINT},
+      account_type = #{record.accountType,jdbcType=INTEGER},
       username = #{record.username,jdbcType=VARCHAR},
       password = #{record.password,jdbcType=VARCHAR},
       salt = #{record.salt,jdbcType=VARCHAR},
-      status = #{record.status,jdbcType=TINYINT},
+      status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -210,7 +210,7 @@
     update admin
     <set>
       <if test="accountType != null">
-        account_type = #{accountType,jdbcType=TINYINT},
+        account_type = #{accountType,jdbcType=INTEGER},
       </if>
       <if test="username != null">
         username = #{username,jdbcType=VARCHAR},
@@ -222,7 +222,7 @@
         salt = #{salt,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -232,11 +232,11 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.Admin">
     update admin
-    set account_type = #{accountType,jdbcType=TINYINT},
+    set account_type = #{accountType,jdbcType=INTEGER},
       username = #{username,jdbcType=VARCHAR},
       password = #{password,jdbcType=VARCHAR},
       salt = #{salt,jdbcType=VARCHAR},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

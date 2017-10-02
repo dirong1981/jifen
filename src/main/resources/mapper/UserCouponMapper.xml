@@ -10,7 +10,7 @@
     <result column="soo_id" jdbcType="INTEGER" property="sooId" />
     <result column="valid_from" jdbcType="DATE" property="validFrom" />
     <result column="valid_to" jdbcType="DATE" property="validTo" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -114,7 +114,7 @@
       )
     values (#{uid,jdbcType=INTEGER}, #{siId,jdbcType=INTEGER}, #{scId,jdbcType=INTEGER}, 
       #{couponCode,jdbcType=VARCHAR}, #{sooId,jdbcType=INTEGER}, #{validFrom,jdbcType=DATE}, 
-      #{validTo,jdbcType=DATE}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}
+      #{validTo,jdbcType=DATE}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.UserCoupon">
@@ -174,7 +174,7 @@
         #{validTo,jdbcType=DATE},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -215,7 +215,7 @@
         valid_to = #{record.validTo,jdbcType=DATE},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=TINYINT},
+        status = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -235,7 +235,7 @@
       soo_id = #{record.sooId,jdbcType=INTEGER},
       valid_from = #{record.validFrom,jdbcType=DATE},
       valid_to = #{record.validTo,jdbcType=DATE},
-      status = #{record.status,jdbcType=TINYINT},
+      status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -266,7 +266,7 @@
         valid_to = #{validTo,jdbcType=DATE},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -283,7 +283,7 @@
       soo_id = #{sooId,jdbcType=INTEGER},
       valid_from = #{validFrom,jdbcType=DATE},
       valid_to = #{validTo,jdbcType=DATE},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

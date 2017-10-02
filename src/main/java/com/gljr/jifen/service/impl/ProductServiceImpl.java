@@ -1,5 +1,8 @@
 package com.gljr.jifen.service.impl;
 
+
+import com.gljr.jifen.common.ValidCheck;
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.dao.ProductMapper;
 import com.gljr.jifen.dao.ProductPhotoMapper;
 import com.gljr.jifen.pojo.Product;
@@ -9,6 +12,7 @@ import com.gljr.jifen.pojo.ProductPhotoExample;
 import com.gljr.jifen.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,15 +26,33 @@ public class ProductServiceImpl implements ProductService{
     private ProductPhotoMapper productPhotoMapper;
 
 
-
     @Override
-    public int addProduct(Product product) {
-        return productMapper.insert(product);
+    @Transactional
+    public int addProduct(Product product, Integer random) {
+
+        productMapper.insert(product);
+
+        ProductPhotoExample productPhotoExample = new ProductPhotoExample();
+        ProductPhotoExample.Criteria criteria = productPhotoExample.or();
+        criteria.andPidEqualTo(random);
+
+        List<ProductPhoto> productPhotos = productPhotoMapper.selectByExample(productPhotoExample);
+
+        if(!ValidCheck.validList(productPhotos)){
+            for (ProductPhoto productPhoto : productPhotos){
+                productPhoto.setPid(product.getId());
+                productPhotoMapper.updateByPrimaryKey(productPhoto);
+            }
+        }
+
+        return 0;
     }
 
     @Override
     public List<Product> selectAllProduct() {
         ProductExample productExample = new ProductExample();
+        ProductExample.Criteria criteria = productExample.or();
+        criteria.andStatusNotEqualTo(DBConstants.ProductStatus.DELETED.getCode());
         productExample.setOrderByClause("id desc");
         return productMapper.selectByExample(productExample);
     }
@@ -39,7 +61,7 @@ public class ProductServiceImpl implements ProductService{
     public List<Product> selectAllProduct(int sort) {
         ProductExample productExample = new ProductExample();
         ProductExample.Criteria criteria = productExample.createCriteria();
-        criteria.andStatusEqualTo(new Byte("1"));
+        criteria.andStatusEqualTo(DBConstants.ProductStatus.ON_SALE.getCode());
 
         //设置排序
         if(sort == 0){
@@ -63,8 +85,16 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public int deleteProduct(int id) {
-        return productMapper.deleteByPrimaryKey(id);
+    public int deleteProduct(Product product) {
+        return productMapper.updateByPrimaryKey(product);
+    }
+
+    @Override
+    public Long selectProductPhotoCountByPid(Integer pid) {
+        ProductPhotoExample productPhotoExample = new ProductPhotoExample();
+        ProductPhotoExample.Criteria criteria = productPhotoExample.or();
+        criteria.andPidEqualTo(pid);
+        return productPhotoMapper.countByExample(productPhotoExample);
     }
 
     @Override
@@ -76,7 +106,7 @@ public class ProductServiceImpl implements ProductService{
     public List<Product> selectProductByKeyword(String keyword, int sort) {
         ProductExample productExample = new ProductExample();
         ProductExample.Criteria criteria = productExample.createCriteria();
-        criteria.andStatusEqualTo(new Byte("1"));
+        criteria.andStatusEqualTo(DBConstants.ProductStatus.ON_SALE.getCode());
         criteria.andNameLike("%" + keyword + "%");
         //设置排序
         if(sort == 0){
@@ -97,7 +127,7 @@ public class ProductServiceImpl implements ProductService{
     public List<Product> selectCategoryProduct(int code, int sort) {
         ProductExample productExample = new ProductExample();
         ProductExample.Criteria criteria = productExample.createCriteria();
-        criteria.andStatusEqualTo(new Byte("1"));
+        criteria.andStatusEqualTo(DBConstants.ProductStatus.ON_SALE.getCode());
         criteria.andCategoryCodeEqualTo(code);
         //设置排序
         if(sort == 0){

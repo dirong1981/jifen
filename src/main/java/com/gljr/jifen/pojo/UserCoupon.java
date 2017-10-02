@@ -19,7 +19,7 @@ public class UserCoupon {
 
     private Date validTo;
 
-    private Byte status;
+    private Integer status;
 
     private Date createTime;
 
@@ -87,11 +87,11 @@ public class UserCoupon {
         this.validTo = validTo;
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

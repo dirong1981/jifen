@@ -7,7 +7,7 @@ public class StorePhoto {
 
     private Integer siId;
 
-    private Byte type;
+    private Integer type;
 
     private String imgKey;
 
@@ -33,11 +33,11 @@ public class StorePhoto {
         this.siId = siId;
     }
 
-    public Byte getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(Byte type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 

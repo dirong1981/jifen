@@ -4,7 +4,8 @@
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.UserExtInfo">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="cellphone" jdbcType="VARCHAR" property="cellphone" />
-    <result column="view_type" jdbcType="TINYINT" property="viewType" />
+    <result column="view_type" jdbcType="INTEGER" property="viewType" />
+    <result column="uid" jdbcType="INTEGER" property="uid" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -65,7 +66,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, cellphone, view_type
+    id, cellphone, view_type, uid
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.UserExtInfoExample" resultMap="BaseResultMap">
     select
@@ -101,8 +102,10 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into user_ext_info (cellphone, view_type)
-    values (#{cellphone,jdbcType=VARCHAR}, #{viewType,jdbcType=TINYINT})
+    insert into user_ext_info (cellphone, view_type, uid
+      )
+    values (#{cellphone,jdbcType=VARCHAR}, #{viewType,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.UserExtInfo">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -116,13 +119,19 @@
       <if test="viewType != null">
         view_type,
       </if>
+      <if test="uid != null">
+        uid,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="cellphone != null">
         #{cellphone,jdbcType=VARCHAR},
       </if>
       <if test="viewType != null">
-        #{viewType,jdbcType=TINYINT},
+        #{viewType,jdbcType=INTEGER},
+      </if>
+      <if test="uid != null">
+        #{uid,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -142,7 +151,10 @@
         cellphone = #{record.cellphone,jdbcType=VARCHAR},
       </if>
       <if test="record.viewType != null">
-        view_type = #{record.viewType,jdbcType=TINYINT},
+        view_type = #{record.viewType,jdbcType=INTEGER},
+      </if>
+      <if test="record.uid != null">
+        uid = #{record.uid,jdbcType=INTEGER},
       </if>
     </set>
     <if test="_parameter != null">
@@ -153,7 +165,8 @@
     update user_ext_info
     set id = #{record.id,jdbcType=INTEGER},
       cellphone = #{record.cellphone,jdbcType=VARCHAR},
-      view_type = #{record.viewType,jdbcType=TINYINT}
+      view_type = #{record.viewType,jdbcType=INTEGER},
+      uid = #{record.uid,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -165,7 +178,10 @@
         cellphone = #{cellphone,jdbcType=VARCHAR},
       </if>
       <if test="viewType != null">
-        view_type = #{viewType,jdbcType=TINYINT},
+        view_type = #{viewType,jdbcType=INTEGER},
+      </if>
+      <if test="uid != null">
+        uid = #{uid,jdbcType=INTEGER},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -173,7 +189,8 @@
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.UserExtInfo">
     update user_ext_info
     set cellphone = #{cellphone,jdbcType=VARCHAR},
-      view_type = #{viewType,jdbcType=TINYINT}
+      view_type = #{viewType,jdbcType=INTEGER},
+      uid = #{uid,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

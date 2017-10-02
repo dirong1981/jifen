@@ -1,8 +1,6 @@
 package com.gljr.jifen.pojo;
 
-
 import java.util.Date;
-
 
 public class Product {
     private Integer id;
@@ -25,13 +23,17 @@ public class Product {
 
     private Integer sales;
 
+    private Integer maxPurchases;
+
     private String unit;
 
-    private Byte status;
+    private Integer status;
 
     private Date createTime;
 
     private String description;
+
+    private String storeName;
 
     public Integer getId() {
         return id;
@@ -113,6 +115,14 @@ public class Product {
         this.sales = sales;
     }
 
+    public Integer getMaxPurchases() {
+        return maxPurchases;
+    }
+
+    public void setMaxPurchases(Integer maxPurchases) {
+        this.maxPurchases = maxPurchases;
+    }
+
     public String getUnit() {
         return unit;
     }
@@ -121,11 +131,11 @@ public class Product {
         this.unit = unit == null ? null : unit.trim();
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -143,5 +153,13 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description == null ? null : description.trim();
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }

@@ -9,13 +9,13 @@ public class Module {
 
     private String description;
 
-    private Byte type;
+    private Integer type;
 
     private String thumbKey;
 
-    private Byte extType;
+    private Integer extType;
 
-    private Byte status;
+    private Integer status;
 
     private Integer managerId;
 
@@ -45,11 +45,11 @@ public class Module {
         this.description = description == null ? null : description.trim();
     }
 
-    public Byte getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(Byte type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
@@ -61,19 +61,19 @@ public class Module {
         this.thumbKey = thumbKey == null ? null : thumbKey.trim();
     }
 
-    public Byte getExtType() {
+    public Integer getExtType() {
         return extType;
     }
 
-    public void setExtType(Byte extType) {
+    public void setExtType(Integer extType) {
         this.extType = extType;
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

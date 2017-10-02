@@ -5,7 +5,7 @@ import java.util.Date;
 public class UserCredits {
     private Integer id;
 
-    private Byte ownerType;
+    private Integer ownerType;
 
     private Integer ownerId;
 
@@ -25,11 +25,11 @@ public class UserCredits {
         this.id = id;
     }
 
-    public Byte getOwnerType() {
+    public Integer getOwnerType() {
         return ownerType;
     }
 
-    public void setOwnerType(Byte ownerType) {
+    public void setOwnerType(Integer ownerType) {
         this.ownerType = ownerType;
     }
 

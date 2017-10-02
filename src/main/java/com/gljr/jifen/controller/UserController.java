@@ -1,18 +1,15 @@
 package com.gljr.jifen.controller;
 
-import com.gljr.jifen.common.HttpClientHelper;
-import com.gljr.jifen.common.JsonResult;
-import com.gljr.jifen.common.StrUtil;
+import com.gljr.jifen.common.*;
 import com.gljr.jifen.constants.GlobalConstants;
-import com.gljr.jifen.pojo.IntegralTransferOrder;
-import com.gljr.jifen.pojo.UserAddress;
-import com.gljr.jifen.pojo.UserCredits;
+import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.UserCreditsService;
 import com.gljr.jifen.service.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,7 +65,7 @@ public class UserController {
 
                     UserAddress defaultUserAddress = userService.selectUserAddressByIsDefault(Integer.parseInt(uid));
                     if(defaultUserAddress != null) {
-                        defaultUserAddress.setIsDefault(new Byte("0"));
+                        defaultUserAddress.setIsDefault(0);
                         userService.updateUserAddressById(defaultUserAddress);
                     }
                 }
@@ -255,7 +252,7 @@ public class UserController {
 
                         UserAddress defaultUserAddress = userService.selectUserAddressByIsDefault(Integer.parseInt(uid));
                         if (defaultUserAddress != null) {
-                            defaultUserAddress.setIsDefault(new Byte("0"));
+                            defaultUserAddress.setIsDefault(0);
                             userService.updateUserAddressById(defaultUserAddress);
                         }
                     }
@@ -347,111 +344,296 @@ public class UserController {
     @GetMapping(value = "/verification")
     @ResponseBody
 
-    public JsonResult connectGLJR(@RequestParam(value = "type") String type, @RequestParam(value = "identify",required = false) String identify,
+    public JsonResult connectGLJR(@RequestParam(value = "type", required = false) String type, @RequestParam(value = "identify",required = false) String identify,
                                     @RequestParam(value = "password", required = false) String password,
                                     HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+        JsonResult jsonResult = new JsonResult();
 
+        if(StringUtils.isEmpty(type)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
+        }
+
+        //获取用户信息
+        if(type.equals("2")){
+
+            //uid不为空
+            if(StringUtils.isEmpty(identify)){
+                CommonResult.userNotExit(jsonResult);
+                return jsonResult;
+            }
+
+            String realName;
+            Integer totalValue;
+            Integer validValue;
+            String phone;
+            Integer uid;
+            String token_key = StrUtil.randomKey(32);
+
+            try {
+                //去够力那边取数据
+                int code = (int) (Math.random() * 10000);
+//            int code = 3361;
+                String text = identify + code;
+                String url = "http://120.27.166.31/pointsMall/user/userInfo.html?identify=" + identify + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
+
+                String result = HttpClientHelper.httpClientGet(url);
+                JSONObject jsonObject = new JSONObject(result);
+
+                if (jsonObject.getString("code").equals("200")) {
+                    jsonObject = (JSONObject) jsonObject.get("data");
+
+                    realName = jsonObject.getString("realName");
+                    totalValue = jsonObject.getInt("totalValue");
+                    validValue = jsonObject.getInt("validValue");
+                    phone = jsonObject.getString("phone");
+                    uid = jsonObject.getInt("id");
+                }else {
+                    CommonResult.userNotExit(jsonResult);
+                    return jsonResult;
+                }
+            }catch (Exception e){
+                CommonResult.userNotExit(jsonResult);
+                return jsonResult;
+            }
+
+            try {
+                List<UserCredits> userCreditss = userCreditsService.selectUserCreditsByUid(uid);
+                if(ValidCheck.validList(userCreditss)) {
+                    //用户不存在
+
+                    UserCredits userCredits = new UserCredits();
+                    userCredits.setIntegral(validValue);
+                    userCredits.setOwnerType(1);
+                    userCredits.setWalletAddress("xxxxx");
+                    userCredits.setOwnerId(uid);
+                    userCredits.setFrozenIntegral(totalValue);
+                    userCredits.setCreateTime(new Timestamp(System.currentTimeMillis()));
+
+                    UserExtInfo userExtInfo = new UserExtInfo();
+                    userExtInfo.setCellphone(phone);
+                    userExtInfo.setViewType(1);
+                    userExtInfo.setUid(uid);
+
+                    UserOnline userOnline = new UserOnline();
+                    userOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
+                    userOnline.setToken(token_key);
+                    userOnline.setUid(uid);
+
+                    userService.insertUserInfo(userCredits, userExtInfo, userOnline);
+
+                }else{
+
+                    //积分表数据存在，更新
+                    UserCredits userCredits = userCreditss.get(0);
+                    userCredits.setFrozenIntegral(totalValue);
+                    userCredits.setIntegral(validValue);
+
+                    userCreditsService.updateUserCreditsById(userCredits);
+
+
+                    List<UserExtInfo> userExtInfos = userService.selectUserExtInfoByUid(uid);
+                    //不存在新添加
+                    if(ValidCheck.validList(userExtInfos)){
+                        UserExtInfo userExtInfo = new UserExtInfo();
+                        userExtInfo.setViewType(1);
+                        userExtInfo.setCellphone(phone);
+                        userExtInfo.setUid(uid);
+
+                        userService.insertUserExtInfo(userExtInfo);
+                    }
+
+                }
+
+                User user = new User();
+                user.setCellPhone(phone);
+                user.setIntegral(validValue);
+                user.setWallet_address("xxxxx");
+                user.setRealName(realName);
+                user.setUid(uid+"");
+
+                Map map = new HashMap();
+                map.put("data", user);
+
+                jsonResult.setItem(map);
+                CommonResult.success(jsonResult);
+
+            }catch (Exception e){
+                CommonResult.sqlFailed(jsonResult);
+            }
+        }else if (type.equals("1")){
+            //验证密码
+            String uid = httpServletRequest.getHeader("uid");
+            //uid为空
+            if(StringUtils.isEmpty(uid)){
+                CommonResult.userNotExit(jsonResult);
+                return jsonResult;
+            }
+            try {
+                int code = (int) (Math.random() * 10000);
+                String text = uid + password + code;
+                String url = "http://120.27.166.31/pointsMall/user/pwCheck.html?identify=" + uid + "&password=" + password + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
+
+                String result = HttpClientHelper.httpClientGet(url);
+                JSONObject jsonObject = new JSONObject(result);
+
+                if (jsonObject.getString("code").equals("200")) {
+                    CommonResult.success(jsonResult);
+                } else {
+                    CommonResult.passwordError(jsonResult);
+                }
+            }catch (Exception e){
+                CommonResult.userNotExit(jsonResult);
+            }
+        }else{
+            CommonResult.noObject(jsonResult);
+        }
+
+        return jsonResult;
+
+    }
+
+    /**
+     * 用户进入商城主页，获取用户信息，如果用户信息已存在，更新用户积分，如果不存在，添加用户积分，用户信息，用户登录状态
+     * 返回token，用户电话号码，用户积分，用户真实姓名，钱包地址
+     * @param uid
+     * @param gltoken
+     * @param httpServletResponse
+     * @param httpServletRequest
+     * @return
+     */
+    @GetMapping
+    @ResponseBody
+    public JsonResult selectUserInfo(@RequestParam(value = "uid", required = false) String uid, @RequestParam(value = "token", required = false) String gltoken,
+                                     HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
 
-        String uid = httpServletRequest.getHeader("uid");
-        if(uid == null || uid.equals("")){
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+        if(StringUtils.isEmpty(uid)){
+            CommonResult.userNotExit(jsonResult);
             return jsonResult;
-        }else {
+        }
+
+        String realName;
+        Integer totalValue;
+        Integer validValue;
+        String phone;
+        String token_key = StrUtil.randomKey(32);
+
+        try {
+            //去够力那边取数据
             int code = (int) (Math.random() * 10000);
-            String url = "";
-            String text = "";
-
-
-            //0登录，1验证密码，2获取信息
-            if (type.equals("0")) {
-                //登录
-                text = identify + password + code;
-//                url = login_url + "?identify=" + identify + "&password=" + password + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
-                url = "http://120.27.166.31/pointsMall/user/login.html?identify=" + identify + "&password=" + password + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
-
-            } else if (type.equals("1")) {
-                //验证密码
-                text = uid + password + code;
-//                url = pwCheck_url + "?identify=" + uid + "&password=" + password + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
-                url = "http://120.27.166.31/pointsMall/user/pwCheck.html?identify=" + uid + "&password=" + password + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
-
-            } else if (type.equals("2")) {
-                text = identify + code;
-//                url = userInfo_url + "?identify=" + identify + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
-                url = "http://120.27.166.31/pointsMall/user/userInfo.html?identify=" + identify + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
-
-
-            } else {
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-                return jsonResult;
-            }
+//            int code = 3361;
+            String text = uid + code;
+            String url = "http://120.27.166.31/pointsMall/user/userInfo.html?identify=" + uid + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
 
             String result = HttpClientHelper.httpClientGet(url);
             JSONObject jsonObject = new JSONObject(result);
 
-            Map map = new HashMap();
-
             if (jsonObject.getString("code").equals("200")) {
-                try {
-                    //jsonObject = new JSONObject(jsonObject.get("data"));
-//            System.out.println(jsonObject.get("data"));
-                    if (jsonObject.has("data")) {
-                        jsonObject = (JSONObject) jsonObject.get("data");
+                jsonObject = (JSONObject) jsonObject.get("data");
 
-                        //jsonObject = new JSONObject(data);
-                        map.put("realName", jsonObject.getString("realName"));
-                        map.put("id", jsonObject.getInt("id"));
-                        map.put("phone", jsonObject.getString("phone"));
-                        map.put("userName", jsonObject.getString("userName"));
-                        map.put("totalValue", jsonObject.getInt("totalValue"));
-                        map.put("validValue", jsonObject.getInt("validValue"));
-
-                        Map map1 = new HashMap();
-                        map1.put("data", map);
-
-                        jsonResult.setItem(map1);
-
-
-                        UserCredits userCredits = new UserCredits();
-                        userCredits.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                        userCredits.setFrozenIntegral(0);
-                        userCredits.setIntegral(10000000);
-                        userCredits.setOwnerId(jsonObject.getInt("id"));
-                        userCredits.setOwnerType(new Byte("1"));
-                        userCredits.setWalletAddress("xxxxxx");
-
-                        userCreditsService.insertUserCredits(userCredits);
-
-                    }
-                    jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-                    jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-                } catch (Exception e) {
-                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                    jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-                }
-            } else {
-                if(type.equals("0")){
-                    jsonResult.setMessage("登录失败，请重试！");
-                }else if(type.equals("1")){
-                    jsonResult.setMessage("密码错误，请重试！");
-                }else if(type.equals("2")){
-                    jsonResult.setMessage("没有该用户，请检查电话号码！");
-                }else {
-                    jsonResult.setMessage("操作失败，请重试！");
-                }
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-
+                realName = jsonObject.getString("realName");
+                totalValue = jsonObject.getInt("totalValue");
+                validValue = jsonObject.getInt("validValue");
+                phone = jsonObject.getString("phone");
+            }else {
+                CommonResult.userNotExit(jsonResult);
+                return jsonResult;
             }
+        }catch (Exception e){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
         }
 
+        try {
+            List<UserCredits> userCreditss = userCreditsService.selectUserCreditsByUid(Integer.parseInt(uid));
+            if(ValidCheck.validList(userCreditss)) {
+                //用户不存在
 
+                    UserCredits userCredits = new UserCredits();
+                    userCredits.setIntegral(validValue);
+                    userCredits.setOwnerType(1);
+                    userCredits.setWalletAddress("xxxxx");
+                    userCredits.setOwnerId(Integer.parseInt(uid));
+                    userCredits.setFrozenIntegral(totalValue);
+                    userCredits.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
+                    UserExtInfo userExtInfo = new UserExtInfo();
+                    userExtInfo.setCellphone(phone);
+                    userExtInfo.setViewType(1);
+                    userExtInfo.setUid(Integer.parseInt(uid));
 
+                    UserOnline userOnline = new UserOnline();
+                    userOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
+                    userOnline.setToken(token_key);
+                    userOnline.setUid(Integer.parseInt(uid));
 
+                    userService.insertUserInfo(userCredits, userExtInfo, userOnline);
+
+            }else{
+
+                UserCredits userCredits = userCreditss.get(0);
+                userCredits.setFrozenIntegral(totalValue);
+                userCredits.setIntegral(validValue);
+
+                List<UserOnline> userOnlines = userService.selectUserOnlineByUid(Integer.parseInt(uid));
+
+                if(ValidCheck.validList(userOnlines)){
+                    //不存在新添加
+                    UserOnline userOnline = new UserOnline();
+                    userOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
+                    userOnline.setToken(token_key);
+                    userOnline.setUid(Integer.parseInt(uid));
+
+                    userService.insertUserOnline(userOnline);
+                }else{
+                    //用户存在更新
+                    UserOnline userOnline = userOnlines.get(0);
+                    userOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
+
+                    userService.updateUserInfo(userCredits, userOnline);
+
+                }
+
+                List<UserExtInfo> userExtInfos = userService.selectUserExtInfoByUid(Integer.parseInt(uid));
+                //不存在新添加
+                if(ValidCheck.validList(userExtInfos)){
+                    UserExtInfo userExtInfo = new UserExtInfo();
+                    userExtInfo.setViewType(1);
+                    userExtInfo.setCellphone(phone);
+                    userExtInfo.setUid(Integer.parseInt(uid));
+
+                    userService.insertUserExtInfo(userExtInfo);
+                }
+
+            }
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("uid", uid);
+            jsonObject.put("phone", phone);
+
+            //生成token
+            String token = JwtUtil.createJWT("gljr", jsonObject.toString(), token_key, 60 * 60 * 24 * 360);
+
+            User user = new User();
+            user.setCellPhone(phone);
+            user.setIntegral(validValue);
+            user.setToken(token);
+            user.setWallet_address("xxxxx");
+            user.setRealName(realName);
+            user.setUid(uid);
+
+            Map map = new HashMap();
+            map.put("data", user);
+
+            jsonResult.setItem(map);
+            CommonResult.success(jsonResult);
+
+        }catch (Exception e){
+            System.out.println(e);
+            CommonResult.sqlFailed(jsonResult);
+        }
 
         return jsonResult;
     }
