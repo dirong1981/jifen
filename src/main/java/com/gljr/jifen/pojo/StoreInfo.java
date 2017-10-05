@@ -9,6 +9,8 @@ public class StoreInfo {
 
     private Integer categoryCode;
 
+    private String categoryName;
+
     private String name;
 
     private Integer locationCode;
@@ -131,5 +133,13 @@ public class StoreInfo {
 
     public void setDescription(String description) {
         this.description = description == null ? null : description.trim();
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }

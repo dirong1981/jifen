@@ -1,5 +1,7 @@
 package com.gljr.jifen.service;
 
+import com.gljr.jifen.common.JsonResult;
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.pojo.*;
 
 import java.util.List;
@@ -12,7 +14,7 @@ public interface AdminService {
      * @param admin
      * @return
      */
-    List<Admin> login(Admin admin);
+    Admin login(Admin admin);
 
     /**
      * 查询管理员拥有的权限
@@ -137,5 +139,26 @@ public interface AdminService {
 //    int deleteSonSystemPermission(Integer code);
 //
 //    SystemPermission selectSystemPermissionById(Integer id);
+
+    /**
+     * 用户登录
+     * @param username 用户名
+     * @param password 密码
+     * @param accountType 用户类型
+     * @return JsonResult
+     */
+    JsonResult doLogin(String username, String password, Integer type);
+
+    /**
+     * 用户退出登录
+     * @param uid 管理员ID
+     * @param accountType 用户类型
+     * @return JsonResult
+     */
+    JsonResult doLogout(String uid, DBConstants.AdminAccountType accountType);
+
+    boolean checkToken(String uid, String token);
+
+    List<AdminOnline> selectAdminOnlines(int aId);
 
 }

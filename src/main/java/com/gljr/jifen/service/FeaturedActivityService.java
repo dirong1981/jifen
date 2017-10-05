@@ -1,8 +1,9 @@
 package com.gljr.jifen.service;
 
+import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.pojo.FeaturedActivity;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 
 public interface FeaturedActivityService {
 
@@ -10,35 +11,35 @@ public interface FeaturedActivityService {
 
 
     /**
-     * 查询所有精选内容，状态0,1,2
+     * 查询所有精选内容，状态不为-1
      * @return
      */
-    List<FeaturedActivity> selectFeaturedActivitys();
+    JsonResult selectFeaturedActivitys(JsonResult jsonResult);
 
     /**
      * 按照状态查询精选页
-     * @param status
      * @return
      */
-    List<FeaturedActivity> selectFeaturedActivitysByStatus(Integer status);
-
-    /**
-     * 按照id查询精选页
-     * @param id
-     * @return
-     */
-    FeaturedActivity selectFeaturedActivityById(Integer id);
-
+    JsonResult selectFeaturedActivitysEnabled(Integer page, Integer per_page, JsonResult jsonResult);
 
 
     //修改
 
     /**
-     * 修改一个精选页
-     * @param featuredActivity
+     * 启用
+     * @param featuredId
+     * @param jsonResult
      * @return
      */
-    int updateFeaturedActivityById(FeaturedActivity featuredActivity);
+    JsonResult stopFeaturedActivity(Integer featuredId, JsonResult jsonResult);
+
+    /**
+     * 停用
+     * @param featuredId
+     * @param jsonResult
+     * @return
+     */
+    JsonResult startFeaturedActivity(Integer featuredId, JsonResult jsonResult);
 
 
     //删除
@@ -46,10 +47,9 @@ public interface FeaturedActivityService {
 
     /**
      * 删除一个精选页
-     * @param featuredActivity
      * @return
      */
-    int deleteFeaturedActivitysById(FeaturedActivity featuredActivity);
+    JsonResult deleteFeaturedActivitysById(Integer featuredId, JsonResult jsonResult);
 
 
     //添加
@@ -59,5 +59,15 @@ public interface FeaturedActivityService {
      * @param featuredActivity
      * @return
      */
-    int insertFeaturedActivity(FeaturedActivity featuredActivity);
+    JsonResult insertFeaturedActivity(FeaturedActivity featuredActivity, String aid, MultipartFile file, JsonResult jsonResult);
+
+
+    /**
+     * 上下调换排序
+     * @param cur
+     * @param prev
+     * @param jsonResult
+     * @return
+     */
+    JsonResult changeFeaturedActivitysOrder(Integer cur, Integer prev, JsonResult jsonResult);
 }

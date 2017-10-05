@@ -34,14 +34,6 @@ public class OrderManagerController extends BaseController {
     @Autowired
     private IntegralTransferOrderService integralTransferOrderService;
 
-    @Autowired
-    private StoreInfoService storeInfoService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ProductService productService;
 
 
     /**
@@ -58,32 +50,6 @@ public class OrderManagerController extends BaseController {
         return  jsonResult;
     }
 
-
-    /**
-     * 删除一个订单，把订单状态修改为2
-     * @param id
-     * @return
-     */
-//    @DeleteMapping(value = "/online/{id}")
-//    @ResponseBody
-//    public JsonResult deleteOnlineOrderById(@PathVariable(value = "id") int id){
-//        JsonResult jsonResult = new JsonResult();
-//
-//        try {
-//            OnlineOrder onlineOrder = onlineOrderService.selectOnlineOrderById(id);
-//            onlineOrder.setStatus(DBConstants.OrderStatus.DELETED.getCode());
-//            onlineOrderService.updateOnlineOrderById(onlineOrder);
-//
-//            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-//            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-//        }catch (Exception e){
-//            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-//            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//        }
-//
-//
-//        return jsonResult;
-//    }
 
 
     /**

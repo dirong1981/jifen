@@ -41,4 +41,9 @@ public class JsonResult implements Serializable{
     public void setItem(Map<Object, Object> item) {
         this.item = item;
     }
+
+    public void setErrorCodeAndMessage(String[] errorCodeAndMessage){
+        this.errorCode = errorCodeAndMessage[0];
+        this.message = errorCodeAndMessage[1];
+    }
 }

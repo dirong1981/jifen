@@ -1,23 +1,41 @@
 package com.gljr.jifen.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Date;
 
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class Admin {
     private Integer id;
 
+    @JsonIgnore
     private Integer accountType;
 
     private String username;
 
+    @JsonIgnore
     private String password;
 
+    @JsonIgnore
     private String salt;
 
+    private String token;
+
+    @JsonIgnore
     private Integer status;
 
+    @JsonIgnore
     private Date createTime;
 
     private String permission;
+
+    public Admin() {
+    }
+
+    public Admin(String username) {
+        this.username = username;
+    }
 
     public Integer getId() {
         return id;
@@ -81,5 +99,13 @@ public class Admin {
 
     public void setPermission(String permission) {
         this.permission = permission;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

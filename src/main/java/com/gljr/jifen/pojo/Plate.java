@@ -1,6 +1,7 @@
 package com.gljr.jifen.pojo;
 
 import java.util.Date;
+import java.util.List;
 
 public class Plate {
     private Integer id;
@@ -12,6 +13,14 @@ public class Plate {
     private Integer managerId;
 
     private Date createTime;
+
+    private String title;
+
+    private String description;
+
+    private Integer type;
+
+    private Integer extType;
 
     public Integer getId() {
         return id;
@@ -51,5 +60,37 @@ public class Plate {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public Integer getExtType() {
+        return extType;
+    }
+
+    public void setExtType(Integer extType) {
+        this.extType = extType;
     }
 }

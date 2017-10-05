@@ -104,7 +104,7 @@ public class DBConstants {
      * 商户状态
      */
     public enum MerchantStatus {
-        INACTIVE(0, "未激活"), ACTIVED(1, "已激活"), OFFLINE(2, "已下线"), DELETED(3, "已删除");
+        INACTIVE(0, "未激活"), ACTIVED(1, "已激活"), OFFLINE(2, "已下线"), DELETED(-1, "已删除");
         private int code;
 
         private String description;
@@ -215,6 +215,29 @@ public class DBConstants {
         }
     }
 
+
+
+    public enum OfflineOrderStatus {
+        UNPAID(1, "待付款"), PAID(2, "已付款"), CANCELED(4, "已取消"), DELETED(-1, "已删除"), REFUND(3, "已退款");
+        private int code;
+
+        private String description;
+
+        OfflineOrderStatus(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+
     public enum TrxStatus {
         UNPAID(0, "未付款"),COMPLETED(1, "交易完成"), REFUND(2, "已退款"), SETTLED(3, "已结算"), CANCELED(4, "已取消");
         private int code;
@@ -262,6 +285,112 @@ public class DBConstants {
         private String description;
 
         ProductStatus(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public enum FeaturedActivityStatus {
+        INACTIVE(0, "未开始"), ACTIVED(1, "活跃中"), OFFLINE(2, "已过期"), DELETED(-1, "已删除");
+        private int code;
+
+        private String description;
+
+        FeaturedActivityStatus(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public enum ModuleStatus {
+        INACTIVE(0, "未激活"), ACTIVED(1, "已激活"), DELETED(-1, "已删除");
+        private int code;
+
+        private String description;
+
+        ModuleStatus(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public enum ModuleType {
+        PICTURE(1, "图片"), PRODUCT(2, "产品"), PICTUREANDPRODUCT(3, "图片+产品"), PACKET(4, "加息券+红包");
+        private int code;
+
+        private String description;
+
+        ModuleType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public enum ModuleSecondType {
+        PICTURE(1, "图片"), PRODUCT2(2, "2产品"), PRODUCT4(3, "4产品"), PRODUCT6(4, "6产品"), PRODUCT8(5, "8产品"), PACKET(6, "加息券+红包"), PICTURE2(7, "8产品"),
+        PICTURE4(8, "8产品"), PICTURE6(9, "8产品"), PICTURE8(10, "8产品");
+        private int code;
+
+        private String description;
+
+        ModuleSecondType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+
+    /**
+     * 聚合页状态
+     */
+    public enum ModuleAggregationStatus {
+
+        INACTIVE(0, "下线"), ACTIVED(1, "上线"), DELETED(-1, "已删除");
+        private int code;
+
+        private String description;
+
+        ModuleAggregationStatus(int code, String description) {
             this.code = code;
             this.description = description;
         }

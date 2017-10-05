@@ -24,4 +24,15 @@ public class TransactionServiceImpl implements TransactionService {
     public Transaction selectTransactionById(Integer id) {
         return transactionMapper.selectByPrimaryKey(id);
     }
+
+    @Override
+    public Transaction getTransactionById(Integer id) {
+
+        return transactionMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public void updateTransaction(Transaction transaction) {
+        transactionMapper.updateByPrimaryKey(transaction);
+    }
 }

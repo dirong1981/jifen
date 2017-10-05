@@ -1,10 +1,16 @@
 package com.gljr.jifen.controller;
 
 import com.gljr.jifen.common.*;
+import com.gljr.jifen.common.dtchain.GatewayResponse;
+import com.gljr.jifen.common.dtchain.GouliUserInfo;
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.*;
+import com.gljr.jifen.service.DTChainService;
+import com.gljr.jifen.service.RedisService;
 import com.gljr.jifen.service.UserCreditsService;
 import com.gljr.jifen.service.UserService;
+import com.sun.xml.internal.rngom.parse.host.Base;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,11 +26,12 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Controller
 @RequestMapping(value = "/v1/users")
-public class UserController {
+public class UserController extends BaseController{
 
     @Autowired
     private UserService userService;
@@ -32,6 +39,12 @@ public class UserController {
 
     @Autowired
     private UserCreditsService userCreditsService;
+
+    @Autowired
+    private DTChainService chainService;
+
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 添加用户收货地址
@@ -321,6 +334,58 @@ public class UserController {
     }
 
 
+    @GetMapping("/pwCheck")
+    @ResponseBody
+    public JsonResult pwCheck(@RequestParam(value = "identify", required = false) String identify,
+                              @RequestParam(value = "password", required = false) String password) {
+        JsonResult jsonResult = new JsonResult();
+
+        String uid = request.getHeader("uid");
+        if (uid == null || uid.equals("")) {
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            return jsonResult;
+        }
+
+        if (StringUtils.isEmpty(identify) || !org.apache.commons.lang3.math.NumberUtils.isNumber(identify)) {
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
+        }
+
+        if (StringUtils.isEmpty(password)) {
+            CommonResult.passwordError(jsonResult);
+            return jsonResult;
+        }
+
+        GatewayResponse response = this.chainService.checkPassword(Long.parseLong(identify), password);
+        if (null == response || response.getCode() != 200) {
+            CommonResult.passwordError(jsonResult);
+        } else {
+            CommonResult.success(jsonResult);
+        }
+
+        return jsonResult;
+    }
+
+
+//    @GetMapping
+//    @ResponseBody
+//    public JsonResult selectUserInfo(@RequestParam(value = "uid", required = false) String uid, @RequestParam(value = "token", required = false) String gltoken){
+//        JsonResult jsonResult = new JsonResult();
+//
+//        if(StringUtils.isEmpty(uid)){
+//            CommonResult.userNotExit(jsonResult);
+//            return jsonResult;
+//        }
+//
+//        GatewayResponse<GouliUserInfo> gouliUserInfo = chainService.getUserInfo(uid);
+//        jsonResult.setMessage(gouliUserInfo.getContent().getUserName()+","+gouliUserInfo.getContent().getTotalValue());
+//
+//        return  jsonResult;
+//
+//    }
+
+
 
     /**
      * 获取够力用户信息
@@ -332,14 +397,6 @@ public class UserController {
      * @return
      */
 
-    @Value("${static.gljr.login.url}")
-    private String login_url;
-
-    @Value("${static.gljr.pwCheck.url}")
-    private String pwCheck_url;
-
-    @Value("${static.gljr.userInfo.url}")
-    private String userInfo_url;
 
     @GetMapping(value = "/verification")
     @ResponseBody
@@ -372,26 +429,21 @@ public class UserController {
 
             try {
                 //去够力那边取数据
-                int code = (int) (Math.random() * 10000);
-//            int code = 3361;
-                String text = identify + code;
-                String url = "http://120.27.166.31/pointsMall/user/userInfo.html?identify=" + identify + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
 
-                String result = HttpClientHelper.httpClientGet(url);
-                JSONObject jsonObject = new JSONObject(result);
+                GatewayResponse<GouliUserInfo> gouliUserInfo = chainService.getUserInfo(identify);
 
-                if (jsonObject.getString("code").equals("200")) {
-                    jsonObject = (JSONObject) jsonObject.get("data");
-
-                    realName = jsonObject.getString("realName");
-                    totalValue = jsonObject.getInt("totalValue");
-                    validValue = jsonObject.getInt("validValue");
-                    phone = jsonObject.getString("phone");
-                    uid = jsonObject.getInt("id");
-                }else {
-                    CommonResult.userNotExit(jsonResult);
-                    return jsonResult;
+                if (null == gouliUserInfo || gouliUserInfo.getCode() != 200) {
+                    CommonResult.passwordError(jsonResult);
+                } else {
+                    CommonResult.success(jsonResult);
                 }
+
+                realName = gouliUserInfo.getContent().getRealName();
+                totalValue = Integer.parseInt(String.valueOf(gouliUserInfo.getContent().getTotalValue()));
+                validValue = Integer.parseInt(String.valueOf(gouliUserInfo.getContent().getValidValue()));
+                phone = gouliUserInfo.getContent().getPhone();
+                uid = Integer.parseInt(String.valueOf(gouliUserInfo.getContent().getId()));
+
             }catch (Exception e){
                 CommonResult.userNotExit(jsonResult);
                 return jsonResult;
@@ -404,7 +456,7 @@ public class UserController {
 
                     UserCredits userCredits = new UserCredits();
                     userCredits.setIntegral(validValue);
-                    userCredits.setOwnerType(1);
+                    userCredits.setOwnerType(DBConstants.OwnerType.CUSTOMER.getCode());
                     userCredits.setWalletAddress("xxxxx");
                     userCredits.setOwnerId(uid);
                     userCredits.setFrozenIntegral(totalValue);
@@ -470,17 +522,14 @@ public class UserController {
                 return jsonResult;
             }
             try {
-                int code = (int) (Math.random() * 10000);
-                String text = uid + password + code;
-                String url = "http://120.27.166.31/pointsMall/user/pwCheck.html?identify=" + uid + "&password=" + password + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
-
-                String result = HttpClientHelper.httpClientGet(url);
-                JSONObject jsonObject = new JSONObject(result);
-
-                if (jsonObject.getString("code").equals("200")) {
-                    CommonResult.success(jsonResult);
-                } else {
+                GatewayResponse response = this.chainService.checkPassword(Long.parseLong(uid), password);
+                if (null == response || response.getCode() != 200) {
                     CommonResult.passwordError(jsonResult);
+                } else {
+                    Integer random = (int)(Math.random()*100000000);
+                    redisService.put(uid+"random", random+"", 60, TimeUnit.SECONDS);
+                    jsonResult.setMessage(random+"");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
                 }
             }catch (Exception e){
                 CommonResult.userNotExit(jsonResult);
@@ -498,14 +547,11 @@ public class UserController {
      * 返回token，用户电话号码，用户积分，用户真实姓名，钱包地址
      * @param uid
      * @param gltoken
-     * @param httpServletResponse
-     * @param httpServletRequest
      * @return
      */
     @GetMapping
     @ResponseBody
-    public JsonResult selectUserInfo(@RequestParam(value = "uid", required = false) String uid, @RequestParam(value = "token", required = false) String gltoken,
-                                     HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+    public JsonResult selectUserInfo(@RequestParam(value = "uid", required = false) String uid, @RequestParam(value = "token", required = false) String gltoken){
         JsonResult jsonResult = new JsonResult();
 
 
@@ -522,25 +568,19 @@ public class UserController {
 
         try {
             //去够力那边取数据
-            int code = (int) (Math.random() * 10000);
-//            int code = 3361;
-            String text = uid + code;
-            String url = "http://120.27.166.31/pointsMall/user/userInfo.html?identify=" + uid + "&code=" + code + "&checkValue=" + StrUtil.encryption4AnyCode(text, code + "");
+            GatewayResponse<GouliUserInfo> gouliUserInfo = chainService.getUserInfo(uid);
 
-            String result = HttpClientHelper.httpClientGet(url);
-            JSONObject jsonObject = new JSONObject(result);
-
-            if (jsonObject.getString("code").equals("200")) {
-                jsonObject = (JSONObject) jsonObject.get("data");
-
-                realName = jsonObject.getString("realName");
-                totalValue = jsonObject.getInt("totalValue");
-                validValue = jsonObject.getInt("validValue");
-                phone = jsonObject.getString("phone");
-            }else {
-                CommonResult.userNotExit(jsonResult);
-                return jsonResult;
+            if (null == gouliUserInfo || gouliUserInfo.getCode() != 200) {
+                CommonResult.passwordError(jsonResult);
+            } else {
+                CommonResult.success(jsonResult);
             }
+
+            realName = gouliUserInfo.getContent().getRealName();
+            totalValue = Integer.parseInt(String.valueOf(gouliUserInfo.getContent().getTotalValue()));
+            validValue = Integer.parseInt(String.valueOf(gouliUserInfo.getContent().getValidValue()));
+            phone = gouliUserInfo.getContent().getPhone();
+
         }catch (Exception e){
             CommonResult.userNotExit(jsonResult);
             return jsonResult;
@@ -553,7 +593,7 @@ public class UserController {
 
                     UserCredits userCredits = new UserCredits();
                     userCredits.setIntegral(validValue);
-                    userCredits.setOwnerType(1);
+                    userCredits.setOwnerType(DBConstants.OwnerType.CUSTOMER.getCode());
                     userCredits.setWalletAddress("xxxxx");
                     userCredits.setOwnerId(Integer.parseInt(uid));
                     userCredits.setFrozenIntegral(totalValue);
@@ -611,10 +651,10 @@ public class UserController {
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("uid", uid);
-            jsonObject.put("phone", phone);
+            jsonObject.put("role", "USER");
 
             //生成token
-            String token = JwtUtil.createJWT("gljr", jsonObject.toString(), token_key, 60 * 60 * 24 * 360);
+            String token = JwtUtil.createJWT(GlobalConstants.GLJR_PREFIX, jsonObject.toString(), token_key, GlobalConstants.TOKEN_FAILURE_TIME);
 
             User user = new User();
             user.setCellPhone(phone);

@@ -54,23 +54,9 @@ public class StoreInfoManagerController extends BaseController {
     @GetMapping("/all")
     @ResponseBody
     public JsonResult getAllStores() {
-
-
         JsonResult jsonResult = new JsonResult();
 
-
-        try {
-            List<StoreInfo> storeInfos = storeInfoService.selectAllStoreInfo();
-
-            Map map = new HashMap();
-            map.put("data", storeInfos);
-
-            jsonResult.setItem(map);
-            CommonResult.success(jsonResult);
-
-        } catch (Exception e) {
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = storeInfoService.selectAllStoreInfo(jsonResult);
 
         return jsonResult;
     }
@@ -79,43 +65,20 @@ public class StoreInfoManagerController extends BaseController {
 
     /**
      * 审核通过商户信息
-     * @param id 商户id
+     * @param storeId 商户id
      * @return 状态码
      */
-    @GetMapping(value = "/{id}/acceptance")
+    @GetMapping(value = "/{storeId}/acceptance")
     @ResponseBody
-    public JsonResult startStore(@PathVariable("id") Integer id) {
+    public JsonResult startStore(@PathVariable("storeId") Integer storeId) {
         JsonResult jsonResult = new JsonResult();
 
-        if(StringUtils.isEmpty(id)){
+        if(StringUtils.isEmpty(storeId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
-        try {
-            StoreInfo storeInfo = storeInfoService.selectStoreInfoById(id);
-
-            if(ValidCheck.validPojo(storeInfo)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            storeInfo.setStatus(DBConstants.MerchantStatus.ACTIVED.getCode());
-
-            storeInfoService.updataStoreInfo(storeInfo);
-
-            //更新商户管理员的状态
-//            Admin admin = adminService.selectAdminById(storeInfo.getAid());
-//
-//            admin.setStatus(DBConstants.AdminAccountStatus.ACTIVED.getCode());
-//
-//            adminService.updateAdminById(admin);
-
-            CommonResult.success(jsonResult);
-
-        } catch (Exception e) {
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = storeInfoService.startStoreInfo(storeId, jsonResult);
 
 
         return jsonResult;
@@ -124,90 +87,41 @@ public class StoreInfoManagerController extends BaseController {
 
     /**
      * 下线商户
-     * @param id 商户id
+     * @param storeId 商户id
      * @return 状态码
      */
-    @GetMapping(value = "/{id}/rejection")
+    @GetMapping(value = "/{storeId}/rejection")
     @ResponseBody
-    public JsonResult stopStore(@PathVariable("id") Integer id) {
+    public JsonResult stopStore(@PathVariable("storeId") Integer storeId) {
         JsonResult jsonResult = new JsonResult();
 
-        if(StringUtils.isEmpty(id)){
+        if(StringUtils.isEmpty(storeId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
-        try {
-            StoreInfo storeInfo = storeInfoService.selectStoreInfoById(id);
-
-            if(ValidCheck.validPojo(storeInfo)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            storeInfo.setStatus(DBConstants.MerchantStatus.OFFLINE.getCode());
-
-            storeInfoService.updataStoreInfo(storeInfo);
-
-            //更新商户管理员的状态
-//            Admin admin = adminService.selectAdminById(storeInfo.getAid());
-//
-//            admin.setStatus(DBConstants.AdminAccountStatus.DISABLED.getCode());
-//
-//            adminService.updateAdminById(admin);
-
-            CommonResult.success(jsonResult);
-
-        } catch (Exception e) {
-            CommonResult.sqlFailed(jsonResult);
-        }
-
+        jsonResult = storeInfoService.stopStoreInfo(storeId, jsonResult);
 
         return jsonResult;
     }
 
 
     /**
-     * 删除一个商户
-     * @param id 商户id
+     * 删除一个商户,禁用管理员账号
+     * @param storeId 商户id
      * @return 状态码
      */
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/{storeId}")
     @ResponseBody
-    public JsonResult deleteStore(@PathVariable("id") Integer id) {
+    public JsonResult deleteStore(@PathVariable("storeId") Integer storeId) {
         JsonResult jsonResult = new JsonResult();
 
-        if(StringUtils.isEmpty(id)){
+        if(StringUtils.isEmpty(storeId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
-        try {
-            StoreInfo storeInfo = storeInfoService.selectStoreInfoById(id);
-
-            if(ValidCheck.validPojo(storeInfo)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            Admin admin = adminService.selectAdminById(storeInfo.getAid());
-
-            if(ValidCheck.validPojo(admin)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            storeInfo.setStatus(DBConstants.MerchantStatus.DELETED.getCode());
-            admin.setStatus(DBConstants.AdminAccountStatus.DISABLED.getCode());
-
-            storeInfoService.deleteStoreInfoById(storeInfo, admin);
-
-
-            CommonResult.success(jsonResult);
-
-        } catch (Exception e) {
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = storeInfoService.deleteStoreInfo(storeId, jsonResult);
 
 
         return jsonResult;
@@ -228,10 +142,20 @@ public class StoreInfoManagerController extends BaseController {
 
         JsonResult jsonResult = new JsonResult();
 
+        if(bindingResult.hasErrors()){
+            CommonResult.notNull(jsonResult);
+            return jsonResult;
+        }
 
-        if (bindingResult.hasErrors()) {
-            jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
-            jsonResult.setMessage(GlobalConstants.NOTNULL);
+        if(storeInfo.getCategoryCode() == -1 || StringUtils.isEmpty(storeInfo.getCategoryCode())){
+            jsonResult.setMessage("请选择分类！");
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            return jsonResult;
+        }
+        storeInfo.setLocationCode(450204);
+        if(storeInfo.getLocationCode() == -1 || StringUtils.isEmpty(storeInfo.getLocationCode())){
+            jsonResult.setMessage("请选择地区！");
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
             return jsonResult;
         }
 
@@ -241,50 +165,14 @@ public class StoreInfoManagerController extends BaseController {
             return jsonResult;
         }
 
-
-        //添加商户管理员账号
-        List<Admin> admins = adminService.selectAdminByUsername(username);
-        if(!ValidCheck.validList(admins)){
+        if(StringUtils.isEmpty(username)){
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage("管理员账号已存在，请更换！");
+            jsonResult.setMessage("管理员账号不能为空！");
             return jsonResult;
         }
 
-        Admin admin = new Admin();
-        admin.setUsername(username);
-        admin.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        admin.setAccountType(DBConstants.AdminAccountType.STORE_ADMIN.getCode());
-        admin.setStatus(DBConstants.AdminAccountStatus.INACTIVE.getCode());
-        String salt = StrUtil.randomKey(32);
-        admin.setSalt(salt);
-        admin.setPassword(Md5Util.md5("admin"+salt));
+        jsonResult = storeInfoService.insertStoreInfo(storeInfo, file, username, random, jsonResult);
 
-
-
-        //上传图片
-        if (file != null && !file.isEmpty()) {
-            String _key = storageService.uploadToPublicBucket("store", file);
-            if (StringUtils.isEmpty(_key)) {
-                CommonResult.uploadFailed(jsonResult);
-                return jsonResult;
-            }
-            storeInfo.setLogoKey(_key);
-        } else {
-            storeInfo.setLogoKey("store/default.png");
-        }
-
-        try {
-            storeInfo.setStatus(DBConstants.MerchantStatus.INACTIVE.getCode());
-            storeInfo.setSerialCode(serialNumberService.gextNextStoreSerialCode(450204));
-            storeInfo.setLocationCode(450204);
-            storeInfo.setCreateTime(new Timestamp(System.currentTimeMillis()));
-
-            storeInfoService.addStoreInfo(storeInfo, admin, random);
-
-            CommonResult.success(jsonResult);
-        } catch (Exception e) {
-            CommonResult.sqlFailed(jsonResult);
-        }
 
         return jsonResult;
     }
@@ -333,7 +221,7 @@ public class StoreInfoManagerController extends BaseController {
 
         try {
 
-            storeInfoService.updataStoreInfo(storeInfo);
+            //storeInfoService.updataStoreInfo(storeInfo);
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
             jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
         } catch (Exception e) {
@@ -363,40 +251,8 @@ public class StoreInfoManagerController extends BaseController {
             return jsonResult;
         }
 
+        jsonResult = storeInfoService.uploadFile(random, file, jsonResult);
 
-        try {
-            long num = storeInfoService.selectStorePhotoCountBySiId(random);
-
-            if(num >= 5){
-                jsonResult.setMessage("最多上传5张图片！");
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                return jsonResult;
-            }
-
-
-            if (file != null && !file.isEmpty()) {
-
-                String _key = storageService.uploadToPublicBucket("store", file);
-                if (StringUtils.isEmpty(_key)) {
-                    CommonResult.uploadFailed(jsonResult);
-                    return jsonResult;
-                }
-
-                StorePhoto storePhoto = new StorePhoto();
-                storePhoto.setImgKey(_key);
-                storePhoto.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                storePhoto.setSiId(random);
-                storePhoto.setSort(99);
-                storePhoto.setImgTitle("pic");
-                storePhoto.setType(1);
-                storeInfoService.insertStorePhoto(storePhoto);
-
-                CommonResult.success(jsonResult);
-            }else{
-            }
-        }catch (Exception e){
-            CommonResult.uploadFailed(jsonResult);
-        }
         return jsonResult;
     }
 
@@ -417,21 +273,7 @@ public class StoreInfoManagerController extends BaseController {
             return jsonResult;
         }
 
-        try {
-            List<StoreInfo> storeInfos = storeInfoService.selectStroreInfoByKeyword(keyword);
-            if(ValidCheck.validList(storeInfos)){
-                jsonResult.setErrorCode("500");
-                jsonResult.setMessage("没有找到商铺信息，请更换关键字！");
-                return jsonResult;
-            }
-            Map map = new HashMap();
-            map.put("data", storeInfos);
-
-            jsonResult.setItem(map);
-            CommonResult.success(jsonResult);
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = storeInfoService.selectStoreInfoByKeyword(keyword, 1, 100, 0, jsonResult);
 
 
         return jsonResult;

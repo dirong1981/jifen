@@ -1,12 +1,25 @@
 package com.gljr.jifen.service;
 
+import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.pojo.Module;
 import com.gljr.jifen.pojo.ModulePicture;
+import com.gljr.jifen.pojo.ModuleProduct;
 import com.gljr.jifen.pojo.Plate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface ModuleService {
+
+    JsonResult insertModuel(Module module, JsonResult jsonResult);
+
+    JsonResult uploadFile(MultipartFile file, ModulePicture modulePicture, JsonResult jsonResult);
+
+    JsonResult deletePictureByModuleIdAndPictureId(Integer moduleId, Integer pictureId, JsonResult jsonResult);
+
+
+
+
 
     //添加
 
@@ -90,6 +103,8 @@ public interface ModuleService {
      */
     List<ModulePicture> selectModulePictureByModuleId(Integer moduleId);
 
+    List<ModuleProduct> selectModuleProductByModuleId(Integer moduleId);
+
     /**
      * 通过id查询一个模块
      * @param moduleId
@@ -108,7 +123,7 @@ public interface ModuleService {
      * @param status
      * @return
      */
-    List<Module> selectModulesByStatus(Integer status);
+    List<Module> selectModulesByEnabled();
 
     /**
      * 通过id查找一个首页在线模块

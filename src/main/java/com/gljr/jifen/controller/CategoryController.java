@@ -3,6 +3,7 @@ package com.gljr.jifen.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.Category;
@@ -16,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,21 +40,6 @@ public class CategoryController {
     @Autowired
     private StoreInfoService storeInfoService;
 
-    @Autowired
-    private AdminService adminService;
-
-//    @DeleteMapping(value = "/deleteall")
-//    @ResponseBody
-//    public JsonResult deleteAdmins(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
-//        JsonResult jsonResult = new JsonResult();
-//
-//        try {
-//            adminService.deleteAdmin();
-//        }catch (Exception e){
-//            System.out.println(e);
-//        }
-//        return jsonResult;
-//    }
 
 
     /**
@@ -154,125 +141,69 @@ public class CategoryController {
     }
 
 
-
-
-
-
-
     /**
      * 查询某个分类下的商品
      * @param code 分类code
      * @param page 页数
      * @param per_page 每页显示数量
      * @param sort 排序 0时间排序，1销量高到低，2销量低到高，3积分高到低，4积分低到高
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return 返回商品列表，总页数，商品总数，当前第几页
      */
     @GetMapping(value = "/{code}/products")
     @ResponseBody
-    @ApiOperation(value = "根据分类code获取商品", httpMethod = "GET", notes = "code,page,per_page,sort", response = JsonResult.class)
-    public JsonResult categoryProduct(@ApiParam(required = true, name = "code", value = "分类代码") @PathVariable("code") Integer code,
-                                      @ApiParam(required = false, name = "page", value = "分当前页") @RequestParam(value = "page", required = false) Integer page,
-                                      @ApiParam(required = false, name = "per_page", value = "每页显示数量") @RequestParam(value = "per_page", required = false) Integer per_page,
-                                      @ApiParam(required = false, name = "sort", value = "排序方式") @RequestParam(value = "sort", required = false) Integer sort,
-                                      HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult categoryProduct(@PathVariable("code") Integer code, @RequestParam(value = "page", required = false) Integer page,
+                                      @RequestParam(value = "per_page", required = false) Integer per_page, @RequestParam(value = "sort", required = false) Integer sort){
         JsonResult jsonResult = new JsonResult();
 
-
-
-        try{
-
-            //设置各个参数的默认值
-            if(page == null){
-                page = 1;
-            }
-            if(per_page == null){
-                per_page = 10;
-            }
-            if(sort == null || sort > 4 || sort < 0){
-                sort = 0;
-            }
-
-            PageHelper.startPage(page,per_page);
-            //查询分类下的商品，按照sort排序
-            List<Product> list = productService.selectCategoryProduct(code, sort);
-
-            PageInfo pageInfo = new PageInfo(list);
-            Map  map = new HashMap();
-            map.put("data", list);
-            //设置总页面
-            map.put("pages", pageInfo.getPages());
-
-            map.put("total", pageInfo.getTotal());
-            //当前页
-            map.put("pageNum", pageInfo.getPageNum());
-
-
-            jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-
-            return jsonResult;
-        }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+        //设置各个参数的默认值
+        if(page == null){
+            page = 1;
         }
+        if(per_page == null){
+            per_page = 10;
+        }
+        if(sort == null || sort > 4 || sort < 0){
+            sort = 0;
+        }
+
+        jsonResult = productService.selectProductByCode(code, page, per_page, sort, jsonResult);
 
         return jsonResult;
     }
 
 
-
+    /**
+     * 按分类查询商户
+     * @param code
+     * @param page
+     * @param per_page
+     * @param sort
+     * @return
+     */
     @GetMapping(value = "/{code}/stores")
     @ResponseBody
-    @ApiOperation(value = "根据分类code获取商品", httpMethod = "GET", notes = "code,page,per_page,sort", response = JsonResult.class)
-    public JsonResult categoryStore(@ApiParam(required = true, name = "code", value = "分类代码") @PathVariable("code") Integer code,
-                                      @ApiParam(required = false, name = "page", value = "分当前页") @RequestParam(value = "page", required = false) Integer page,
-                                      @ApiParam(required = false, name = "per_page", value = "每页显示数量") @RequestParam(value = "per_page", required = false) Integer per_page,
-                                      @ApiParam(required = false, name = "sort", value = "排序方式") @RequestParam(value = "sort", required = false) Integer sort,
-                                      HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult categoryStore(@PathVariable("code") Integer code, @RequestParam(value = "page", required = false) Integer page,
+                                    @RequestParam(value = "per_page", required = false) Integer per_page, @RequestParam(value = "sort", required = false) Integer sort){
         JsonResult jsonResult = new JsonResult();
 
 
-
-        try{
-
-            //设置各个参数的默认值
-            if(page == null){
-                page = 1;
-            }
-            if(per_page == null){
-                per_page = 10;
-            }
-            if(sort == null || sort > 4 || sort < 0){
-                sort = 0;
-            }
-
-            PageHelper.startPage(page,per_page);
-            //查询分类下的商品，按照sort排序
-            List<StoreInfo> storeInfos = storeInfoService.selectAllShowStoreInfo(code, sort);
-
-            PageInfo pageInfo = new PageInfo(storeInfos);
-            Map  map = new HashMap();
-            map.put("data", storeInfos);
-            //设置总页面
-            map.put("pages", pageInfo.getPages());
-
-            map.put("total", pageInfo.getTotal());
-            //当前页
-            map.put("pageNum", pageInfo.getPageNum());
-
-
-            jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-
+        if(StringUtils.isEmpty(code)){
+            CommonResult.noObject(jsonResult);
             return jsonResult;
-        }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
         }
+
+        //设置各个参数的默认值
+        if(page == null){
+            page = 1;
+        }
+        if(per_page == null){
+            per_page = 10;
+        }
+        if(sort == null || sort > 4 || sort < 0){
+            sort = 0;
+        }
+
+        jsonResult = storeInfoService.selectStoreInfoByCode(code, page, per_page, sort, jsonResult);
 
         return jsonResult;
     }

@@ -51,14 +51,16 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     private StoreInfoMapper storeInfoMapper;
 
     @Override
-    public JsonResult selectOnlineOrdersByUid(String uid, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
+    public JsonResult selectOnlineOrdersByUid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
         try {
             OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
             OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
             onlineOrderExample.setOrderByClause("id desc");
 
+            PageHelper.startPage(page,per_page);
             List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
+            PageInfo pageInfo = new PageInfo(onlineOrders);
 
             if(!ValidCheck.validList(onlineOrders)) {
                 for (OnlineOrder onlineOrder : onlineOrders) {
@@ -87,6 +89,11 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
             Map  map = new HashMap();
             map.put("data", onlineOrders);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
@@ -99,7 +106,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     }
 
     @Override
-    public JsonResult selectOnlineOrdersByUidNotPay(String uid, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
+    public JsonResult selectOnlineOrdersByUidNotPay(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
 
         try {
             OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
@@ -108,7 +115,9 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             criteria.andUidEqualTo(Integer.parseInt(uid));
             onlineOrderExample.setOrderByClause("id desc");
 
+            PageHelper.startPage(page,per_page);
             List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
+            PageInfo pageInfo = new PageInfo(onlineOrders);
 
             if(!ValidCheck.validList(onlineOrders)) {
                 for (OnlineOrder onlineOrder : onlineOrders) {
@@ -137,6 +146,11 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
             Map  map = new HashMap();
             map.put("data", onlineOrders);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);

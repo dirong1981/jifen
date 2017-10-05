@@ -1,6 +1,7 @@
 package com.gljr.jifen.pojo;
 
 import java.util.Date;
+import java.util.List;
 
 public class Module {
     private Integer id;
@@ -20,6 +21,10 @@ public class Module {
     private Integer managerId;
 
     private Date createTime;
+
+    private List picture;
+
+    private List product;
 
     public Integer getId() {
         return id;
@@ -91,5 +96,21 @@ public class Module {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public List getProduct() {
+        return product;
+    }
+
+    public void setProduct(List product) {
+        this.product = product;
+    }
+
+    public List getPicture() {
+        return picture;
+    }
+
+    public void setPicture(List picture) {
+        this.picture = picture;
     }
 }

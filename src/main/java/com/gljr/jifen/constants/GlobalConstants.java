@@ -7,8 +7,8 @@ public class GlobalConstants {
 
 
     //设置返回的请求域名
-//    public static final String DOMAIN = "http://console.iep.dtchain.io";
-    public static final String DOMAIN = "http://localhost";
+    public static final String DOMAIN = "http://console.iep.dtchain.io";
+//    public static final String DOMAIN = "http://localhost";
 
 
     //数据验证错误
@@ -73,5 +73,43 @@ public class GlobalConstants {
     public static final String OBJ_IS_USED = "该对象正在被使用！";
     public static final String USER_NO_EXIST = "获取用户数据失败！";
 
-
+//商家端api新增信息返回--------start--------
+    /**
+     * token过期时间
+     */
+    public static final long TOKEN_FAILURE_TIME = 60 * 60 * 24 * 360;
+    public static final String GLJR_PREFIX = "gljr";
+    /**
+     * 缓存数据过期时间
+     */
+    public static final int CACHE_DATA_FAILURE_TIME = 60 * 10;
+    /**
+     * 积分和人民币兑换比例
+     */
+    public static final long INTEGRAL_RMB_EXCHANGE_RATIO = 10;
+    /**
+     * 缓存积分校验结果key前缀
+     */
+    public static final String CHECK_INTEGRAL_RESULT_PREFIX = "checkIntegralResult";
+    public static final String[] STORE_USER_OPERATION_SECCESS = {OPERATION_SUCCEED, OPERATION_SUCCEED_MESSAGE};
+    public static final String[] STORE_USER_USERNAME_IS_BLANK = {"499", "用户名不能为空"};
+    public static final String[] STORE_USER_PASSWORD_IS_BLANK = {"498", "密码不能为空"};
+    public static final String[] USER_NOT_LOGIN = {"497", "用户未登录"};
+    public static final String[] STORE_USER_NOT_EXIST = {"496", "商户信息不存在"};
+    public static final String[] REQUEST_PARAMETER_ERROR = {"495", "请求参数异常"};
+    public static final String[] ORDER_INFO_NOT_EXIST = {"494", "订单信息不存在"};
+    public static final String[] MORE_THAN_REFUND_TIME = {"493", "订单已超过可退款时间"};
+    public static final String[] GET_USER_INFO_FAIL = {"492", "获取用户信息失败"};
+    public static final String[] ORDER_CAN_NOT_REFUND = {"491", "该订单不能退款"};
+    public static final String[] STORE_USER_PASSWORD_ERROR = {"490", "用户密码错误"};
+    public static final String[] CAN_NOT_GET_USER_CREDIT = {"489", "无法获取用户积分信息"};
+    public static final String[] NO_RESULT = {"488", "暂无结果"};
+    public static final String[] USER_INTEGRAL_NOT_ENOUGH = {"487", INTEGRAL_NOT_ENOUGH};
+    public static final String[] ORDER_STATUS_EXCEPTION = {"486", "订单状态异常"};
+    public static final String[] PASSWORD_NOT_CHECK = {"485", "密码未校验"};
+    public static final String[] USER_NOT_EXIST = {"484", "用户信息不存在"};
+    public static final String[] CONFIGURATION_ERROR = {"998", "配置错误"};
+    public static final String[] SYSTEM_EXCEPTION = {"999", "系统异常"};
+    public static final String SESSION_STORE_USER = "session_store_user";
+    //商家端api新增信息返回--------end--------
 }

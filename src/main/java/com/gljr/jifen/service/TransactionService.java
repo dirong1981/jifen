@@ -19,4 +19,8 @@ public interface TransactionService {
      */
     Transaction selectTransactionById(Integer id);
 
+    Transaction getTransactionById(Integer id);
+
+    void updateTransaction(Transaction transaction);
+
 }

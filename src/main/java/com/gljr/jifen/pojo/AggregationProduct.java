@@ -10,7 +10,7 @@ public class AggregationProduct {
 
     private Integer integral;
 
-    private String logo_key;
+    private String logoKey;
 
     private Integer price;
 
@@ -50,14 +50,6 @@ public class AggregationProduct {
         this.integral = integral;
     }
 
-    public String getLogo_key() {
-        return logo_key;
-    }
-
-    public void setLogo_key(String logo_key) {
-        this.logo_key = logo_key;
-    }
-
     public Integer getPrice() {
         return price;
     }
@@ -80,5 +72,13 @@ public class AggregationProduct {
 
     public void setSales(Integer sales) {
         this.sales = sales;
+    }
+
+    public String getLogoKey() {
+        return logoKey;
+    }
+
+    public void setLogoKey(String logoKey) {
+        this.logoKey = logoKey;
     }
 }

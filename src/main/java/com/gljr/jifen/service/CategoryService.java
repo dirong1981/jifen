@@ -1,8 +1,11 @@
 package com.gljr.jifen.service;
 
+import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.pojo.Category;
 import com.gljr.jifen.pojo.CategoryExample;
+import com.qiniu.util.Json;
 
+import javax.xml.bind.util.JAXBSource;
 import java.util.List;
 
 public interface CategoryService {
@@ -59,5 +62,9 @@ public interface CategoryService {
     //查询所有启用的分类，包括商品，商户
     List<Category> selectAllShowParentCategory();
     List<Category> selectAllShowSonCategory();
+
+    JsonResult allCategoriesIncludeProductStore(JsonResult jsonResult);
+
+    JsonResult changeCategoryOrder(Integer cur, Integer prev, JsonResult jsonResult);
 
 }

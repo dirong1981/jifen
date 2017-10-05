@@ -3,8 +3,11 @@ package com.gljr.jifen.controller.manager;
 import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
+import com.gljr.jifen.constants.DBConstants;
+import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.Module;
 import com.gljr.jifen.pojo.ModulePicture;
+import com.gljr.jifen.pojo.ModuleProduct;
 import com.gljr.jifen.pojo.Plate;
 import com.gljr.jifen.service.ModuleService;
 import com.gljr.jifen.service.StorageService;
@@ -36,41 +39,26 @@ public class ModuleManagerController {
     /**
      * 添加一个模块信息
      * @param module
-     * @param file
      * @param httpServletRequest
-     * @param httpServletResponse
      * @return
      */
     @PostMapping
     @ResponseBody
-    public JsonResult insertModule(Module module, @RequestParam(value="pic",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult insertModule(Module module, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
-        try {
-            String aid = httpServletRequest.getHeader("aid");
-            //上传图片
-
-            if (file != null && !file.isEmpty()) {
-                String _key = storageService.uploadToPublicBucket("module", file);
-                if (StringUtils.isEmpty(_key)) {
-                    CommonResult.uploadFailed(jsonResult);
-                    return jsonResult;
-                }
-                module.setThumbKey(_key);
-            } else {
-                module.setThumbKey("module/default.png");
-            }
-
-            module.setCreateTime(new Timestamp(System.currentTimeMillis()));
-            module.setManagerId(Integer.parseInt(aid));
-            module.setStatus(1);
-            moduleService.insertModule(module);
-
-            CommonResult.success(jsonResult);
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
+        String aid = httpServletRequest.getHeader("aid");
+        if(StringUtils.isEmpty(aid)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
         }
 
+        module.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        module.setManagerId(Integer.parseInt(aid));
+        module.setThumbKey("module/default.png");
+        module.setStatus(DBConstants.ModuleStatus.INACTIVE.getCode());
+
+        jsonResult = moduleService.insertModuel(module, jsonResult);
 
         return jsonResult;
     }
@@ -82,25 +70,32 @@ public class ModuleManagerController {
      * @param file
      * @param title
      * @param linkUrl
-     * @param httpServletResponse
-     * @param httpServletRequest
      * @return
      */
     @PostMapping("/{moduleId}/upload")
     @ResponseBody
     public JsonResult uploadPic(@PathVariable(value = "moduleId") Integer moduleId, @RequestParam(value="pic") MultipartFile file,
-                                @RequestParam(value = "title") String title, @RequestParam(value = "linkUrl", required = false) String linkUrl,
-                                HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+                                @RequestParam(value = "title") String title, @RequestParam(value = "linkUrl", required = false) String linkUrl){
         JsonResult jsonResult = new JsonResult();
 
-        try{
-            Module module = moduleService.selectModuleById(moduleId);
-            if(ValidCheck.validPojo(module)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
+        if(StringUtils.isEmpty(moduleId)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
+        if(StringUtils.isEmpty(title)){
+            jsonResult.setMessage("请添加标题！");
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            return jsonResult;
+        }
+
+        if(StringUtils.isEmpty(linkUrl)){
+            linkUrl = "";
+        }
+
+        if (file == null && file.isEmpty()) {
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage("请添加图片！");
             return jsonResult;
         }
 
@@ -111,35 +106,7 @@ public class ModuleManagerController {
         modulePicture.setSort(99);
         modulePicture.setTitle(title);
 
-        //查询已添加图片数量，最多5张
-        List<ModulePicture> modulePictures = moduleService.selectModulePictureByModuleId(moduleId);
-
-        if(modulePictures.size() >= 5){
-            CommonResult.greatThan5(jsonResult);
-            return jsonResult;
-        }
-
-        //上传图片
-        if (file != null && !file.isEmpty()) {
-            String _key = storageService.uploadToPublicBucket("module/picture", file);
-            if (StringUtils.isEmpty(_key)) {
-                CommonResult.uploadFailed(jsonResult);
-                return jsonResult;
-            }
-            modulePicture.setPictureKey(_key);
-        } else {
-            modulePicture.setPictureKey("module/picture/default.png");
-        }
-
-        try {
-            moduleService.insertModulePicture(modulePicture);
-            Map map = new HashMap();
-            map.put("data", modulePicture);
-            jsonResult.setItem(map);
-            CommonResult.success(jsonResult);
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = moduleService.uploadFile(file, modulePicture, jsonResult);
 
         return jsonResult;
     }
@@ -164,12 +131,7 @@ public class ModuleManagerController {
             return jsonResult;
         }
 
-        try {
-            moduleService.deletePictureByModuleIdAndPictureId(moduleId, id);
-            CommonResult.success(jsonResult);
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = moduleService.deletePictureByModuleIdAndPictureId(moduleId, id, jsonResult);
 
         return jsonResult;
     }
@@ -179,23 +141,17 @@ public class ModuleManagerController {
      * 添加一个模块下的商品
      * @param moduleId 模块id
      * @param productIds 商品id字符串
-     * @param httpServletResponse
-     * @param httpServletRequest
      * @return
      */
     @PostMapping(value = "/{moduleId}/products")
     @ResponseBody
-    public JsonResult insertModuleProductByModuleId(@PathVariable(value = "moduleId") Integer moduleId, @RequestParam(value = "productIds") String productIds,
-                                                    HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+    public JsonResult insertModuleProductByModuleId(@PathVariable(value = "moduleId") Integer moduleId, @RequestParam(value = "productIds") String productIds){
         JsonResult jsonResult = new JsonResult();
 
         if(StringUtils.isEmpty(productIds) || StringUtils.isEmpty(moduleId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
-
-
-
         try {
             //查询该模块的信息
             Module module = moduleService.selectModuleById(moduleId);
@@ -209,29 +165,29 @@ public class ModuleManagerController {
             }
 
             //如果该模块不是商品类型，提示错误
-            if(module.getType() != 2 && module.getType() != 3){
+            if(module.getType() != DBConstants.ModuleType.PICTUREANDPRODUCT.getCode() && module.getType() != DBConstants.ModuleType.PRODUCT.getCode()){
                 CommonResult.notAllowedOperation(jsonResult);
                 return jsonResult;
             }
-
+            productIds = productIds.substring(1, productIds.length());
             String[] ids = productIds.split(",");
 
             int num = 0;
 
-            if(module.getExtType() == 3){
+            if(module.getExtType() == DBConstants.ModuleSecondType.PRODUCT2.getCode()){
                 num = 2;
-            }else if (module.getExtType() == 4){
+            }else if (module.getExtType() == DBConstants.ModuleSecondType.PRODUCT4.getCode()){
                 num = 4;
-            }else if (module.getExtType() == 5){
+            }else if (module.getExtType() == DBConstants.ModuleSecondType.PRODUCT6.getCode()){
                 num = 6;
+            }else if (module.getExtType() == DBConstants.ModuleSecondType.PRODUCT8.getCode()){
+                num = 8;
             }else{
                 CommonResult.greatThan5(jsonResult);
                 return jsonResult;
             }
-
             //判断该模块能上传的商品数量
             if(ids.length == num) {
-
                 moduleService.insertModuleProductByModuleId(moduleId, productIds);
                 CommonResult.success(jsonResult);
             }else{
@@ -279,13 +235,11 @@ public class ModuleManagerController {
 
     /**
      * 查询所有可用模块
-     * @param httpServletResponse
-     * @param httpServletRequest
      * @return
      */
     @GetMapping
     @ResponseBody
-    public JsonResult selectModuls(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+    public JsonResult selectModuls(){
         JsonResult jsonResult = new JsonResult();
 
         try {
@@ -365,24 +319,45 @@ public class ModuleManagerController {
     }
 
     /**
-     * 按照状态查询模块
-     * @param status
-     * @param httpServletRequest
-     * @param httpServletResponse
+     * 查询模块下有多少商品
+     * @param moduleId
      * @return
      */
-    @GetMapping(value = "/status/{status}")
+    @GetMapping(value = "/{moduleId}/products")
     @ResponseBody
-    public JsonResult selectModulesByStatus(@PathVariable("status") Integer status, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult selectModuleProducts(@PathVariable(value = "moduleId") Integer moduleId){
         JsonResult jsonResult = new JsonResult();
 
-        if(StringUtils.isEmpty(status)){
+        if(StringUtils.isEmpty(moduleId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
         try {
-            List<Module> modules = moduleService.selectModulesByStatus(status);
+            List<ModuleProduct> moduleProducts = moduleService.selectModuleProductByModuleId(moduleId);
+            Map map = new HashMap();
+            map.put("data", moduleProducts);
+
+            jsonResult.setItem(map);
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+
+        return jsonResult;
+    }
+
+    /**
+     * 查询可以用的模块
+     * @return
+     */
+    @GetMapping(value = "/enabled")
+    @ResponseBody
+    public JsonResult selectModulesByStatus(){
+        JsonResult jsonResult = new JsonResult();
+
+        try {
+            List<Module> modules = moduleService.selectModulesByEnabled();
             Map map = new HashMap();
             map.put("data", modules);
 
@@ -411,20 +386,18 @@ public class ModuleManagerController {
         JsonResult jsonResult = new JsonResult();
 
         if(StringUtils.isEmpty(moduleId)){
-            System.out.println("aaa");
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
         Module module = moduleService.selectModuleById(moduleId);
-        System.out.println(module.getTitle());
         if(ValidCheck.validPojo(module)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
         try {
-            module.setStatus(0);
+            module.setStatus(DBConstants.ModuleStatus.ACTIVED.getCode());
 
             String aid = httpServletRequest.getHeader("aid");
 
@@ -450,14 +423,11 @@ public class ModuleManagerController {
     /**
      * 下线一个首页模块
      * @param moduleId
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return
      */
     @GetMapping(value = "/offline/{moduleId}")
     @ResponseBody
-    public JsonResult offlineModuleById(@PathVariable("moduleId") Integer moduleId,
-                                        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult offlineModuleById(@PathVariable("moduleId") Integer moduleId){
         JsonResult jsonResult = new JsonResult();
 
         if(StringUtils.isEmpty(moduleId)){
@@ -478,7 +448,7 @@ public class ModuleManagerController {
         }
 
         try {
-            module.setStatus(1);
+            module.setStatus(DBConstants.ModuleStatus.INACTIVE.getCode());
             moduleService.offlineModuleById(module,plates.get(0));
             CommonResult.success(jsonResult);
         }catch (Exception e){
@@ -491,23 +461,19 @@ public class ModuleManagerController {
 
 
     /**
-     * 删除一个模块，把模块的状态设置成2
+     * 删除一个模块
      * @param moduleId
-     * @param httpServletResponse
-     * @param httpServletRequest
      * @return
      */
     @DeleteMapping(value = "/{moduleId}")
     @ResponseBody
-    public JsonResult deleteModuleById(@PathVariable(value = "moduleId") Integer moduleId, HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+    public JsonResult deleteModuleById(@PathVariable(value = "moduleId") Integer moduleId){
         JsonResult jsonResult = new JsonResult();
 
         if(StringUtils.isEmpty(moduleId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
-
-
 
         try {
             //不存在
@@ -524,7 +490,7 @@ public class ModuleManagerController {
                 return jsonResult;
             }
 
-            module.setStatus(2);
+            module.setStatus(DBConstants.ModuleStatus.DELETED.getCode());
             moduleService.deleteModuleByModule(module);
             CommonResult.success(jsonResult);
         }catch (Exception e){

@@ -68,7 +68,7 @@ public class OnlineOrderController {
             sort = 0;
         }
 
-        jsonResult = onlineOrderService.selectOnlineOrdersByUid(uid, sort, start_time, end_time, jsonResult);
+        jsonResult = onlineOrderService.selectOnlineOrdersByUid(uid, page, per_page, sort, start_time, end_time, jsonResult);
 
         return jsonResult;
     }
@@ -112,7 +112,7 @@ public class OnlineOrderController {
             sort = 0;
         }
 
-        onlineOrderService.selectOnlineOrdersByUidNotPay(uid, sort, start_time, end_time, jsonResult);
+        onlineOrderService.selectOnlineOrdersByUidNotPay(uid, page, per_page, sort, start_time, end_time, jsonResult);
 
         return jsonResult;
     }

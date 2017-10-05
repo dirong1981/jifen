@@ -43,6 +43,9 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
     @Autowired
     private SerialNumberService serialNumberService;
 
+    @Autowired
+    private RedisService redisService;
+
     @Transactional
     @Override
     public JsonResult insertIntegralOrder(IntegralTransferOrder integralTransferOrder, String uid, JsonResult jsonResult)  {
@@ -61,6 +64,7 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
                 return jsonResult;
             }
             UserExtInfo userExtInfo = userExtInfos.get(0);
+
 
             //判断积分是否足够
             UserCreditsExample userCreditsExample = new UserCreditsExample();
@@ -138,10 +142,13 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
 
             messageMapper.insert(message);
 
+            redisService.evict(uid+"random");
+
             jsonResult.setMessage(integralTransferOrder.getTrxCode());
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
 
         }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
 
@@ -150,7 +157,7 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
     }
 
     @Override
-    public JsonResult selectIntegralOrderByuid(String uid, int sort, String start_time, String end_time, JsonResult jsonResult) {
+    public JsonResult selectIntegralOrderByuid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
 
         try {
             IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
@@ -158,7 +165,9 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
             criteria.andUidEqualTo(Integer.parseInt(uid));
             integralTransferOrderExample.setOrderByClause("id desc");
 
+            PageHelper.startPage(page,per_page);
             List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderMapper.selectByExample(integralTransferOrderExample);
+            PageInfo pageInfo = new PageInfo(integralTransferOrders);
 
             if(!ValidCheck.validList(integralTransferOrders)) {
                 for (IntegralTransferOrder integralTransferOrder : integralTransferOrders) {
@@ -179,6 +188,11 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
 
             Map map = new HashMap();
             map.put("data", integralTransferOrders);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
             CommonResult.success(jsonResult);
             jsonResult.setItem(map);

@@ -1,5 +1,7 @@
 package com.gljr.jifen.service.impl;
 
+import com.gljr.jifen.common.CommonResult;
+import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.dao.CategoryMapper;
 import com.gljr.jifen.dao.ProductMapper;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -59,7 +63,11 @@ public class CategoryServiceImpl implements CategoryService {
         category.setCode(this.serialNumberService.getNextCategoryCode(category));
         category.setStatus(DBConstants.CategoryStatus.INACTIVE.getCode());
         category.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        return  categoryMapper.insert(category);
+        categoryMapper.insert(category);
+
+        category.setSort(category.getId());
+        categoryMapper.updateByPrimaryKey(category);
+        return  0;
     }
 
     @Override
@@ -209,6 +217,52 @@ public class CategoryServiceImpl implements CategoryService {
         categoryExample.setOrderByClause("sort asc");
         categoryExample.setOrderByClause("id desc");
         return categoryMapper.selectByExample(categoryExample);
+    }
+
+    @Override
+    public JsonResult allCategoriesIncludeProductStore(JsonResult jsonResult) {
+        try {
+            CategoryExample categoryExample = new CategoryExample();
+            CategoryExample.Criteria criteria = categoryExample.or();
+            criteria.andStatusEqualTo(DBConstants.CategoryStatus.ACTIVED.getCode());
+            criteria.andParentCodeEqualTo(0);
+            categoryExample.setOrderByClause("sort asc");
+
+            List<Category> categories = categoryMapper.selectByExample(categoryExample);
+
+            Map map = new HashMap();
+            map.put("data", categories);
+            jsonResult.setItem(map);
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
+    @Override
+    @Transactional
+    public JsonResult changeCategoryOrder(Integer cur, Integer prev, JsonResult jsonResult) {
+
+        try {
+            Category category = categoryMapper.selectByPrimaryKey(cur);
+
+            Category category1 = categoryMapper.selectByPrimaryKey(prev);
+
+            cur = category.getSort();
+
+            prev = category1.getSort();
+
+            category.setSort(prev);
+            category1.setSort(cur);
+
+            categoryMapper.updateByPrimaryKey(category);
+            categoryMapper.updateByPrimaryKey(category1);
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
     }
 
 }

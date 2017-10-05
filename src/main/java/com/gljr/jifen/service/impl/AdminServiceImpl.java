@@ -1,22 +1,45 @@
 package com.gljr.jifen.service.impl;
 
+import com.gljr.jifen.common.*;
+import com.gljr.jifen.constants.DBConstants;
+import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.dao.AdminMapper;
 import com.gljr.jifen.dao.AdminOnlineMapper;
 import com.gljr.jifen.dao.AdminPermissionAssignMapper;
 import com.gljr.jifen.dao.SystemPermissionMapper;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.AdminService;
+import com.gljr.jifen.service.RedisService;
+import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.Jedis;
 
 import java.sql.Timestamp;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class AdminServiceImpl implements AdminService {
+
+    private Logger logger = LoggerFactory.getLogger(AdminServiceImpl.class);
+
+    /**
+     * redis token key前缀
+     */
+    private static final String REDIS_ADMIN_TOKEN_PREFIX = "admin_token_";
+    /**
+     * redis permission_codes key前缀
+     */
+    private static final String REDIS_PERMISSION_CODES_PREFIX = "permission_codes_";
 
     @Autowired
     private AdminMapper adminMapper;
@@ -29,18 +52,30 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private SystemPermissionMapper systemPermissionMapper;
-
+    @Autowired
+    private RedisService redisService;
 
 
     @Override
-    public List<Admin> login(Admin admin) {
+    public Admin login(Admin admin) {
 
         AdminExample adminExample = new AdminExample();
         AdminExample.Criteria criteria = adminExample.createCriteria();
+        //System.out.printf(admin.getaName());
         criteria.andUsernameEqualTo(admin.getUsername());
+        //criteria.andAPasswordEqualTo(admin.getaPassword());
+
+        Admin selectAdmin = null;
+        try {
+            List<Admin> list = adminMapper.selectByExample(adminExample);
+            selectAdmin = list.get(0);
+        } catch (Exception e) {
+            System.out.println(e);
+            //return GlobalConstants.USER_DOES_NOT_EXIST;
+        }
 
 
-        return adminMapper.selectByExample(adminExample);
+        return selectAdmin;
     }
 
     @Override
@@ -149,6 +184,15 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public int updateAdminById(Admin admin) {
         return adminMapper.updateByPrimaryKey(admin);
+    }
+
+
+    @Override
+    public List<AdminOnline> selectAdminOnlines(int aId) {
+        AdminOnlineExample adminOnlineExample = new AdminOnlineExample();
+        AdminOnlineExample.Criteria criteria = adminOnlineExample.createCriteria();
+        criteria.andAidEqualTo(aId);
+        return adminOnlineMapper.selectByExample(adminOnlineExample);
     }
 
 
@@ -303,5 +347,107 @@ public class AdminServiceImpl implements AdminService {
 //        return systemPermissionMapper.selectByPrimaryKey(id);
 //    }
 
+    @Override
+    public JsonResult doLogin(String username, String password, Integer type) {
+        JsonResult jsonResult = new JsonResult();
+        Admin admin = login(new Admin(username));
+        if (admin != null) {
+            try {
+                String md5Password = Md5Util.md5(password + admin.getSalt());
+                if (md5Password != null && md5Password.equals(admin.getPassword())) {
+                    //生成32位token的key
+                    String key = StrUtil.randomKey(32);
 
+                    //生成token中的数据
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("id", admin.getId());
+                    jsonObject.put("role", "STORE_ADMIN");
+                    jsonObject.put("username", admin.getUsername());
+
+                    String token;
+
+                    //查询online表中用户是否存在
+                    List<AdminOnline> list = selectAdminOnlinesByAid(admin.getId(), type);
+                    if (list.size() == 0) {
+                        //如果在线表中用户不存在，将用户存入online表
+                        AdminOnline adminOnline = new AdminOnline();
+                        adminOnline.setAid(admin.getId());
+                        adminOnline.setToken(key);
+                        adminOnline.setClientType(type);
+                        adminOnline.setLoginTime(new Date());
+
+                        insertAdminOnline(adminOnline);
+                        //生成token
+                        token = JwtUtil.createJWT(GlobalConstants.GLJR_PREFIX, jsonObject.toString(), key, GlobalConstants.TOKEN_FAILURE_TIME);
+                    } else {
+                        //用户存在
+                        //更新token的时间
+                        key = list.get(0).getToken();
+                        token = JwtUtil.createJWT(GlobalConstants.GLJR_PREFIX, jsonObject.toString(), key, GlobalConstants.TOKEN_FAILURE_TIME);
+                    }
+
+                    admin.setToken(token);
+
+                    //查询用户权限
+                    String permission_codes = "";
+
+                    this.redisService.put(REDIS_ADMIN_TOKEN_PREFIX + admin.getId(), token);
+                    this.redisService.put(REDIS_PERMISSION_CODES_PREFIX + admin.getId(), permission_codes);
+
+                    Map<Object, Object> mapData = new HashMap<>();
+                    mapData.put("data", admin);
+
+                    jsonResult.setItem(mapData);
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+                    jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+                } else {
+                    jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_PASSWORD_ERROR);
+                }
+            } catch (Exception e) {
+                jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
+                jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
+            }
+        } else {
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.USER_NOT_EXIST);
+        }
+
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult doLogout(String uid, DBConstants.AdminAccountType accountType) {
+        JsonResult jsonResult = new JsonResult();
+
+        this.redisService.evict(REDIS_ADMIN_TOKEN_PREFIX + uid, REDIS_PERMISSION_CODES_PREFIX + uid);
+
+        jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+        jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
+
+        return jsonResult;
+    }
+
+    @Override
+    public boolean checkToken(String uid, String jwt) {
+        int requestUid = NumberUtils.getInt(uid);
+        if (requestUid == 0) {
+            return false;
+        }
+        //从redis获取tonken，如果不存在再从数据库获取
+        String storeToken = this.redisService.get("token" + uid);
+        if (StringUtils.isBlank(storeToken)) {
+            List<AdminOnline> adminOnlineList = selectAdminOnlines(requestUid);
+            if (adminOnlineList.isEmpty()) {
+                return false;
+            }
+            storeToken = adminOnlineList.get(0).getToken();
+        }
+
+        try {
+            Claims claims = JwtUtil.parseJWT(jwt, storeToken);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

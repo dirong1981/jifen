@@ -74,8 +74,8 @@ public class AdminManagerController extends BaseController {
                     //把权限集合放入管理员模型中
                     admin.setPermission(adminPermissions);
                 }else{
-                    StoreInfo storeInfo = storeInfoService.selectStoreInfoByAid(admin.getId());
-                    admin.setPermission(storeInfo.getName());
+//                    StoreInfo storeInfo = storeInfoService.selectStoreInfoByAid(admin.getId());
+//                    admin.setPermission(storeInfo.getName());
                 }
 
                 //查询管理员最后登录时间
@@ -385,12 +385,12 @@ public class AdminManagerController extends BaseController {
         int clientType = ClientType.checkClientType(client_type);
 
 
-        List<Admin> admins = adminService.login(admin);
+//        List<Admin> admins = adminService.login(admin);
 
+        Admin selectAdmin = adminService.login(admin);
 
         //用户名存在
-        if(admins != null && admins.size() != 0){
-            Admin selectAdmin = admins.get(0);
+        if(!ValidCheck.validPojo(selectAdmin)){
 
             if(selectAdmin.getStatus() == 0){
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);

@@ -25,7 +25,7 @@ public interface IntegralTransferOrderService {
      * @param uid
      * @return
      */
-    JsonResult selectIntegralOrderByuid(String uid, int sort, String start_time, String end_time, JsonResult jsonResult);
+    JsonResult selectIntegralOrderByuid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult);
 
 
     /**

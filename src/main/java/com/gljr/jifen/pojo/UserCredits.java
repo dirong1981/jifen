@@ -15,6 +15,8 @@ public class UserCredits {
 
     private Integer frozenIntegral;
 
+    private Integer feePaymentLimit;
+
     private Date createTime;
 
     public Integer getId() {
@@ -71,5 +73,13 @@ public class UserCredits {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Integer getFeePaymentLimit() {
+        return feePaymentLimit;
+    }
+
+    public void setFeePaymentLimit(Integer feePaymentLimit) {
+        this.feePaymentLimit = feePaymentLimit;
     }
 }

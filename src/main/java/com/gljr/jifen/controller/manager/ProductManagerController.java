@@ -13,6 +13,7 @@ import com.gljr.jifen.pojo.StoreInfo;
 import com.gljr.jifen.service.ProductService;
 import com.gljr.jifen.service.StorageService;
 import com.gljr.jifen.service.StoreInfoService;
+import com.qiniu.util.Json;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -52,35 +53,10 @@ public class ProductManagerController extends BaseController {
      */
     @GetMapping("/all")
     @ResponseBody
-    public JsonResult allProducts(){
+    public JsonResult selectProducts(){
         JsonResult jsonResult = new JsonResult();
-        try{
-            //状态不为4的商品
-            List<Product> products = productService.selectAllProduct();
 
-            //获取商户名称
-            if(!ValidCheck.validList(products)){
-                for (Product product : products){
-                    StoreInfo storeInfo = storeInfoService.selectStoreInfoById(product.getSiId());
-                    if(ValidCheck.validPojo(storeInfo)){
-                        product.setStoreName("已删除");
-                    }else {
-                        product.setStoreName(storeInfo.getName());
-                    }
-                }
-            }
-
-            Map map = new HashMap();
-            map.put("data", products);
-
-
-            jsonResult.setItem(map);
-            CommonResult.success(jsonResult);
-
-            return jsonResult;
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = productService.selectAllProduct(jsonResult);
 
         return jsonResult;
     }
@@ -89,34 +65,20 @@ public class ProductManagerController extends BaseController {
 
     /**
      * 下架商品
-     * @param id 商品id
+     * @param productId 商品id
      * @return 返回状态值
      */
-    @GetMapping(value = "/{id}/rejection")
+    @GetMapping(value = "/{productId}/rejection")
     @ResponseBody
-    public JsonResult stopProduct(@PathVariable("id") Integer id){
+    public JsonResult stopProduct(@PathVariable("productId") Integer productId){
         JsonResult jsonResult = new JsonResult();
 
-        if(StringUtils.isEmpty(id)){
+        if(StringUtils.isEmpty(productId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
-        try {
-            Product product = productService.selectProductById(id);
-            if(ValidCheck.validPojo(product)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-            product.setStatus(DBConstants.ProductStatus.OFF_SALE.getCode());
-
-            productService.updateProduct(product);
-
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = productService.stopProductById(productId, jsonResult);
 
 
         return jsonResult;
@@ -125,34 +87,20 @@ public class ProductManagerController extends BaseController {
 
     /**
      * 商品上架
-     * @param id 商品id
+     * @param productId 商品id
      * @return 返回状态值
      */
-    @GetMapping(value = "/{id}/acceptance")
+    @GetMapping(value = "/{productId}/acceptance")
     @ResponseBody
-    public JsonResult startProduct(@PathVariable("id") Integer id){
+    public JsonResult startProduct(@PathVariable("productId") Integer productId){
         JsonResult jsonResult = new JsonResult();
 
-        if(StringUtils.isEmpty(id)){
+        if(StringUtils.isEmpty(productId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
-        try {
-            Product product = productService.selectProductById(id);
-            if(ValidCheck.validPojo(product)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-            product.setStatus(DBConstants.ProductStatus.ON_SALE.getCode());
-
-            productService.updateProduct(product);
-
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = productService.startProductById(productId, jsonResult);
 
 
         return jsonResult;
@@ -161,35 +109,20 @@ public class ProductManagerController extends BaseController {
 
     /**
      * 删除商品
-     * @param id 商品id
+     * @param productId 商品id
      * @return 返回状态值
      */
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/{productId}")
     @ResponseBody
-    public JsonResult deleteProduct(@PathVariable("id") Integer id){
+    public JsonResult deleteProduct(@PathVariable("productId") Integer productId){
         JsonResult jsonResult = new JsonResult();
 
-        if(StringUtils.isEmpty(id)){
+        if(StringUtils.isEmpty(productId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
-        try {
-            Product product = productService.selectProductById(id);
 
-            if(ValidCheck.validPojo(product)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            product.setStatus(DBConstants.ProductStatus.DELETED.getCode());
-            productService.deleteProduct(product);
-
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
-
+        jsonResult = productService.deleteProductById(productId, jsonResult);
 
         return jsonResult;
     }
@@ -198,62 +131,29 @@ public class ProductManagerController extends BaseController {
     /**
      * 添加商品
      * @param product 商品模型
-     * @param bindingResult 验证类
      * @param file 上传的商品缩略图
      * @return 返回状态码
      */
     @PostMapping
     @ResponseBody
-    public JsonResult addProduct(@Valid Product product, BindingResult bindingResult, @RequestParam(value="pic",required=false) MultipartFile file,
-                                 @RequestParam(value = "random") Integer random, HttpServletRequest httpServletRequest){
+    public JsonResult addProduct(Product product, @RequestParam(value="pic",required=false) MultipartFile file,
+                                 @RequestParam(value = "random") Integer random){
         JsonResult jsonResult = new JsonResult();
-
-//        if(bindingResult.hasErrors()){
-//            jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
-//            return jsonResult;
-//        }
-
         if(StringUtils.isEmpty(product.getSiId())){
             jsonResult.setMessage("请选择商户！");
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
             return jsonResult;
         }
-
         if(StringUtils.isEmpty(product.getCategoryCode()) || product.getCategoryCode() == -1){
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
             jsonResult.setMessage("请选择分类！");
             return jsonResult;
         }
-
-        //上传图片
-
-        if (file != null && !file.isEmpty()) {
-            String _key = storageService.uploadToPublicBucket("product", file);
-            if (StringUtils.isEmpty(_key)) {
-                CommonResult.uploadFailed(jsonResult);
-                return jsonResult;
-            }
-            product.setLogoKey(_key);
-        } else {
-            product.setLogoKey("product/default.png");
-        }
-
-
-        try {
-            String priceStr = httpServletRequest.getParameter("price");
-            int price = (int)(Double.parseDouble(priceStr) * 100);
-
-            product.setPrice(price);
-            product.setStatus(DBConstants.ProductStatus.OFF_SALE.getCode());
-            product.setCreateTime(new Timestamp(System.currentTimeMillis()));
-
-            productService.addProduct(product, random);
-
-            CommonResult.success(jsonResult);
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
-
+//        String priceStr = httpServletRequest.getParameter("price");
+//        int price = (int)(Double.parseDouble(priceStr) * 100);
+//
+//        product.setPrice(price);
+        jsonResult = productService.insertProduct(product, file, random, jsonResult);
 
         return jsonResult;
     }
@@ -299,7 +199,7 @@ public class ProductManagerController extends BaseController {
         }
 
         try{
-            productService.updateProduct(product);
+            //productService.updateProduct(product);
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
         }catch (Exception e){
             System.out.println(e);
@@ -321,28 +221,13 @@ public class ProductManagerController extends BaseController {
         JsonResult jsonResult = new JsonResult();
         //上传图片
 
-        try {
-
-            if (file != null && !file.isEmpty()) {
-                String _key = storageService.uploadToPublicBucket("product", file);
-                if (StringUtils.isEmpty(_key)) {
-                    CommonResult.uploadFailed(jsonResult);
-                    return jsonResult;
-                }
-
-                ProductPhoto productPhoto = new ProductPhoto();
-                productPhoto.setImgKey(_key);
-                productPhoto.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                productPhoto.setPid(random);
-                productPhoto.setSort(99);
-                productService.insertProductPhoto(productPhoto);
-
-
-            }
-            CommonResult.success(jsonResult);
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
+        if(file == null || file.isEmpty() || StringUtils.isEmpty(random)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
         }
+
+        jsonResult = productService.uploadFile(file, random, jsonResult);
+
         return jsonResult;
     }
 

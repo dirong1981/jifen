@@ -2,6 +2,8 @@ package com.gljr.jifen.dao;
 
 import com.gljr.jifen.pojo.StoreOfflineOrder;
 import com.gljr.jifen.pojo.StoreOfflineOrderExample;
+
+import java.util.HashMap;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -27,4 +29,6 @@ public interface StoreOfflineOrderMapper {
     int updateByPrimaryKeySelective(StoreOfflineOrder record);
 
     int updateByPrimaryKey(StoreOfflineOrder record);
+
+    HashMap getStoreTotalInfo(Integer uid);
 }

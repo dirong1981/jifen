@@ -380,4 +380,32 @@ public class CategoryManagerController extends BaseController {
     }
 
 
+    /**
+     * 查询所有通过审核商户和商品分类
+     * @return
+     */
+    @GetMapping(value = "/sort")
+    @ResponseBody
+    public JsonResult allCategoriesIncludeProductStore(){
+        JsonResult jsonResult = new JsonResult();
+
+        jsonResult = categoryService.allCategoriesIncludeProductStore(jsonResult);
+
+        return  jsonResult;
+    }
+
+    @PutMapping(value = "/order")
+    @ResponseBody
+    public JsonResult changeCategoryOrder(@RequestParam(value = "cur") Integer cur, @RequestParam(value = "prev") Integer prev){
+        JsonResult jsonResult = new JsonResult();
+
+        if(StringUtils.isEmpty(cur) || StringUtils.isEmpty(prev)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
+        jsonResult = categoryService.changeCategoryOrder(cur, prev, jsonResult);
+
+        return  jsonResult;
+    }
 }

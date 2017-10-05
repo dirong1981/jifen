@@ -29,22 +29,9 @@ public class ModuleAggregationManagerController {
     @Autowired
     private ModuleAggregationService moduleAggregationService;
 
-    @Autowired
-    private AdminService adminService;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private StoreInfoService storeInfoService;
-
-    @Autowired
-    private RedisService redisService;
-
     /**
      * 添加一个聚合页
      * @param moduleAggregation
-     * @param httpServletResponse
      * @param httpServletRequest
      * @return
      */
@@ -101,35 +88,15 @@ public class ModuleAggregationManagerController {
 
     /**
      * 下架一个聚合页
-     * @param id
+     * @param moduleAggregationId
      * @return
      */
-    @GetMapping(value = "/{id}/rejection")
+    @GetMapping(value = "/{moduleAggregationId}/rejection")
     @ResponseBody
-    public JsonResult stopModuleAggregation(@PathVariable("id") Integer id){
+    public JsonResult stopModuleAggregation(@PathVariable("moduleAggregationId") Integer moduleAggregationId){
         JsonResult jsonResult = new JsonResult();
 
-        try {
-            ModuleAggregation moduleAggregation = moduleAggregationService.selectModuleAggregationById(id);
-
-            if(ValidCheck.validPojo(moduleAggregation)) {
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            moduleAggregation.setStatus(DBConstants.CategoryStatus.INACTIVE.getCode());
-
-            //删除缓存
-            this.redisService.evict(moduleAggregation.getLinkCode(), moduleAggregation.getLinkCode()+"1",
-                    moduleAggregation.getLinkCode()+"2", moduleAggregation.getLinkCode()+"3", moduleAggregation.getLinkCode()+"4");
-
-            moduleAggregationService.updateModuleAggregationById(moduleAggregation);
-
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = moduleAggregationService.rejectionModuleAggregationById(moduleAggregationId, jsonResult);
 
 
         return jsonResult;
@@ -138,164 +105,15 @@ public class ModuleAggregationManagerController {
 
     /**
      * 生效一个聚合页
-     * @param id
+     * @param moduleAggregationId
      * @return
      */
-    @GetMapping(value = "/{id}/acceptance")
+    @GetMapping(value = "/{moduleAggregationId}/acceptance")
     @ResponseBody
-    public JsonResult startModuleAggregation(@PathVariable("id") Integer id){
+    public JsonResult startModuleAggregation(@PathVariable("moduleAggregationId") Integer moduleAggregationId){
         JsonResult jsonResult = new JsonResult();
 
-        try {
-            ModuleAggregation moduleAggregation = moduleAggregationService.selectModuleAggregationById(id);
-
-            //判断是否找到该聚合页
-            if(ValidCheck.validPojo(moduleAggregation)) {
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            //查找聚合页下包含哪些商品和商户
-            List<ModuleAggregationProduct> moduleAggregationProducts = moduleAggregationService.selectModuleAggregationProductByAggregationId(moduleAggregation.getId());
-
-
-            //如果聚合页下没有添加商品或者商户，不能启用聚合页
-            if(ValidCheck.validList(moduleAggregationProducts)) {
-
-                CommonResult.noSelected(jsonResult);
-                return jsonResult;
-
-            }
-
-            //循环获取商户或商品信息
-            List<AggregationProduct> aggregationProducts = new ArrayList<>();
-            for (ModuleAggregationProduct moduleAggregationProduct : moduleAggregationProducts) {
-                AggregationProduct aggregationProduct = new AggregationProduct();
-                if (moduleAggregationProduct.getType() == 1) {
-                    //线上商品
-                    Product product = productService.selectProductById(moduleAggregationProduct.getProductId());
-                    if (!ValidCheck.validPojo(product)) {
-
-                        aggregationProduct.setId(product.getId());
-                        aggregationProduct.setIntegral(product.getIntegral());
-                        aggregationProduct.setName(product.getName());
-                        aggregationProduct.setPrice(product.getPrice());
-                        aggregationProduct.setType(DBConstants.CategoryType.PRODUCT.getCode());
-                        aggregationProduct.setLogo_key(product.getLogoKey());
-                        aggregationProduct.setSales(product.getSales());
-
-                        aggregationProducts.add(aggregationProduct);
-                    }
-                } else {
-                    //店铺
-                    StoreInfo storeInfo = storeInfoService.selectStoreInfoById(moduleAggregationProduct.getStoreId());
-                    if (!ValidCheck.validPojo(storeInfo)) {
-                        aggregationProduct.setLogo_key(storeInfo.getLogoKey());
-                        aggregationProduct.setType(DBConstants.CategoryType.STORE.getCode());
-                        aggregationProduct.setName(storeInfo.getName());
-                        aggregationProduct.setId(storeInfo.getId());
-                        aggregationProduct.setAddress(storeInfo.getAddress());
-
-                        aggregationProducts.add(aggregationProduct);
-                    }
-                }
-            }
-
-
-            //生成5种排序规则
-
-
-            //默认排序
-            this.redisService.put(moduleAggregation.getLinkCode(), JsonUtil.toJson(aggregationProducts));
-
-
-
-            //积分低到高
-            Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
-
-                @Override
-                public int compare(AggregationProduct o1, AggregationProduct o2) {
-                    //按照学生的年龄进行升序排列
-                    if (o1.getIntegral() > o2.getIntegral()) {
-                        return 1;
-                    }
-                    if (o1.getIntegral() == o2.getIntegral()) {
-                        return 0;
-                    }
-                    return -1;
-                }
-
-            });
-            this.redisService.put(moduleAggregation.getLinkCode() + "4",JsonUtil.toJson(aggregationProducts));
-
-
-            //积分高到低
-            Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
-
-                @Override
-                public int compare(AggregationProduct o1, AggregationProduct o2) {
-                    //按照学生的年龄进行升序排列
-                    if (o1.getIntegral() > o2.getIntegral()) {
-                        return -1;
-                    }
-                    if (o1.getIntegral() == o2.getIntegral()) {
-                        return 0;
-                    }
-                    return 1;
-                }
-
-            });
-            this.redisService.put(moduleAggregation.getLinkCode() + "3",JsonUtil.toJson(aggregationProducts));
-
-
-            //销量低到高
-            Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
-
-                @Override
-                public int compare(AggregationProduct o1, AggregationProduct o2) {
-                    //按照学生的年龄进行升序排列
-                    if (o1.getSales() > o2.getSales()) {
-                        return 1;
-                    }
-                    if (o1.getSales() == o2.getSales()) {
-                        return 0;
-                    }
-                    return -1;
-                }
-
-            });
-            this.redisService.put(moduleAggregation.getLinkCode() + "2",JsonUtil.toJson(aggregationProducts));
-
-
-            //销量高到低
-            Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
-
-                @Override
-                public int compare(AggregationProduct o1, AggregationProduct o2) {
-                    //按照学生的年龄进行升序排列
-                    if (o1.getSales() > o2.getSales()) {
-                        return -1;
-                    }
-                    if (o1.getSales() == o2.getSales()) {
-                        return 0;
-                    }
-                    return 1;
-                }
-
-            });
-            this.redisService.put(moduleAggregation.getLinkCode() + "1",JsonUtil.toJson(aggregationProducts));
-
-
-            //更新聚合页状态
-            moduleAggregation.setStatus(DBConstants.CategoryStatus.ACTIVED.getCode());
-            moduleAggregationService.updateModuleAggregationById(moduleAggregation);
-
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            System.out.println(e);
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = moduleAggregationService.acceptanceModuleAggregationById(moduleAggregationId, jsonResult);
 
 
         return jsonResult;
@@ -304,63 +122,47 @@ public class ModuleAggregationManagerController {
 
     /**
      * 根据id获取一个聚合页
-     * @param id
+     * @param moduleAggregationId
      * @return
      */
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{moduleAggregationId}")
     @ResponseBody
-    public JsonResult selectOneModuleAggregationById(@PathVariable(value = "id") Integer id){
+    public JsonResult selectOneModuleAggregationById(@PathVariable(value = "moduleAggregationId") Integer moduleAggregationId){
         JsonResult jsonResult = new JsonResult();
 
-        try {
-
-            ModuleAggregation moduleAggregation = moduleAggregationService.selectModuleAggregationById(id);
-            if(ValidCheck.validPojo(moduleAggregation)) {
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            Map map = new HashMap();
-            map.put("data", moduleAggregation);
-
-            jsonResult.setItem(map);
-            CommonResult.success(jsonResult);
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = moduleAggregationService.selectModuleAggregationById(moduleAggregationId, jsonResult);
         return jsonResult;
     }
 
 
     /**
      * 添加商品或者商户到聚合页
-     * @param id 聚合页id
+     * @param moduleAggregationId 聚合页id
      * @param type 类型 1商品，2商户
      * @param httpServletRequest
      * @return
      */
-    @PostMapping(value = "/{id}/products/{type}")
+    @PostMapping(value = "/{moduleAggregationId}/products/{type}")
     @ResponseBody
-    public JsonResult insertModuleAggregationProducts(@PathVariable(value = "id") Integer id, @PathVariable(value = "type") Integer type,
+    public JsonResult insertModuleAggregationProducts(@PathVariable(value = "moduleAggregationId") Integer moduleAggregationId, @PathVariable(value = "type") Integer type,
                                                       HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
-        try {
-            String[] productIds = httpServletRequest.getParameterValues("productIds");
+        String[] productIds = httpServletRequest.getParameterValues("productIds");
 
-            if (productIds == null || productIds.length == 0) {
-                CommonResult.noChoice(jsonResult);
-                return jsonResult;
-            }
-
-            moduleAggregationService.insertModuleAggregationProduct(id, productIds, type);
-
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            System.out.println(e);
-            CommonResult.sqlFailed(jsonResult);
+        if (productIds == null || productIds.length == 0) {
+            CommonResult.noChoice(jsonResult);
+            return jsonResult;
         }
+
+        if(type != 1 && type != 2){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
+        jsonResult = moduleAggregationService.insertModuleAggregationProduct(moduleAggregationId, productIds, type, jsonResult);
+
+
 
         return jsonResult;
     }

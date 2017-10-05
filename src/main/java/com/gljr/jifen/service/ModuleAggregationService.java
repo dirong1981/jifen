@@ -19,9 +19,14 @@ public interface ModuleAggregationService {
      */
     JsonResult insertModuleAggregation(ModuleAggregation moduleAggregation, JsonResult jsonResult);
 
-    int insertModuleAggregationProduct(Integer id, String[] productIds, Integer type);
-
-
+    /**
+     * 添加商品进聚合页
+     * @param moduleAggregationId 聚合页id
+     * @param productIds 商品id集合
+     * @param type 类型1商品， 2商户
+     * @return
+     */
+    JsonResult insertModuleAggregationProduct(Integer moduleAggregationId, String[] productIds, Integer type, JsonResult jsonResult);
 
 
     //查找
@@ -35,34 +40,43 @@ public interface ModuleAggregationService {
 
     /**
      * 根据id查找一个聚合页
-     * @param id
+     * @param moduleAggregationId
      * @return
      */
-    ModuleAggregation selectModuleAggregationById(Integer id);
+    JsonResult selectModuleAggregationById(Integer moduleAggregationId, JsonResult jsonResult);
 
 
     /**
-     * 根据聚合页id查找页面下包含的内容
-     * @param aid
-     * @return
-     */
-    List<ModuleAggregationProduct> selectModuleAggregationProductByAggregationId(Integer aid);
-
-
-    /**
-     * 按照上下架类型查询聚合页
+     * 查询上架聚合页
      * @return
      */
     JsonResult selectModuleAggregationByEnabled(JsonResult jsonResult);
 
+    /**
+     * 重新生成一个redis缓存
+     * @param link
+     * @param jsonResult
+     * @return
+     */
+    JsonResult restartmoduleAggregationByLink(String link, JsonResult jsonResult);
+
     //更新
 
     /**
-     * 通过id更新一个聚合页
-     * @param moduleAggregation
+     * 下架聚合页
+     * @param moduleAggregationId
+     * @param jsonResult
      * @return
      */
-    int updateModuleAggregationById(ModuleAggregation moduleAggregation);
+    JsonResult rejectionModuleAggregationById(Integer moduleAggregationId, JsonResult jsonResult);
+
+    /**
+     * 上架一个聚合页，生成5总排序方式
+     * @param moduleAggregationId
+     * @param jsonResult
+     * @return
+     */
+    JsonResult acceptanceModuleAggregationById(Integer moduleAggregationId, JsonResult jsonResult);
 
 
 }

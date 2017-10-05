@@ -96,6 +96,35 @@ public class TokenIntecepter implements HandlerInterceptor {
                         }
                     }
                 }
+//                else if(clientType == 1){
+//                    String token = httpServletRequest.getHeader("token");
+//                    String uid = httpServletRequest.getHeader("uid");
+//                    if (StringUtils.isEmpty(token) || StringUtils.isEmpty(uid)) {
+//                        StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+//                        return false;
+//                    } else {
+//                        //查询在线表中管理员信息
+//                        List<AdminOnline> adminOnlines = adminService.selectAdminOnlinesByAid(Integer.parseInt(uid), clientType);
+//
+//                        String tokenKey = "";
+//                        //如果管理员存在，获取tokenkey，否则重新登录
+//                        if (adminOnlines != null && adminOnlines.size() != 0) {
+//                            tokenKey = adminOnlines.get(0).getToken();
+//                        } else {
+//                            StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+//                            return false;
+//                        }
+//
+//                        //解密token，失败重新登录，时间过期重新登录
+//                        Claims claims = JwtUtil.parseJWT(token, tokenKey);
+//                        Date exp = claims.getExpiration();
+//                        Date now = new Date(System.currentTimeMillis());
+//                        if (exp.before(now)) {
+//                            StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+//                            return false;
+//                        }
+//                    }
+//                }
             }catch (Exception e){
                 StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
                 return false;

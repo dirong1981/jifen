@@ -17,6 +17,8 @@ public class ModuleProduct {
 
     private Date createTime;
 
+    private String logoKey;
+
     public Integer getId() {
         return id;
     }
@@ -71,5 +73,13 @@ public class ModuleProduct {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getLogoKey() {
+        return logoKey;
+    }
+
+    public void setLogoKey(String logoKey) {
+        this.logoKey = logoKey;
     }
 }

@@ -3,8 +3,11 @@ package com.gljr.jifen.controller;
 
 import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
+import com.gljr.jifen.common.dtchain.GatewayResponse;
+import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.IntegralTransferOrderService;
+import com.gljr.jifen.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -24,6 +27,9 @@ public class IntegralTransferOrderController {
     @Autowired
     private IntegralTransferOrderService integralTransferOrderService;
 
+    @Autowired
+    private RedisService redisService;
+
 
     /**
      * 添加一个积分转增订单
@@ -38,9 +44,33 @@ public class IntegralTransferOrderController {
         JsonResult jsonResult = new JsonResult();
 
         String uid = httpServletRequest.getHeader("uid");
+        String random = httpServletRequest.getParameter("random");
 
         if(StringUtils.isEmpty(uid)){
             CommonResult.userNotExit(jsonResult);
+            return jsonResult;
+        }
+
+        if(StringUtils.isEmpty(random)){
+            CommonResult.failed(jsonResult);
+            return jsonResult;
+        }
+
+        if(!redisService.get(uid+"random").equals(random)){
+            jsonResult.setMessage("非法订单！");
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            return jsonResult;
+        }
+
+        if(Integer.parseInt(uid) == integralTransferOrder.getgUid()){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage("不能给自己赠送积分！");
+            return jsonResult;
+        }
+
+        if(StringUtils.isEmpty(integralTransferOrder.getgUid())){
+            jsonResult.setMessage("接受转增的用户不存在！");
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
             return jsonResult;
         }
 
@@ -81,7 +111,7 @@ public class IntegralTransferOrderController {
             sort = 0;
         }
 
-        jsonResult = integralTransferOrderService.selectIntegralOrderByuid(uid, sort, start_time, end_time, jsonResult);
+        jsonResult = integralTransferOrderService.selectIntegralOrderByuid(uid, page, per_page, sort, start_time, end_time, jsonResult);
 
         return jsonResult;
     }

@@ -19,7 +19,7 @@ public interface OnlineOrderService {
      * @param jsonResult
      * @return
      */
-    JsonResult selectOnlineOrdersByUid(String uid, Integer sort, String start_time, String end_time, JsonResult jsonResult);
+    JsonResult selectOnlineOrdersByUid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult);
 
     /**
      * 查询用户未付款订单
@@ -30,7 +30,7 @@ public interface OnlineOrderService {
      * @param jsonResult
      * @return
      */
-    JsonResult selectOnlineOrdersByUidNotPay(String uid, Integer sort, String start_time, String end_time, JsonResult jsonResult);
+    JsonResult selectOnlineOrdersByUidNotPay(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult);
 
 
     /**

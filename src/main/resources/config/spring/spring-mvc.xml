@@ -8,6 +8,8 @@
 
     <mvc:annotation-driven/>
 
+    <mvc:resources location="/WEB-INF/static" mapping="/**"/>
+
 
     <mvc:cors>
         <mvc:mapping path="/**" />
@@ -50,18 +52,14 @@
     </bean>
 
 
-
-
-
-
-
-
     <mvc:interceptors>
 
         <mvc:interceptor>
             <mvc:mapping path="/v1/**" />
             <mvc:exclude-mapping path="/v1/manager/admins/logout" />
             <mvc:exclude-mapping path="/v1/manager/admins/login" />
+            <mvc:exclude-mapping path="/v1/stores/manager/login" />
+            <mvc:exclude-mapping path="/v1/stores/manager/logout"/>
             <mvc:exclude-mapping path="/**/uploadFiles" />
             <bean class="com.gljr.jifen.filter.TokenIntecepter"></bean>
         </mvc:interceptor>
@@ -74,11 +72,12 @@
             <!-- /register 和 /login 不需要拦截-->
             <mvc:exclude-mapping path="/v1/manager/admins/logout" />
             <mvc:exclude-mapping path="/v1/manager/admins/login" />
+            <mvc:exclude-mapping path="/v1/stores/manager/login" />
+            <mvc:exclude-mapping path="/v1/stores/manager/logout"/>
             <mvc:exclude-mapping path="/**/uploadFiles" />
             <bean class="com.gljr.jifen.filter.AuthInterceptor"></bean>
         </mvc:interceptor>
 
     </mvc:interceptors>
-
 
 </beans>
