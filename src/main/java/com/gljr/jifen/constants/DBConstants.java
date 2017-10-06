@@ -124,6 +124,53 @@ public class DBConstants {
     }
 
     /**
+     * 商户类型
+     */
+    public enum MerchantType {
+        ONLINE(1, "线上商品商户"), OFFLINE(2, "线下扫码商户");
+        private int code;
+
+        private String description;
+
+        MerchantType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+
+    /**
+     * 支付类型
+     */
+    public enum MerchantPayType {
+        NO(0, "不允许积分"), YES(1, "允许积分");
+        private int code;
+
+        private String description;
+
+        MerchantPayType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    /**
      * 分类状态
      */
     public enum CategoryStatus {

@@ -415,6 +415,66 @@ public class UserCreditsExample {
             return (Criteria) this;
         }
 
+        public Criteria andFreePaymentLimitIsNull() {
+            addCriterion("free_payment_limit is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitIsNotNull() {
+            addCriterion("free_payment_limit is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitEqualTo(Integer value) {
+            addCriterion("free_payment_limit =", value, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitNotEqualTo(Integer value) {
+            addCriterion("free_payment_limit <>", value, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitGreaterThan(Integer value) {
+            addCriterion("free_payment_limit >", value, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitGreaterThanOrEqualTo(Integer value) {
+            addCriterion("free_payment_limit >=", value, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitLessThan(Integer value) {
+            addCriterion("free_payment_limit <", value, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitLessThanOrEqualTo(Integer value) {
+            addCriterion("free_payment_limit <=", value, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitIn(List<Integer> values) {
+            addCriterion("free_payment_limit in", values, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitNotIn(List<Integer> values) {
+            addCriterion("free_payment_limit not in", values, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitBetween(Integer value1, Integer value2) {
+            addCriterion("free_payment_limit between", value1, value2, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreePaymentLimitNotBetween(Integer value1, Integer value2) {
+            addCriterion("free_payment_limit not between", value1, value2, "freePaymentLimit");
+            return (Criteria) this;
+        }
+
         public Criteria andFrozenIntegralIsNull() {
             addCriterion("frozen_integral is null");
             return (Criteria) this;

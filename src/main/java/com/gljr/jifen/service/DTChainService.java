@@ -2,6 +2,7 @@ package com.gljr.jifen.service;
 
 import com.gljr.jifen.common.HttpClientHelper;
 import com.gljr.jifen.common.RandomUtil;
+import com.gljr.jifen.common.dtchain.CommonOrderResponse;
 import com.gljr.jifen.common.dtchain.GatewayResponse;
 import com.gljr.jifen.common.dtchain.GouliUserInfo;
 import com.gljr.jifen.common.dtchain.security.SignatureUtil;
@@ -42,6 +43,18 @@ public class DTChainService {
 
     @Value("${dtchain.api.ext.gouli.user.userInfo}")
     private String apiGLUserInfo;
+
+    @Value("${dtchain.api.integral.transfer}")
+    private String apiIntegralTransfer;
+
+    @Value("${dtchain.api.store.accounts}")
+    private String apiStoreAccount;
+
+    @Value("${dtchain.api.orders}")
+    private String apiOrders;
+
+    @Value("${dtchain.api.orders.offline}")
+    private String apiOfflineOrders;
 
     private TreeMap<String, Object> _buildParams() {
         TreeMap<String, Object> params = new TreeMap<>();
@@ -91,8 +104,8 @@ public class DTChainService {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, userInfoAPI), secretKey));
             return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
-                    HttpClientHelper.doGetSSL(apiEndpoint + userInfoAPI, params)
-                    : HttpClientHelper.doGet(apiEndpoint + userInfoAPI, params),
+                            HttpClientHelper.doGetSSL(apiEndpoint + userInfoAPI, params)
+                            : HttpClientHelper.doGet(apiEndpoint + userInfoAPI, params),
                     new TypeToken<GatewayResponse<GouliUserInfo>>(){}.getType());
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -100,4 +113,76 @@ public class DTChainService {
         return null;
     }
 
+    public GatewayResponse<CommonOrderResponse> transferIntegral(Long fromUid, Long toUid, Integer integral) {
+        TreeMap<String, Object> params = _buildParams();
+        params.put("from_uid", fromUid);
+        params.put("to_uid", toUid);
+        params.put("integral", integral);
+
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_POST, apiIntegralTransfer), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doPostSSL(apiEndpoint + apiIntegralTransfer, params)
+                            : HttpClientHelper.doPost(apiEndpoint + apiIntegralTransfer, params),
+                    new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse initStoreAccount(Long storeId) {
+        TreeMap<String, Object> params = _buildParams();
+        params.put("store_id", storeId);
+
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_POST, apiStoreAccount), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                    HttpClientHelper.doPostSSL(apiEndpoint + apiStoreAccount, params)
+                    : HttpClientHelper.doPost(apiEndpoint + apiStoreAccount, params), GatewayResponse.class);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse<CommonOrderResponse> postOrders(Long fromUid, Long productId, Integer integral) {
+        TreeMap<String, Object> params = _buildParams();
+        params.put("buyer_id", fromUid);
+        params.put("product_id", productId);
+        params.put("integral", integral);
+
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_POST, apiOrders), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doPostSSL(apiEndpoint + apiOrders, params)
+                            : HttpClientHelper.doPost(apiEndpoint + apiOrders, params),
+                    new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse<CommonOrderResponse> postOfflineOrders(Long fromUid, Long storeId, Integer integral) {
+        TreeMap<String, Object> params = _buildParams();
+        params.put("buyer_id", fromUid);
+        params.put("store_id", storeId);
+        params.put("integral", integral);
+
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_POST, apiOfflineOrders), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doPostSSL(apiEndpoint + apiOfflineOrders, params)
+                            : HttpClientHelper.doPost(apiEndpoint + apiOfflineOrders, params),
+                    new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
 }

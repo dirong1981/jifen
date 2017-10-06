@@ -19,6 +19,9 @@ public interface StoreInfoService
      */
     JsonResult selectAllStoreInfo(JsonResult jsonResult);
 
+
+    JsonResult selectAllOnlineStoreInfo(JsonResult jsonResult);
+
     /**
      * 通过审核
      * @param storeId

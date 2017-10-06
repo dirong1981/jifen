@@ -7,6 +7,8 @@
     <result column="g_uid" jdbcType="INTEGER" property="gUid" />
     <result column="trx_id" jdbcType="INTEGER" property="trxId" />
     <result column="trx_code" jdbcType="VARCHAR" property="trxCode" />
+    <result column="dtchain_block_id" jdbcType="VARCHAR" property="dtchainBlockId"/>
+    <result column="ext_order_id" jdbcType="VARCHAR" property="extOrderId"/>
     <result column="integral" jdbcType="INTEGER" property="integral" />
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="status" jdbcType="INTEGER" property="status" />
@@ -88,7 +90,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from integral_transfer_order
     where id = #{id,jdbcType=INTEGER}
@@ -107,12 +109,13 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into integral_transfer_order (uid, g_uid, trx_id, 
-      trx_code, integral, title, 
-      status, create_time)
-    values (#{uid,jdbcType=INTEGER}, #{gUid,jdbcType=INTEGER}, #{trxId,jdbcType=INTEGER}, 
-      #{trxCode,jdbcType=VARCHAR}, #{integral,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+    insert into integral_transfer_order (uid, g_uid, trx_id,
+    trx_code, dtchain_block_id, ext_order_id, integral, title,
+    status, create_time)
+    values (#{uid,jdbcType=INTEGER}, #{gUid,jdbcType=INTEGER}, #{trxId,jdbcType=INTEGER},
+    #{trxCode,jdbcType=VARCHAR}, #{dtchainBlockId,jdbcType=VARCHAR}, #{extOrderId,jdbcType=VARCHAR},
+    #{integral,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR},
+    #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.IntegralTransferOrder">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -131,6 +134,12 @@
       </if>
       <if test="trxCode != null">
         trx_code,
+      </if>
+      <if test="dtchainBlockId != null">
+        dtchain_block_id,
+      </if>
+      <if test="extOrderId != null">
+        ext_order_id,
       </if>
       <if test="integral != null">
         integral,
@@ -157,6 +166,12 @@
       </if>
       <if test="trxCode != null">
         #{trxCode,jdbcType=VARCHAR},
+      </if>
+      <if test="dtchainBlockId != null">
+        #{dtchainBlockId,jdbcType=VARCHAR},
+      </if>
+      <if test="extOrderId != null">
+        #{extOrderId,jdbcType=VARCHAR},
       </if>
       <if test="integral != null">
         #{integral,jdbcType=INTEGER},
@@ -216,14 +231,14 @@
   <update id="updateByExample" parameterType="map">
     update integral_transfer_order
     set id = #{record.id,jdbcType=INTEGER},
-      uid = #{record.uid,jdbcType=INTEGER},
-      g_uid = #{record.gUid,jdbcType=INTEGER},
-      trx_id = #{record.trxId,jdbcType=INTEGER},
-      trx_code = #{record.trxCode,jdbcType=VARCHAR},
-      integral = #{record.integral,jdbcType=INTEGER},
-      title = #{record.title,jdbcType=VARCHAR},
-      status = #{record.status,jdbcType=INTEGER},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+    uid = #{record.uid,jdbcType=INTEGER},
+    g_uid = #{record.gUid,jdbcType=INTEGER},
+    trx_id = #{record.trxId,jdbcType=INTEGER},
+    trx_code = #{record.trxCode,jdbcType=VARCHAR},
+    integral = #{record.integral,jdbcType=INTEGER},
+    title = #{record.title,jdbcType=VARCHAR},
+    status = #{record.status,jdbcType=INTEGER},
+    create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>

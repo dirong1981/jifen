@@ -4,14 +4,12 @@ package com.gljr.jifen.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.*;
+import com.gljr.jifen.common.dtchain.GatewayResponse;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.dao.*;
 import com.gljr.jifen.pojo.*;
-import com.gljr.jifen.service.RedisService;
-import com.gljr.jifen.service.SerialNumberService;
-import com.gljr.jifen.service.StorageService;
-import com.gljr.jifen.service.StoreInfoService;
+import com.gljr.jifen.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,10 +49,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
     private StorageService storageService;
 
     @Autowired
-    private UserCreditsMapper userCreditsMapper;
-
-    @Autowired
-    private RedisService redisService;
+    private DTChainService chainService;
 
 
     @Override
@@ -63,6 +58,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             StoreInfoExample storeInfoExample = new StoreInfoExample();
             StoreInfoExample.Criteria criteria = storeInfoExample.or();
             criteria.andStatusNotEqualTo(DBConstants.MerchantStatus.DELETED.getCode());
+            criteria.andStoreTypeEqualTo(DBConstants.MerchantType.OFFLINE.getCode());
             storeInfoExample.setOrderByClause("id desc");
 
             List<StoreInfo> storeInfos = storeInfoMapper.selectByExample(storeInfoExample);
@@ -79,6 +75,31 @@ public class StoreInfoServiceImpl implements StoreInfoService {
                     storeInfo.setCategoryName(categories.get(0).getName());
                 }
             }
+
+            Map map = new HashMap();
+            map.put("data", storeInfos);
+
+            jsonResult.setItem(map);
+            CommonResult.success(jsonResult);
+
+        } catch (Exception e) {
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult selectAllOnlineStoreInfo(JsonResult jsonResult) {
+        try {
+            StoreInfoExample storeInfoExample = new StoreInfoExample();
+            StoreInfoExample.Criteria criteria = storeInfoExample.or();
+            criteria.andStatusNotEqualTo(DBConstants.MerchantStatus.DELETED.getCode());
+            criteria.andStoreTypeEqualTo(DBConstants.MerchantType.ONLINE.getCode());
+            storeInfoExample.setOrderByClause("id desc");
+
+            List<StoreInfo> storeInfos = storeInfoMapper.selectByExample(storeInfoExample);
+
+
 
             Map map = new HashMap();
             map.put("data", storeInfos);
@@ -211,8 +232,6 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             admin.setSalt(salt);
             admin.setPassword(Md5Util.md5("admin"+salt));
 
-
-
             //上传图片
             if (file != null && !file.isEmpty()) {
                 String _key = storageService.uploadToPublicBucket("store", file);
@@ -228,24 +247,18 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             adminMapper.insert(admin);
 
             storeInfo.setStatus(DBConstants.MerchantStatus.INACTIVE.getCode());
-            storeInfo.setSerialCode(serialNumberService.gextNextStoreSerialCode(450204));
+            storeInfo.setSerialCode(serialNumberService.gextNextStoreSerialCode(storeInfo.getLocationCode()));
             storeInfo.setAid(admin.getId());
             storeInfo.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
             storeInfoMapper.insert(storeInfo);
 
             //添加商户的积分信息
-            UserCredits userCredits = new UserCredits();
-            userCredits.setIntegral(0);
-            userCredits.setFrozenIntegral(0);
-            userCredits.setCreateTime(new Timestamp(System.currentTimeMillis()));
-            userCredits.setOwnerId(storeInfo.getId());
-            userCredits.setWalletAddress("xxx");
-            userCredits.setOwnerType(DBConstants.OwnerType.MERCHANT.getCode());
-            userCredits.setFeePaymentLimit(10000);
+            GatewayResponse response = this.chainService.initStoreAccount(storeInfo.getId() + 0L);
 
-            userCreditsMapper.insert(userCredits);
-
+            if (null == response || response.getCode() != 200) {
+                throw new Exception("数链网络内创建商户账号失败");
+            }
 
             //更新图片的商户id
             StorePhotoExample storePhotoExample = new StorePhotoExample();
@@ -354,6 +367,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             StoreInfoExample storeInfoExample = new StoreInfoExample();
             StoreInfoExample.Criteria criteria = storeInfoExample.or();
             criteria.andStatusEqualTo(DBConstants.MerchantStatus.ACTIVED.getCode());
+            criteria.andStoreTypeEqualTo(1);
             criteria.andNameLike("%" + keyword + "%");
 
             PageHelper.startPage(page,per_page);

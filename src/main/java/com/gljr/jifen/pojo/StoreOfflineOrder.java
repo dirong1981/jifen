@@ -13,6 +13,10 @@ public class StoreOfflineOrder {
 
     private String trxCode;
 
+    private String dtchainBlockId;
+
+    private String extOrderId;
+
     private Integer totalMoney;
 
     private Integer integral;
@@ -28,6 +32,8 @@ public class StoreOfflineOrder {
     private String name;
 
     private String description;
+
+    private Integer trxType;
 
     public Integer getId() {
         return id;
@@ -67,6 +73,22 @@ public class StoreOfflineOrder {
 
     public void setTrxCode(String trxCode) {
         this.trxCode = trxCode == null ? null : trxCode.trim();
+    }
+
+    public String getDtchainBlockId() {
+        return dtchainBlockId;
+    }
+
+    public void setDtchainBlockId(String dtchainBlockId) {
+        this.dtchainBlockId = dtchainBlockId;
+    }
+
+    public String getExtOrderId() {
+        return extOrderId;
+    }
+
+    public void setExtOrderId(String extOrderId) {
+        this.extOrderId = extOrderId;
     }
 
     public Integer getTotalMoney() {
@@ -131,5 +153,13 @@ public class StoreOfflineOrder {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getTrxType() {
+        return trxType;
+    }
+
+    public void setTrxType(Integer trxType) {
+        this.trxType = trxType;
     }
 }

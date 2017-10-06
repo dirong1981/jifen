@@ -12,17 +12,17 @@
 
 
     <mvc:cors>
-        <mvc:mapping path="/**" />
+        <mvc:mapping path="/**"/>
     </mvc:cors>
 
     <!--<mvc:cors>-->
 
-        <!--<mvc:mapping path="/**"-->
-                     <!--allowed-origins="http://127.0.0.1, http://localhost, http://localhost:808"-->
-                     <!--allowed-methods="GET, PUT, DELETE, OPTIONS"-->
-                     <!--allowed-headers="header1, header2, header3"-->
-                     <!--exposed-headers="header1, header2" allow-credentials="false"-->
-                     <!--max-age="3600" />-->
+    <!--<mvc:mapping path="/**"-->
+    <!--allowed-origins="http://127.0.0.1, http://localhost, http://localhost:808"-->
+    <!--allowed-methods="GET, PUT, DELETE, OPTIONS"-->
+    <!--allowed-headers="header1, header2, header3"-->
+    <!--exposed-headers="header1, header2" allow-credentials="false"-->
+    <!--max-age="3600" />-->
 
     <!--</mvc:cors>-->
 
@@ -32,14 +32,11 @@
 
 
     <!-- 将自定义的swagger配置类加载到spring容器 -->
-    <bean class="com.gljr.jifen.common.SwaggerConfig" />
+    <bean class="com.gljr.jifen.common.SwaggerConfig"/>
 
 
     <!-- 注解的映射器 -->
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
-
-
-
 
 
     <!-- 上传文件 -->
@@ -55,26 +52,25 @@
     <mvc:interceptors>
 
         <mvc:interceptor>
-            <mvc:mapping path="/v1/**" />
-            <mvc:exclude-mapping path="/v1/manager/admins/logout" />
-            <mvc:exclude-mapping path="/v1/manager/admins/login" />
-            <mvc:exclude-mapping path="/v1/stores/manager/login" />
+            <mvc:mapping path="/v1/**"/>
+            <mvc:exclude-mapping path="/v1/manager/admins/logout"/>
+            <mvc:exclude-mapping path="/v1/manager/admins/login"/>
+            <mvc:exclude-mapping path="/v1/stores/manager/login"/>
             <mvc:exclude-mapping path="/v1/stores/manager/logout"/>
-            <mvc:exclude-mapping path="/**/uploadFiles" />
+            <mvc:exclude-mapping path="/**/uploadFiles"/>
             <bean class="com.gljr.jifen.filter.TokenIntecepter"></bean>
         </mvc:interceptor>
 
 
-
         <mvc:interceptor>
             <!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->
-            <mvc:mapping path="/v1/**" />
+            <mvc:mapping path="/v1/**"/>
             <!-- /register 和 /login 不需要拦截-->
-            <mvc:exclude-mapping path="/v1/manager/admins/logout" />
-            <mvc:exclude-mapping path="/v1/manager/admins/login" />
-            <mvc:exclude-mapping path="/v1/stores/manager/login" />
+            <mvc:exclude-mapping path="/v1/manager/admins/logout"/>
+            <mvc:exclude-mapping path="/v1/manager/admins/login"/>
+            <mvc:exclude-mapping path="/v1/stores/manager/login"/>
             <mvc:exclude-mapping path="/v1/stores/manager/logout"/>
-            <mvc:exclude-mapping path="/**/uploadFiles" />
+            <mvc:exclude-mapping path="/**/uploadFiles"/>
             <bean class="com.gljr.jifen.filter.AuthInterceptor"></bean>
         </mvc:interceptor>
 

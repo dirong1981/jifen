@@ -5,14 +5,13 @@ import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
+import com.gljr.jifen.common.dtchain.CommonOrderResponse;
+import com.gljr.jifen.common.dtchain.GatewayResponse;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.dao.*;
 import com.gljr.jifen.pojo.*;
-import com.gljr.jifen.service.OnlineOrderService;
-import com.gljr.jifen.service.SerialNumberService;
-import com.gljr.jifen.service.TransactionService;
-import com.gljr.jifen.service.UserCreditsService;
+import com.gljr.jifen.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +49,15 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     @Autowired
     private StoreInfoMapper storeInfoMapper;
 
+    @Autowired
+    private DTChainService chainService;
+
+    public final static int PRODUCT_NOT_FOUND = 403;
+
+    public final static int INVALID_PRODUCT_INTEGRAL = 404;
+
+    public final static int INVALID_STORE_INFO = 405;
+
     @Override
     public JsonResult selectOnlineOrdersByUid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
         try {
@@ -84,6 +92,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                         return jsonResult;
                     }
                     onlineOrder.setStoreName(storeInfo.getName());
+                    onlineOrder.setTrxType(2);
                 }
             }
 
@@ -141,6 +150,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                         return jsonResult;
                     }
                     onlineOrder.setStoreName(storeInfo.getName());
+                    onlineOrder.setTrxType(2);
                 }
             }
 
@@ -306,29 +316,34 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             OnlineOrder onlineOrder = onlineOrders.get(0);
             //订单状态为未付款才能继续进行
             if(onlineOrder.getStatus() == DBConstants.OrderStatus.UNPAID.getCode()){
-                //扣除用户积分
-                UserCreditsExample userCreditsExample = new UserCreditsExample();
-                UserCreditsExample.Criteria criteria1 = userCreditsExample.or();
-                criteria1.andOwnerIdEqualTo(onlineOrder.getUid());
 
-                List<UserCredits> userCreditss = userCreditsMapper.selectByExample(userCreditsExample);
-                if(ValidCheck.validList(userCreditss)){
+                GatewayResponse<CommonOrderResponse> response = this.chainService.postOrders(onlineOrder.getUid() + 0L,
+                        onlineOrder.getPid() + 0L, onlineOrder.getIntegral());
+                if (null == response) {
                     jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                    jsonResult.setMessage("用户积分信息不存在！");
-                    return jsonResult;
-                }
-                UserCredits userCredits = userCreditss.get(0);
-                int integral = userCredits.getIntegral() - onlineOrder.getIntegral();
-                if (integral >= 0) {
-                    userCredits.setIntegral(integral);
-                }else{
-                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                    jsonResult.setMessage(GlobalConstants.INTEGRAL_NOT_ENOUGH);
                     return jsonResult;
                 }
 
-                userCreditsMapper.updateByPrimaryKey(userCredits);
+                if (PRODUCT_NOT_FOUND == response.getCode()) {
+                    jsonResult.setMessage("要付款的商品不存在或已下架！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
 
+                if (INVALID_PRODUCT_INTEGRAL == response.getCode()) {
+                    jsonResult.setMessage("商品积分与支付积分不匹配！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if (INVALID_STORE_INFO == response.getCode()) {
+                    jsonResult.setMessage("商品对应的商户信息无效！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                onlineOrder.setDtchainBlockId(response.getContent().getBlockId());
+                onlineOrder.setExtOrderId(response.getContent().getExtOrderId());
                 onlineOrder.setStatus(DBConstants.OrderStatus.PAID.getCode());
                 onlineOrder.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 

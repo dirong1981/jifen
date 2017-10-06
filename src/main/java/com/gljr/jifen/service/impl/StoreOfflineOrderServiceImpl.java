@@ -2,10 +2,9 @@ package com.gljr.jifen.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.gljr.jifen.common.CommonResult;
-import com.gljr.jifen.common.JsonResult;
-import com.gljr.jifen.common.StrUtil;
-import com.gljr.jifen.common.ValidCheck;
+import com.gljr.jifen.common.*;
+import com.gljr.jifen.common.dtchain.CommonOrderResponse;
+import com.gljr.jifen.common.dtchain.GatewayResponse;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.dao.*;
@@ -38,7 +37,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
     private StoreInfoMapper storeInfoMapper;
 
     @Autowired
-    private  SerialNumberService serialNumberService;
+    private SerialNumberService serialNumberService;
 
     @Autowired
     private TransactionMapper transactionMapper;
@@ -55,20 +54,23 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private DTChainService chainService;
+
     @Transactional
     @Override
     public JsonResult insertOfflineOrder(StoreOfflineOrder storeOfflineOrder, String uid, JsonResult jsonResult) {
 
         try {
             //积分不能小于0
-            if(storeOfflineOrder.getIntegral() <= 0){
+            if (storeOfflineOrder.getIntegral() <= 0) {
                 jsonResult.setMessage("支付的积分不能小于0！");
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 return jsonResult;
             }
 
             //积分和总价是否相符
-            if(storeOfflineOrder.getIntegral() != storeOfflineOrder.getTotalMoney() * 10) {
+            if (storeOfflineOrder.getIntegral() != storeOfflineOrder.getTotalMoney() * 10) {
                 jsonResult.setMessage("积分有误，请重试！");
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 return jsonResult;
@@ -76,7 +78,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
 
             //商户是否存在
             StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeOfflineOrder.getSiId());
-            if(ValidCheck.validPojo(storeInfo)){
+            if (ValidCheck.validPojo(storeInfo)) {
                 jsonResult.setMessage("商户不存在，请确认商户信息！");
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 return jsonResult;
@@ -98,7 +100,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             criteria.andOwnerIdEqualTo(Integer.parseInt(uid));
 
             List<UserCredits> userCreditss = userCreditsMapper.selectByExample(userCreditsExample);
-            if(ValidCheck.validList(userCreditss)){
+            if (ValidCheck.validList(userCreditss)) {
                 CommonResult.noObject(jsonResult);
                 return jsonResult;
             }
@@ -110,8 +112,8 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                 transaction.setIntegral(-1 * storeOfflineOrder.getIntegral());
                 storeOfflineOrder.setExtCash(0);
                 message = "将从账户中扣除" + storeOfflineOrder.getIntegral() + "分";
-            }else{
-                integral = -integral/10;
+            } else {
+                integral = -integral / 10;
                 transaction.setIntegral(-1 * userCredits.getIntegral());
                 storeOfflineOrder.setExtCash(integral);
                 storeOfflineOrder.setIntegral(userCredits.getIntegral());
@@ -136,7 +138,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             jsonResult.setItem(map);
             jsonResult.setMessage(storeOfflineOrder.getTrxCode());
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
@@ -148,17 +150,17 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
     @Override
     public JsonResult selectOfflineOrderByUid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
 
-        try{
+        try {
             StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
             StoreOfflineOrderExample.Criteria criteria = storeOfflineOrderExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
             storeOfflineOrderExample.setOrderByClause("id desc");
 
-            PageHelper.startPage(page,per_page);
+            PageHelper.startPage(page, per_page);
             List<StoreOfflineOrder> storeOfflineOrders = storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);
             PageInfo pageInfo = new PageInfo(storeOfflineOrders);
 
-            if(!ValidCheck.validList(storeOfflineOrders)) {
+            if (!ValidCheck.validList(storeOfflineOrders)) {
 
                 for (StoreOfflineOrder storeOfflineOrder : storeOfflineOrders) {
                     StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeOfflineOrder.getSiId());
@@ -168,6 +170,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                     } else {
                         storeOfflineOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分，现金支付" + storeOfflineOrder.getExtCash() + "元");
                     }
+                    storeOfflineOrder.setTrxType(1);
 
                 }
             }
@@ -183,7 +186,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             CommonResult.success(jsonResult);
             jsonResult.setItem(map);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             CommonResult.sqlFailed(jsonResult);
         }
 
@@ -198,12 +201,12 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             storeOfflineOrderExample.setOrderByClause("id desc");
 
             List<StoreOfflineOrder> storeOfflineOrders = storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);
-            if(!ValidCheck.validList(storeOfflineOrders)){
-                for (StoreOfflineOrder storeOfflineOrder : storeOfflineOrders){
+            if (!ValidCheck.validList(storeOfflineOrders)) {
+                for (StoreOfflineOrder storeOfflineOrder : storeOfflineOrders) {
                     StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeOfflineOrder.getSiId());
-                    if(ValidCheck.validPojo(storeInfo)){
+                    if (ValidCheck.validPojo(storeInfo)) {
                         storeOfflineOrder.setName("已删除");
-                    }else {
+                    } else {
                         storeOfflineOrder.setName(storeInfo.getName());
                     }
 
@@ -226,9 +229,21 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
 
     @Override
     public List<StoreOfflineOrder> selectAllOfflineOrderByExample(int uid, OfflineOrderReqParam reqParam) {
+        StoreInfoExample storeInfoExample = new StoreInfoExample();
+        StoreInfoExample.Criteria criteria = storeInfoExample.or();
+        criteria.andAidEqualTo(uid);
+        List<StoreInfo> storeInfos = storeInfoMapper.selectByExample(storeInfoExample);
+
+        if (ValidCheck.validList(storeInfos)) {
+            throw new ApiServerException("没有找到商户信息");
+        }
+
+        StoreInfo storeInfo = storeInfos.get(0);
+
+
         StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
-        StoreOfflineOrderExample.Criteria criteria = storeOfflineOrderExample.or();
-        criteria.andSiIdEqualTo(uid);
+        StoreOfflineOrderExample.Criteria criteria1 = storeOfflineOrderExample.or();
+        criteria1.andSiIdEqualTo(storeInfo.getId());
         //0-全部；1-今天；2-最近7天；3-最近30天；4-未结算；5-按时间查询（）;6-查询可退款的订单（24小时内）
         switch (reqParam.getQueryType()) {
             case 0:
@@ -243,7 +258,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                 criteria.andCreateTimeBetween(DateUtils.getSeveralDaysStart(30), DateUtils.getNowDayEnd());
                 break;
             case 4:
-                criteria.andStatusEqualTo(1);
+                criteria.andStatusEqualTo(DBConstants.OfflineOrderStatus.UNPAID.getCode());
                 break;
             case 5:
                 //开始时间,格式为yyyyMMdd 20170102
@@ -261,11 +276,11 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                 //按照类型塞选交易记录
                 switch (reqParam.getUseType()) {
                     case 1:
-                        criteria.andIntegralGreaterThan(0);
-                        criteria.andExtCashEqualTo(0);
+                        criteria1.andIntegralGreaterThan(0);
+                        criteria1.andExtCashEqualTo(0);
                         break;
                     case 2:
-                        criteria.andExtCashGreaterThan(0);
+                        criteria1.andExtCashGreaterThan(0);
                         break;
                     default:
                         break;
@@ -274,18 +289,18 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                 //按照交易状态塞选
                 switch (reqParam.getTransationStat()) {
                     case 1:
-                        criteria.andStatusEqualTo(2);
+                        criteria1.andStatusEqualTo(DBConstants.OfflineOrderStatus.PAID.getCode());
                         break;
                     case 2:
-                        criteria.andStatusEqualTo(5);
+                        criteria1.andStatusEqualTo(5);
                         break;
                     default:
                         break;
                 }
                 break;
             case 6:
-                criteria.andCreateTimeGreaterThan(DateUtils.getRallDate(new Date(), -1));
-                criteria.andStatusEqualTo(2);
+                criteria1.andCreateTimeGreaterThan(DateUtils.getRallDate(new Date(), -1));
+                criteria1.andStatusEqualTo(DBConstants.OfflineOrderStatus.PAID.getCode());
                 break;
             default:
                 break;
@@ -296,24 +311,37 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
     }
 
     @Override
-    public HashMap getStoreTotalInfo(int uid){
-        return storeOfflineOrderMapper.getStoreTotalInfo(uid);
+    public HashMap getStoreTotalInfo(int uid) {
+        StoreInfoExample storeInfoExample = new StoreInfoExample();
+        StoreInfoExample.Criteria criteria = storeInfoExample.or();
+        criteria.andAidEqualTo(uid);
+        List<StoreInfo> storeInfos = storeInfoMapper.selectByExample(storeInfoExample);
+
+        StoreInfo storeInfo = storeInfos.get(0);
+        return storeOfflineOrderMapper.getStoreTotalInfo(storeInfo.getId());
     }
 
     @Override
     public List<StoreOfflineOrder> getStoreTotalInfo(String trxCode) {
         StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
-        StoreOfflineOrderExample.Criteria criteria= storeOfflineOrderExample.or();
+        StoreOfflineOrderExample.Criteria criteria = storeOfflineOrderExample.or();
         criteria.andTrxCodeEqualTo(trxCode);
         return storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);
     }
 
     @Override
     public List<StoreOfflineOrder> getStoreTotalInfo(int uid, String trxCode) {
+        StoreInfoExample storeInfoExample = new StoreInfoExample();
+        StoreInfoExample.Criteria criteria = storeInfoExample.or();
+        criteria.andAidEqualTo(uid);
+        List<StoreInfo> storeInfos = storeInfoMapper.selectByExample(storeInfoExample);
+
+        StoreInfo storeInfo = storeInfos.get(0);
+
         StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
-        StoreOfflineOrderExample.Criteria criteria= storeOfflineOrderExample.or();
-        criteria.andTrxCodeEqualTo(trxCode);
-        criteria.andSiIdEqualTo(uid);
+        StoreOfflineOrderExample.Criteria criteria1 = storeOfflineOrderExample.or();
+        criteria1.andTrxCodeEqualTo(trxCode);
+        criteria1.andSiIdEqualTo(storeInfo.getId());
         return storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);
     }
 
@@ -327,7 +355,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
 
         //积分返回到用户上
         List<UserCredits> userCreditsList = userCreditsService.selectUserCreditsByUid(storeOfflineOrder.getUid());
-        if(userCreditsList.isEmpty()){
+        if (userCreditsList.isEmpty()) {
             throw new ApiServerException(String.format("无法获取用户[%s]的积分信息。", storeOfflineOrder.getUid()));
         }
 
@@ -337,7 +365,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
 
         //商户扣除得到的积分
         List<UserCredits> storeUserCreditsList = userCreditsService.selectUserCreditsByUid(storeOfflineOrder.getSiId());
-        if(storeUserCreditsList.isEmpty()){
+        if (storeUserCreditsList.isEmpty()) {
             throw new ApiServerException(String.format("无法获取商户[%s]的积分信息。", storeOfflineOrder.getSiId()));
         }
 
@@ -366,21 +394,34 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
 
         StoreInfo storeInfo = storeInfos.get(0);
 
-        if(ValidCheck.validList(storeInfos)){
+        if (ValidCheck.validList(storeInfos)) {
             throw new ApiServerException("没有找到商户积分信息");
         }
-
-
 
         List<UserCredits> storeUserCreditsList = userCreditsService.selectUserCreditsByUid(storeInfo.getId());
         if (storeUserCreditsList.isEmpty()) {
             throw new ApiServerException("没有找到商户积分信息");
         }
-        String orderCode = StrUtil.randomKey(18);
+
         double cash = 0L;
         if (userCredits.getIntegral() < integral) {
             cash = (integral - userCredits.getIntegral()) / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO;
+            integral = userCredits.getIntegral();
         }
+
+        GatewayResponse<CommonOrderResponse> response = this.chainService.postOfflineOrders(userId + 0L,
+                storeInfo.getId() + 0L, integral);
+
+        if (null == response) {
+            throw new ApiServerException("上级服务未能完成响应");
+        }
+
+        if (response.getCode() != 200) {
+            throw new ApiServerException(response.getMessage());
+        }
+
+        CommonOrderResponse cor = response.getContent();
+
         //生产通用交易记录
         Transaction transaction = new Transaction();
         transaction.setType(DBConstants.OwnerType.CUSTOMER.getCode());
@@ -392,6 +433,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
         transaction.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
 
         transactionService.insertTransaction(transaction);
+
         //生成线下订单
         StoreOfflineOrder storeOfflineOrder = new StoreOfflineOrder();
         storeOfflineOrder.setSiId(storeInfo.getId());
@@ -403,29 +445,18 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
         storeOfflineOrder.setExtCash((int) cash);
         storeOfflineOrder.setIntegral(integral);
         storeOfflineOrder.setTotalMoney((int) (integral / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO + cash));
+        storeOfflineOrder.setDtchainBlockId(cor.getBlockId());
+        storeOfflineOrder.setExtOrderId(cor.getExtOrderId());
         storeOfflineOrderMapper.insert(storeOfflineOrder);
-
-        //扣除用户积分
-        if (userCredits.getIntegral() <= integral) {
-            userCredits.setIntegral(0);
-        } else {
-            userCredits.setIntegral(userCredits.getIntegral() - integral);
-        }
-        userCreditsMapper.updateByPrimaryKey(userCredits);
-
-        //增加商户积分
-        UserCredits storeUserCredits = storeUserCreditsList.get(0);
-        storeUserCredits.setIntegral(storeUserCredits.getIntegral() + integral);
-        userCreditsMapper.updateByPrimaryKey(userCredits);
 
         Map map = new HashMap();
         map.put("trxCode", transaction.getCode());
+        map.put("integral", storeOfflineOrder.getIntegral());
+        map.put("extCash", storeOfflineOrder.getExtCash());
+        map.put("storeName", storeInfo.getName());
         jsonResult.setItem(map);
 
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId;
-        redisService.evict(cacheKey);
-
-        return  jsonResult;
+        return jsonResult;
     }
 
     @Override
@@ -437,7 +468,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
     @Override
     public List<StoreOfflineOrder> selectAllOfflineOrderByUid(int uid, int sort, String start_time, String end_time) {
         StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
-        StoreOfflineOrderExample.Criteria criteria= storeOfflineOrderExample.or();
+        StoreOfflineOrderExample.Criteria criteria = storeOfflineOrderExample.or();
         criteria.andUidEqualTo(uid);
         storeOfflineOrderExample.setOrderByClause("id desc");
         return storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);

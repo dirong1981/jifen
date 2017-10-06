@@ -7,9 +7,9 @@ public class StoreInfo {
 
     private String serialCode;
 
-    private Integer categoryCode;
+    private Integer storeType;
 
-    private String categoryName;
+    private Integer categoryCode;
 
     private String name;
 
@@ -31,6 +31,8 @@ public class StoreInfo {
 
     private String description;
 
+    private String categoryName;
+
     public Integer getId() {
         return id;
     }
@@ -45,6 +47,14 @@ public class StoreInfo {
 
     public void setSerialCode(String serialCode) {
         this.serialCode = serialCode == null ? null : serialCode.trim();
+    }
+
+    public Integer getStoreType() {
+        return storeType;
+    }
+
+    public void setStoreType(Integer storeType) {
+        this.storeType = storeType;
     }
 
     public Integer getCategoryCode() {

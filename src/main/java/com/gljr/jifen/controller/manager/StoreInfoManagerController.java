@@ -48,7 +48,7 @@ public class StoreInfoManagerController extends BaseController {
 
 
     /**
-     * 获取所有商户信息，包括未审核通过商户
+     * 获取所有线下支付商户信息，包括未审核通过商户
      * @return 商户列表
      */
     @GetMapping("/all")
@@ -61,6 +61,20 @@ public class StoreInfoManagerController extends BaseController {
         return jsonResult;
     }
 
+
+    /**
+     * 获取所有线上商户信息，包括未审核通过商户
+     * @return 商户列表
+     */
+    @GetMapping("/online/all")
+    @ResponseBody
+    public JsonResult getAllOnlineStores() {
+        JsonResult jsonResult = new JsonResult();
+
+        jsonResult = storeInfoService.selectAllOnlineStoreInfo(jsonResult);
+
+        return jsonResult;
+    }
 
 
     /**
@@ -147,12 +161,13 @@ public class StoreInfoManagerController extends BaseController {
             return jsonResult;
         }
 
-        if(storeInfo.getCategoryCode() == -1 || StringUtils.isEmpty(storeInfo.getCategoryCode())){
-            jsonResult.setMessage("请选择分类！");
+        //线下扫码商户要进分类，线上商户不进分类，分类-1
+        if(storeInfo.getStoreType() == DBConstants.MerchantType.OFFLINE.getCode() && storeInfo.getCategoryCode() == -1){
+            jsonResult.setMessage("请选择商户分类！");
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
             return jsonResult;
         }
-        storeInfo.setLocationCode(450204);
+
         if(storeInfo.getLocationCode() == -1 || StringUtils.isEmpty(storeInfo.getLocationCode())){
             jsonResult.setMessage("请选择地区！");
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);

@@ -13,9 +13,9 @@ public class UserCredits {
 
     private Integer integral;
 
-    private Integer frozenIntegral;
+    private Integer freePaymentLimit;
 
-    private Integer feePaymentLimit;
+    private Integer frozenIntegral;
 
     private Date createTime;
 
@@ -59,6 +59,14 @@ public class UserCredits {
         this.integral = integral;
     }
 
+    public Integer getFreePaymentLimit() {
+        return freePaymentLimit;
+    }
+
+    public void setFreePaymentLimit(Integer freePaymentLimit) {
+        this.freePaymentLimit = freePaymentLimit;
+    }
+
     public Integer getFrozenIntegral() {
         return frozenIntegral;
     }
@@ -73,13 +81,5 @@ public class UserCredits {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
-    }
-
-    public Integer getFeePaymentLimit() {
-        return feePaymentLimit;
-    }
-
-    public void setFeePaymentLimit(Integer feePaymentLimit) {
-        this.feePaymentLimit = feePaymentLimit;
     }
 }

@@ -22,7 +22,7 @@ import java.util.*;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Controller
 @RequestMapping(value = "/v1/products")
-public class ProductController {
+public class ProductController extends BaseController{
 
     @Autowired
     private ProductService productService;
@@ -37,12 +37,14 @@ public class ProductController {
     public JsonResult oneProduct(@PathVariable("productId") Integer productId){
         JsonResult jsonResult = new JsonResult();
 
+        String uid = request.getHeader("uid");
+
         if(StringUtils.isEmpty(productId)){
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
 
-        jsonResult = productService.selectProductById(productId, jsonResult);
+        jsonResult = productService.selectProductById(productId, uid, jsonResult);
 
         return jsonResult;
     }

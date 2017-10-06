@@ -68,7 +68,7 @@ public interface ProductService {
      * @param jsonResult
      * @return
      */
-    JsonResult selectProductById(Integer productId, JsonResult jsonResult);
+    JsonResult selectProductById(Integer productId, String uid, JsonResult jsonResult);
 
 
     /**

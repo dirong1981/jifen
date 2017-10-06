@@ -1,5 +1,6 @@
 package com.gljr.jifen.service.impl;
 
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.dao.UserCreditsMapper;
 import com.gljr.jifen.pojo.UserCredits;
 import com.gljr.jifen.pojo.UserCreditsExample;

@@ -204,7 +204,6 @@ public class CategoryServiceImpl implements CategoryService {
         criteria.andStatusEqualTo(DBConstants.CategoryStatus.ACTIVED.getCode());
         criteria.andParentCodeEqualTo(0);
         categoryExample.setOrderByClause("sort asc");
-        categoryExample.setOrderByClause("id desc");
         return categoryMapper.selectByExample(categoryExample);
     }
 
@@ -215,7 +214,6 @@ public class CategoryServiceImpl implements CategoryService {
         criteria.andStatusEqualTo(DBConstants.CategoryStatus.ACTIVED.getCode());
         criteria.andParentCodeNotEqualTo(0);
         categoryExample.setOrderByClause("sort asc");
-        categoryExample.setOrderByClause("id desc");
         return categoryMapper.selectByExample(categoryExample);
     }
 

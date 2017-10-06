@@ -35,6 +35,8 @@ public class Product {
 
     private String storeName;
 
+    private Integer userPurchases;
+
     public Integer getId() {
         return id;
     }
@@ -161,5 +163,13 @@ public class Product {
 
     public void setStoreName(String storeName) {
         this.storeName = storeName;
+    }
+
+    public Integer getUserPurchases() {
+        return userPurchases;
+    }
+
+    public void setUserPurchases(Integer userPurchases) {
+        this.userPurchases = userPurchases;
     }
 }

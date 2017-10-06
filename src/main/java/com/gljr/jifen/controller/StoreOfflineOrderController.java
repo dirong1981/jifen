@@ -35,19 +35,6 @@ public class StoreOfflineOrderController extends BaseController{
     @Autowired
     private StoreOfflineOrderService storeOfflineOrderService;
 
-    @Autowired
-    private StoreInfoService storeInfoService;
-
-    @Autowired
-    private UserCreditsService userCreditsService;
-
-    @Autowired
-    private RedisService redisService;
-
-    @Autowired
-    private DTChainService chainService;
-
-    private final String ORDER_DATE_FORMAT = "yyyy/MM/dd HH:mm";
 
     /**
      * 添加一条线下订单，添加一条通用交易信息

@@ -235,6 +235,66 @@ public class StoreInfoExample {
             return (Criteria) this;
         }
 
+        public Criteria andStoreTypeIsNull() {
+            addCriterion("store_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeIsNotNull() {
+            addCriterion("store_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeEqualTo(Integer value) {
+            addCriterion("store_type =", value, "storeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeNotEqualTo(Integer value) {
+            addCriterion("store_type <>", value, "storeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeGreaterThan(Integer value) {
+            addCriterion("store_type >", value, "storeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("store_type >=", value, "storeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeLessThan(Integer value) {
+            addCriterion("store_type <", value, "storeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeLessThanOrEqualTo(Integer value) {
+            addCriterion("store_type <=", value, "storeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeIn(List<Integer> values) {
+            addCriterion("store_type in", values, "storeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeNotIn(List<Integer> values) {
+            addCriterion("store_type not in", values, "storeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeBetween(Integer value1, Integer value2) {
+            addCriterion("store_type between", value1, value2, "storeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStoreTypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("store_type not between", value1, value2, "storeType");
+            return (Criteria) this;
+        }
+
         public Criteria andCategoryCodeIsNull() {
             addCriterion("category_code is null");
             return (Criteria) this;

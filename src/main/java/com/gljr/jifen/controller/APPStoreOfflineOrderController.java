@@ -195,16 +195,11 @@ public class APPStoreOfflineOrderController extends BaseController{
             pageSize = 10;
         }
 
-        List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(Integer.parseInt(uid));
 
-        if(ValidCheck.validList(storeInfos)){
-            CommonResult.noObject(jsonResult);
-            return jsonResult;
-        }
 
 
         PageHelper.startPage(pageNum, pageSize);
-        List<StoreOfflineOrder> storeOfflineOrderList = storeOfflineOrderService.selectAllOfflineOrderByExample(storeInfos.get(0).getId(), offlineOrderReqParam);
+        List<StoreOfflineOrder> storeOfflineOrderList = storeOfflineOrderService.selectAllOfflineOrderByExample(NumberUtils.getInt(uid), offlineOrderReqParam);
         PageInfo pageInfo = new PageInfo(storeOfflineOrderList);
         Map<Object,Object> resultMap = new HashMap<>(7);
         HashMap totalInfo = storeOfflineOrderService.getStoreTotalInfo(NumberUtils.getInt(uid));
@@ -293,14 +288,10 @@ public class APPStoreOfflineOrderController extends BaseController{
             return jsonResult;
         }
 
-        List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(NumberUtils.getInt(uid));
-        if(ValidCheck.validList(storeInfos)){
-            CommonResult.noObject(jsonResult);
-            return jsonResult;
-        }
+
 
         List<StoreOfflineOrder> storeOfflineOrderList = storeOfflineOrderService
-                .getStoreTotalInfo(storeInfos.get(0).getId(), orderId);
+                .getStoreTotalInfo(NumberUtils.getInt(uid), orderId);
         if(storeOfflineOrderList.isEmpty()){
             jsonResult.setErrorCodeAndMessage(GlobalConstants.ORDER_INFO_NOT_EXIST);
             return jsonResult;
@@ -309,7 +300,7 @@ public class APPStoreOfflineOrderController extends BaseController{
         StoreOfflineOrder storeOfflineOrder = storeOfflineOrderList.get(0);
 
         //只有付款成功订单可退款
-        if (storeOfflineOrder.getStatus() != 2) {
+        if (storeOfflineOrder.getStatus() != DBConstants.OfflineOrderStatus.PAID.getCode()) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.ORDER_CAN_NOT_REFUND);
             return jsonResult;
         }
@@ -355,7 +346,7 @@ public class APPStoreOfflineOrderController extends BaseController{
         }
 
         List<UserCredits> userCreditsList = userCreditsService.selectUserCreditsByUid(userId);
-        if(userCreditsList.isEmpty()){
+        if(ValidCheck.validList(userCreditsList)){
             jsonResult.setErrorCodeAndMessage(GlobalConstants.CAN_NOT_GET_USER_CREDIT);
             return jsonResult;
         }
@@ -369,8 +360,7 @@ public class APPStoreOfflineOrderController extends BaseController{
         if (userCredits.getIntegral() < integral) {
             cash = (integral - userCredits.getIntegral()) / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO;
         }
-
-        if (userCredits.getFeePaymentLimit() != null && userCredits.getFeePaymentLimit() < integral) {
+        if (userCredits.getFreePaymentLimit() != null && userCredits.getFreePaymentLimit() < integral) {
             exceedLimit = 1;
             pwCheck = 0;
         }
@@ -383,7 +373,7 @@ public class APPStoreOfflineOrderController extends BaseController{
         String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" +integral;
         String cacheKey1 = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId;
         this.redisService.put(cacheKey, JsonUtil.toJson(checkResult), GlobalConstants.CACHE_DATA_FAILURE_TIME, TimeUnit.SECONDS);
-        this.redisService.put(cacheKey1, integral+"", GlobalConstants.CACHE_DATA_FAILURE_TIME, TimeUnit.SECONDS);
+        this.redisService.put(cacheKey1, integral+"", 60, TimeUnit.SECONDS);
 
         jsonResult.setItem(checkResult);
         jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
@@ -412,6 +402,8 @@ public class APPStoreOfflineOrderController extends BaseController{
 
         jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
         jsonResult.setMessage(integral);
+        //获取到积分后清除redis
+        redisService.evict(cacheKey);
         return jsonResult;
     }
 

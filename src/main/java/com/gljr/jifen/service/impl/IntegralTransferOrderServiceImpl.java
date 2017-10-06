@@ -5,6 +5,8 @@ import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
+import com.gljr.jifen.common.dtchain.CommonOrderResponse;
+import com.gljr.jifen.common.dtchain.GatewayResponse;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.dao.*;
@@ -44,12 +46,19 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
     private SerialNumberService serialNumberService;
 
     @Autowired
+    private DTChainService chainService;
+
+    @Autowired
     private RedisService redisService;
+
+    public final static int INSUFFICIENT_INTEGRAL_AMOUNT = 401;
+
+    public final static int INVALID_INTEGRAL_AMOUNT = 402;
+
 
     @Transactional
     @Override
     public JsonResult insertIntegralOrder(IntegralTransferOrder integralTransferOrder, String uid, JsonResult jsonResult)  {
-
 
         try {
             //判断对方是否存在
@@ -64,7 +73,6 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
                 return jsonResult;
             }
             UserExtInfo userExtInfo = userExtInfos.get(0);
-
 
             //判断积分是否足够
             UserCreditsExample userCreditsExample = new UserCreditsExample();
@@ -84,35 +92,52 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
                 jsonResult.setMessage("积分不足！");
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 return jsonResult;
-            }else{
-                userCredits.setIntegral(userCredits.getIntegral() - integralTransferOrder.getIntegral());
             }
 
-            userCreditsMapper.updateByPrimaryKey(userCredits);
+            integralTransferOrder.setUid(Integer.parseInt(uid));
+            GatewayResponse<CommonOrderResponse> response = this.chainService.transferIntegral(integralTransferOrder.getUid() + 0L,
+                    integralTransferOrder.getgUid() + 0L, integralTransferOrder.getIntegral());
 
-            //增加受转账积分
-            userCreditsExample = new UserCreditsExample();
-            criteria1 = userCreditsExample.or();
-            criteria1.andOwnerIdEqualTo(integralTransferOrder.getgUid());
+            if (null == response) {
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                return jsonResult;
+            }
 
-            userCreditss = userCreditsMapper.selectByExample(userCreditsExample);
-            userCredits = userCreditss.get(0);
-            userCredits.setIntegral(userCredits.getIntegral() + integralTransferOrder.getIntegral());
+            if (INSUFFICIENT_INTEGRAL_AMOUNT == response.getCode()) {
+                jsonResult.setMessage("积分不足！");
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                return jsonResult;
+            }
 
-            userCreditsMapper.updateByPrimaryKey(userCredits);
-
+            if (INVALID_INTEGRAL_AMOUNT == response.getCode()) {
+                jsonResult.setMessage("无效的转赠积分数额！");
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                return jsonResult;
+            }
 
             //添加一个交易通用信息
+            String trxCode = this.serialNumberService.getNextTrxCode(DBConstants.TrxType.TRANSFER.getCode());
+
             Transaction transaction = new Transaction();
-            transaction.setCode(this.serialNumberService.getNextTrxCode(DBConstants.TrxType.TRANSFER.getCode()));
+            transaction.setCode(trxCode);
             transaction.setCreateTime(new Timestamp(System.currentTimeMillis()));
             transaction.setIntegral(-1 * integralTransferOrder.getIntegral());
-            transaction.setOwnerId(Integer.parseInt(uid));
+            transaction.setOwnerId(integralTransferOrder.getUid());
             transaction.setOwnerType(DBConstants.OwnerType.CUSTOMER.getCode());
             transaction.setType(DBConstants.TrxType.TRANSFER.getCode());
             transaction.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
-
             transactionMapper.insert(transaction);
+
+            transaction = new Transaction();
+            transaction.setCode(trxCode);
+            transaction.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            transaction.setIntegral(integralTransferOrder.getIntegral());
+            transaction.setOwnerId(integralTransferOrder.getgUid());
+            transaction.setOwnerType(DBConstants.OwnerType.CUSTOMER.getCode());
+            transaction.setType(DBConstants.TrxType.TRANSFER.getCode());
+            transaction.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
+            transactionMapper.insert(transaction);
+
 
             String title = "向" + userExtInfo.getCellphone() + "转账" + integralTransferOrder.getIntegral() + "分";
             //添加一个积分转增订单
@@ -123,8 +148,13 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
             integralTransferOrder.setTrxId(transaction.getId());
             integralTransferOrder.setTrxCode(transaction.getCode());
 
-            integralTransferOrderMapper.insert(integralTransferOrder);
+            if (null != response.getContent()) {
+                CommonOrderResponse cor = response.getContent();
+                integralTransferOrder.setDtchainBlockId(cor.getBlockId());
+                integralTransferOrder.setExtOrderId(cor.getExtOrderId());
+            }
 
+            integralTransferOrderMapper.insert(integralTransferOrder);
 
             //创建一个消息
             userExtInfoExample = new UserExtInfoExample();
@@ -151,7 +181,6 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
             System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
-
 
         return jsonResult;
     }
@@ -182,6 +211,8 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
                         integralTransferOrder.setName(userExtInfos.get(0).getCellphone());
                         integralTransferOrder.setDescription("转账" + integralTransferOrder.getIntegral() + "分");
                     }
+
+                    integralTransferOrder.setTrxType(3);
 
                 }
             }

@@ -1,10 +1,23 @@
 package com.gljr.jifen.service;
 
+import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.pojo.*;
+import com.qiniu.util.Json;
 
 import java.util.List;
 
 public interface UserService {
+
+
+    /**
+     * 获取用户信息，
+     * 1、如果token为空，返回用户在商城的个人信息，
+     * 2、如果token不为空，去够力验证用户的token，添加或更新商城的登录状态，返回用户在商城的个人信息
+     * @param uid 用户id
+     * @param gltoken 够力token
+     * @return
+     */
+    JsonResult selecteUserInfoByUid(Integer uid, String gltoken, JsonResult jsonResult);
 
 
     /**

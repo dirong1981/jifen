@@ -7,6 +7,7 @@
     <result column="owner_id" jdbcType="INTEGER" property="ownerId" />
     <result column="wallet_address" jdbcType="VARCHAR" property="walletAddress" />
     <result column="integral" jdbcType="INTEGER" property="integral" />
+    <result column="free_payment_limit" jdbcType="INTEGER" property="freePaymentLimit" />
     <result column="frozen_integral" jdbcType="INTEGER" property="frozenIntegral" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -69,7 +70,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, owner_type, owner_id, wallet_address, integral, frozen_integral, create_time
+    id, owner_type, owner_id, wallet_address, integral, free_payment_limit, frozen_integral, 
+    create_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.UserCreditsExample" resultMap="BaseResultMap">
     select
@@ -106,11 +108,11 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into user_credits (owner_type, owner_id, wallet_address, 
-      integral, frozen_integral, create_time
-      )
+      integral, free_payment_limit, frozen_integral, 
+      create_time)
     values (#{ownerType,jdbcType=INTEGER}, #{ownerId,jdbcType=INTEGER}, #{walletAddress,jdbcType=VARCHAR}, 
-      #{integral,jdbcType=INTEGER}, #{frozenIntegral,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
-      )
+      #{integral,jdbcType=INTEGER}, #{freePaymentLimit,jdbcType=INTEGER}, #{frozenIntegral,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.UserCredits">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -129,6 +131,9 @@
       </if>
       <if test="integral != null">
         integral,
+      </if>
+      <if test="freePaymentLimit != null">
+        free_payment_limit,
       </if>
       <if test="frozenIntegral != null">
         frozen_integral,
@@ -149,6 +154,9 @@
       </if>
       <if test="integral != null">
         #{integral,jdbcType=INTEGER},
+      </if>
+      <if test="freePaymentLimit != null">
+        #{freePaymentLimit,jdbcType=INTEGER},
       </if>
       <if test="frozenIntegral != null">
         #{frozenIntegral,jdbcType=INTEGER},
@@ -182,6 +190,9 @@
       <if test="record.integral != null">
         integral = #{record.integral,jdbcType=INTEGER},
       </if>
+      <if test="record.freePaymentLimit != null">
+        free_payment_limit = #{record.freePaymentLimit,jdbcType=INTEGER},
+      </if>
       <if test="record.frozenIntegral != null">
         frozen_integral = #{record.frozenIntegral,jdbcType=INTEGER},
       </if>
@@ -200,6 +211,7 @@
       owner_id = #{record.ownerId,jdbcType=INTEGER},
       wallet_address = #{record.walletAddress,jdbcType=VARCHAR},
       integral = #{record.integral,jdbcType=INTEGER},
+      free_payment_limit = #{record.freePaymentLimit,jdbcType=INTEGER},
       frozen_integral = #{record.frozenIntegral,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -221,6 +233,9 @@
       <if test="integral != null">
         integral = #{integral,jdbcType=INTEGER},
       </if>
+      <if test="freePaymentLimit != null">
+        free_payment_limit = #{freePaymentLimit,jdbcType=INTEGER},
+      </if>
       <if test="frozenIntegral != null">
         frozen_integral = #{frozenIntegral,jdbcType=INTEGER},
       </if>
@@ -236,6 +251,7 @@
       owner_id = #{ownerId,jdbcType=INTEGER},
       wallet_address = #{walletAddress,jdbcType=VARCHAR},
       integral = #{integral,jdbcType=INTEGER},
+      free_payment_limit = #{freePaymentLimit,jdbcType=INTEGER},
       frozen_integral = #{frozenIntegral,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

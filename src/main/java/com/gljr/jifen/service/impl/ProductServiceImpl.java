@@ -47,6 +47,9 @@ public class ProductServiceImpl implements ProductService{
     @Autowired
     private StorageService storageService;
 
+    @Autowired
+    private OnlineOrderMapper onlineOrderMapper;
+
 
     @Override
     public JsonResult selectAllProduct(JsonResult jsonResult) {
@@ -270,7 +273,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public JsonResult selectProductById(Integer productId, JsonResult jsonResult) {
+    public JsonResult selectProductById(Integer productId, String uid, JsonResult jsonResult) {
 
         try{
             Product product = productMapper.selectByPrimaryKey(productId);
@@ -285,13 +288,31 @@ public class ProductServiceImpl implements ProductService{
                 return jsonResult;
             }
 
+            //查询用户已购买数量
+            OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
+            OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
+            criteria.andUidEqualTo(Integer.parseInt(uid));
+            criteria.andPidEqualTo(productId);
+
+            List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
+
+            int userPurchases = 0;
+
+            if(ValidCheck.validList(onlineOrders)){
+                for (OnlineOrder onlineOrder : onlineOrders){
+                    userPurchases += onlineOrder.getQuantity();
+                }
+            }
+
+            product.setUserPurchases(userPurchases);
+
             Map  map = new HashMap();
             map.put("data", product);
 
             //查找商品图片
             ProductPhotoExample productPhotoExample = new ProductPhotoExample();
-            ProductPhotoExample.Criteria criteria = productPhotoExample.or();
-            criteria.andPidEqualTo(productId);
+            ProductPhotoExample.Criteria criteria1 = productPhotoExample.or();
+            criteria1.andPidEqualTo(productId);
             List<ProductPhoto> productPhotos = productPhotoMapper.selectByExample(productPhotoExample);
 
             map.put("photos", productPhotos);

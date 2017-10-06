@@ -13,6 +13,10 @@ public class OnlineOrder {
 
     private String trxCode;
 
+    private String dtchainBlockId;
+
+    private String extOrderId;
+
     private Integer integral;
 
     private Integer quantity;
@@ -32,6 +36,8 @@ public class OnlineOrder {
     private String userName;
 
     private String storeName;
+
+    private Integer trxType;
 
     public Integer getId() {
         return id;
@@ -71,6 +77,22 @@ public class OnlineOrder {
 
     public void setTrxCode(String trxCode) {
         this.trxCode = trxCode == null ? null : trxCode.trim();
+    }
+
+    public String getDtchainBlockId() {
+        return dtchainBlockId;
+    }
+
+    public void setDtchainBlockId(String dtchainBlockId) {
+        this.dtchainBlockId = dtchainBlockId;
+    }
+
+    public String getExtOrderId() {
+        return extOrderId;
+    }
+
+    public void setExtOrderId(String extOrderId) {
+        this.extOrderId = extOrderId;
     }
 
     public Integer getIntegral() {
@@ -151,5 +173,13 @@ public class OnlineOrder {
 
     public void setStoreName(String storeName) {
         this.storeName = storeName;
+    }
+
+    public Integer getTrxType() {
+        return trxType;
+    }
+
+    public void setTrxType(Integer trxType) {
+        this.trxType = trxType;
     }
 }

@@ -52,7 +52,8 @@ public class IntegralTransferOrderController {
         }
 
         if(StringUtils.isEmpty(random)){
-            CommonResult.failed(jsonResult);
+            jsonResult.setMessage("非法订单！");
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
             return jsonResult;
         }
 
