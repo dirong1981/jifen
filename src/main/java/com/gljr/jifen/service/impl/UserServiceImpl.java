@@ -146,6 +146,7 @@ public class UserServiceImpl implements UserService {
 
 
         }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;

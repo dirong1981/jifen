@@ -263,4 +263,33 @@ public class CategoryServiceImpl implements CategoryService {
         return jsonResult;
     }
 
+    @Override
+    public JsonResult selectProductCategories(JsonResult jsonResult) {
+        try {
+            Map map = new HashMap();
+
+            CategoryExample categoryExample = new CategoryExample();
+            CategoryExample.Criteria criteria = categoryExample.or();
+            criteria.andParentCodeEqualTo(0);
+            criteria.andTypeEqualTo(DBConstants.CategoryType.PRODUCT.getCode());
+            criteria.andStatusEqualTo(DBConstants.CategoryStatus.ACTIVED.getCode());
+            List<Category> categories = categoryMapper.selectByExample(categoryExample);
+
+            map.put("parents", categories);
+
+            criteria = categoryExample.or();
+            criteria.andParentCodeNotEqualTo(0);
+            criteria.andTypeEqualTo(DBConstants.CategoryType.PRODUCT.getCode());
+            criteria.andStatusEqualTo(DBConstants.CategoryStatus.ACTIVED.getCode());
+            categories = categoryMapper.selectByExample(categoryExample);
+
+            map.put("sons", categories);
+            jsonResult.setItem(map);
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
 }

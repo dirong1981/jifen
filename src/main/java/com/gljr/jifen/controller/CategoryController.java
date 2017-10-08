@@ -75,6 +75,20 @@ public class CategoryController {
         return  jsonResult;
     }
 
+    /**
+     * 查询通过审核的商品分类
+     * @return
+     */
+    @GetMapping(value = "/products")
+    @ResponseBody
+    public JsonResult selectProductCategories(){
+        JsonResult jsonResult = new JsonResult();
+
+        jsonResult = categoryService.selectProductCategories(jsonResult);
+
+        return  jsonResult;
+    }
+
 
     /**
      * 获取所有通过审核的商户分类

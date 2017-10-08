@@ -63,8 +63,27 @@ public interface CategoryService {
     List<Category> selectAllShowParentCategory();
     List<Category> selectAllShowSonCategory();
 
+    /**
+     * 所有分类包括商品和商户
+     * @param jsonResult
+     * @return
+     */
     JsonResult allCategoriesIncludeProductStore(JsonResult jsonResult);
 
+    /**
+     * 更改分类顺序
+     * @param cur
+     * @param prev
+     * @param jsonResult
+     * @return
+     */
     JsonResult changeCategoryOrder(Integer cur, Integer prev, JsonResult jsonResult);
+
+    /**
+     * 查找通过审核商品分类
+     * @param jsonResult
+     * @return
+     */
+    JsonResult selectProductCategories(JsonResult jsonResult);
 
 }

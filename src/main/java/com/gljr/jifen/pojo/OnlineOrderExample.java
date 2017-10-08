@@ -285,6 +285,71 @@ public class OnlineOrderExample {
             return (Criteria) this;
         }
 
+
+
+        public Criteria andSiIdIsNull() {
+            addCriterion("si_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdIsNotNull() {
+            addCriterion("si_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdEqualTo(Integer value) {
+            addCriterion("si_id =", value, "si_id");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdNotEqualTo(Integer value) {
+            addCriterion("si_id <>", value, "si_id");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdGreaterThan(Integer value) {
+            addCriterion("si_id >", value, "si_id");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("si_id >=", value, "si_id");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdLessThan(Integer value) {
+            addCriterion("si_id <", value, "si_id");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdLessThanOrEqualTo(Integer value) {
+            addCriterion("si_id <=", value, "si_id");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdIn(List<Integer> values) {
+            addCriterion("si_id in", values, "si_id");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdNotIn(List<Integer> values) {
+            addCriterion("si_id not in", values, "si_id");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdBetween(Integer value1, Integer value2) {
+            addCriterion("si_id between", value1, value2, "si_id");
+            return (Criteria) this;
+        }
+
+        public Criteria andSiIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("si_id not between", value1, value2, "si_id");
+            return (Criteria) this;
+        }
+
+
+
+
         public Criteria andTrxIdIsNull() {
             addCriterion("trx_id is null");
             return (Criteria) this;

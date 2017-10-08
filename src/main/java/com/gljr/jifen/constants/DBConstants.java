@@ -123,9 +123,6 @@ public class DBConstants {
         }
     }
 
-    /**
-     * 商户类型
-     */
     public enum MerchantType {
         ONLINE(1, "线上商品商户"), OFFLINE(2, "线下扫码商户");
         private int code;
@@ -146,29 +143,6 @@ public class DBConstants {
         }
     }
 
-
-    /**
-     * 支付类型
-     */
-    public enum MerchantPayType {
-        NO(0, "不允许积分"), YES(1, "允许积分");
-        private int code;
-
-        private String description;
-
-        MerchantPayType(int code, String description) {
-            this.code = code;
-            this.description = description;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
 
     /**
      * 分类状态
@@ -220,7 +194,6 @@ public class DBConstants {
     }
 
 
-
     public enum TrxType {
         OFFLINE(1, "线下交易"), ONLINE(2, "线上交易"), TRANSFER(3, "积分转赠"), REFUND(4, "交易退款");
 
@@ -243,7 +216,7 @@ public class DBConstants {
     }
 
     public enum OrderStatus {
-        UNPAID(0, "待付款"), PAID(1, "已付款"), CANCELED(2, "已取消"), DELETED(-1, "已删除");
+        UNPAID(0, "待付款"), PAID(1, "已付款"), CANCELED(2, "已取消"), REFUND(3, "已退款"), DELETED(-1, "已删除");
         private int code;
 
         private String description;
@@ -261,7 +234,6 @@ public class DBConstants {
             return description;
         }
     }
-
 
 
     public enum OfflineOrderStatus {
@@ -286,7 +258,7 @@ public class DBConstants {
 
 
     public enum TrxStatus {
-        UNPAID(0, "未付款"),COMPLETED(1, "交易完成"), REFUND(2, "已退款"), SETTLED(3, "已结算"), CANCELED(4, "已取消");
+        UNPAID(0, "未付款"), COMPLETED(1, "交易完成"), REFUND(2, "已退款"), SETTLED(3, "已结算"), CANCELED(4, "已取消");
         private int code;
 
         private String description;

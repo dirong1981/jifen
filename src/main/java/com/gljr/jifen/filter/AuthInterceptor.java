@@ -4,6 +4,7 @@ import com.gljr.jifen.common.ClientType;
 
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.StrUtil;
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,55 +33,92 @@ public class AuthInterceptor implements HandlerInterceptor {
 
             JsonResult jsonResult = new JsonResult();
             jsonResult.setMessage(GlobalConstants.AUTH_FAILED);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setErrorCode(GlobalConstants.NOT_LOGIN_CODE);
 
             try {
 
 
                 String device = httpServletRequest.getHeader("device");
 
-                int clientType = ClientType.checkClientType(device);
-
                 //获取路径
                 String requestUri = httpServletRequest.getRequestURI();
 
-                if (requestUri.contains("/manager/")) {
-                    if (clientType == 2) {
-                        String aid = httpServletRequest.getHeader("aid");
-                        String permission = httpServletRequest.getHeader("permission");
+                if(device.equals(DBConstants.ClientType.WEB.getDescription())){
+                    HandlerMethod method = (HandlerMethod) handler;
+                    AuthPassport authPassport = method.getMethodAnnotation(AuthPassport.class);
 
-                        Map<String, String> tokenMap = this.redisService.getMap("admin_" + aid, String.class);
-                        if (null == tokenMap || !tokenMap.containsKey("permission")) {
-                            StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
-                            return false;
-                        }
+                    String aid = httpServletRequest.getHeader("aid");
 
-                        if (permission == null || permission.equals("") || permission.equals("NULL")) {
-                            StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
-                            return false;
-                        }
+                    Map<String, String> tokenMap = this.redisService.getMap("admin_" + aid, String.class);
 
-                        //获取服务器端管理员信息
-
-                        String permissions = tokenMap.get("permission");
-
-
-                        if(permissions.contains(permission)){
-                            return true;
-                        }
-
-
-
-                        StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
-                        return false;
-
-                    } else {
-                        StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+                    if (null == tokenMap || !tokenMap.containsKey("permission")) {
+                        StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
                         return false;
                     }
+
+                    String permissions = tokenMap.get("permission");
+
+                    //没有声明需要权限,或者声明不验证权限
+                    if (authPassport != null && authPassport.validate() != false) {
+
+                        try {
+                            //通过id查询用户的权限
+                            String permission = authPassport.permission_code();
+
+                            //如果不包含权限，则不允许访问
+                            if(!permissions.contains(permission)){
+                                StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
+                                return false;
+                            }
+                        }catch (Exception e){
+                            return false;
+                        }
+                    }
                 }
+
+
+
+
+
+
+//                if (requestUri.contains("/manager/")) {
+//                    if (device.equals(DBConstants.ClientType.WEB.getDescription())) {
+//                        String aid = httpServletRequest.getHeader("aid");
+//                        String permission = httpServletRequest.getHeader("permission");
+//
+//                        Map<String, String> tokenMap = this.redisService.getMap("admin_" + aid, String.class);
+//                        System.out.println(tokenMap.get("permission"));
+//                        if (null == tokenMap || !tokenMap.containsKey("permission")) {
+//                            StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
+//                            return false;
+//                        }
+//
+//                        if (permission == null || permission.equals("") || permission.equals("NULL")) {
+//                            StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
+//                            return false;
+//                        }
+//
+//                        //获取服务器端管理员信息
+//
+//                        String permissions = tokenMap.get("permission");
+//
+//
+//                        if(permissions.contains(permission)){
+//                            return true;
+//                        }
+//
+//
+//
+//                        StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
+//                        return false;
+//
+//                    } else {
+//                        StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
+//                        return false;
+//                    }
+//                }
             }catch (Exception e){
-                StrUtil.dealErrorReturn(httpServletRequest, httpServletResponse, jsonResult);
+                StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
                 return false;
             }
         }

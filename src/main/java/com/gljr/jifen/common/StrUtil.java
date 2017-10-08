@@ -29,10 +29,10 @@ public class StrUtil {
 
 
     // 在拦截器中的输出
-    public static void dealErrorReturn(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object obj){
+    public static void dealErrorReturn(HttpServletResponse httpServletResponse, Object obj, String domain){
 
         //设置返回数据的响应头
-        httpServletResponse.setHeader("Access-Control-Allow-Origin", GlobalConstants.DOMAIN);
+        httpServletResponse.setHeader("Access-Control-Allow-Origin", domain);
         httpServletResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE,PUT");
         httpServletResponse.setHeader("Access-Control-Max-Age", "3600");
         httpServletResponse.setHeader("Access-Control-Allow-Credentials", "true");

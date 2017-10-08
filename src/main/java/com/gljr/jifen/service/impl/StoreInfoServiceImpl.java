@@ -51,6 +51,9 @@ public class StoreInfoServiceImpl implements StoreInfoService {
     @Autowired
     private DTChainService chainService;
 
+    @Autowired
+    private AdminPermissionAssignMapper adminPermissionAssignMapper;
+
 
     @Override
     public JsonResult selectAllStoreInfo(JsonResult jsonResult) {
@@ -252,6 +255,16 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             storeInfo.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
             storeInfoMapper.insert(storeInfo);
+
+
+//            for (String permission : GlobalConstants.STORE_ADMIN_PERMISSION){
+//                AdminPermissionAssign adminPermissionAssign = new AdminPermissionAssign();
+//                adminPermissionAssign.setPermissionCode(NumberUtils.getInt(permission));
+//                adminPermissionAssign.setAssignTime(new Timestamp(System.currentTimeMillis()));
+//                adminPermissionAssign.setAid(admin.getId());
+//
+//                adminPermissionAssignMapper.insert(adminPermissionAssign);
+//            }
 
             //添加商户的积分信息
             GatewayResponse response = this.chainService.initStoreAccount(storeInfo.getId() + 0L);

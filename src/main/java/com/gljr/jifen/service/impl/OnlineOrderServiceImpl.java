@@ -52,11 +52,17 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     @Autowired
     private DTChainService chainService;
 
-    public final static int PRODUCT_NOT_FOUND = 403;
+    private final static int PRODUCT_NOT_FOUND = 403;
 
-    public final static int INVALID_PRODUCT_INTEGRAL = 404;
+    private final static int INVALID_PRODUCT_INTEGRAL = 404;
 
-    public final static int INVALID_STORE_INFO = 405;
+    private final static int INVALID_STORE_INFO = 405;
+
+    private final static int STORE_NOT_FOUND = 406;
+
+    private final static int INVALID_STORE_TYPE = 407;
+
+    private final static int STORE_NOT_ACCEPT_INTEGRAL = 408;
 
     @Override
     public JsonResult selectOnlineOrdersByUid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
@@ -277,6 +283,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
             onlineOrder.setTrxCode(transaction.getCode());
             onlineOrder.setTrxId(transaction.getId());
+            onlineOrder.setSiId(product.getSiId());
 
             onlineOrderMapper.insert(onlineOrder);
 
@@ -290,6 +297,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             jsonResult.setItem(map);
 
         }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
 
@@ -300,13 +308,14 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     @Transactional
     public JsonResult updateOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult) {
 
-        OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
-        OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
-        criteria.andTrxCodeEqualTo(trxCode);
-        criteria.andUidEqualTo(Integer.parseInt(uid));
+
 
         try {
             //查询订单
+            OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
+            OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
+            criteria.andTrxCodeEqualTo(trxCode);
+            criteria.andUidEqualTo(Integer.parseInt(uid));
             List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
 
             if(ValidCheck.validList(onlineOrders)){
@@ -319,6 +328,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
                 GatewayResponse<CommonOrderResponse> response = this.chainService.postOrders(onlineOrder.getUid() + 0L,
                         onlineOrder.getPid() + 0L, onlineOrder.getIntegral());
+
                 if (null == response) {
                     jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                     return jsonResult;
@@ -342,13 +352,40 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                     return jsonResult;
                 }
 
+                if (STORE_NOT_FOUND == response.getCode()) {
+                    jsonResult.setMessage("商户信息不存在！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if (INVALID_STORE_TYPE == response.getCode()) {
+                    jsonResult.setMessage("商户类型不匹配！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if(STORE_NOT_ACCEPT_INTEGRAL == response.getCode()) {
+                    jsonResult.setMessage("商户暂不接受积分支付！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if(response.getCode() != 200) {
+                    jsonResult.setMessage(response.getMessage());
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                System.out.println("aa");
+                System.out.println(response.getContent().getBlockId());
+                System.out.println("bb");
                 onlineOrder.setDtchainBlockId(response.getContent().getBlockId());
                 onlineOrder.setExtOrderId(response.getContent().getExtOrderId());
                 onlineOrder.setStatus(DBConstants.OrderStatus.PAID.getCode());
                 onlineOrder.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 
                 onlineOrderMapper.updateByPrimaryKey(onlineOrder);
-
+                System.out.println("aa");
                 Transaction transaction = transactionMapper.selectByPrimaryKey(onlineOrder.getTrxId());
                 transaction.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
 

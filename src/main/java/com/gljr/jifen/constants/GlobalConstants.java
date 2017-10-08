@@ -7,8 +7,9 @@ public class GlobalConstants {
 
 
     //设置返回的请求域名
-//    public static final String DOMAIN = "http://console.iep.dtchain.io";
-    public static final String DOMAIN = "http://localhost";
+    public static final String WEBDOMAIN = "http://console.iep.dtchain.io";
+//    public static final String WEBDOMAIN = "http://localhost";
+//    public static final String APPDOMAIN = "http://localhost";
 
 
     //数据验证错误
@@ -112,4 +113,15 @@ public class GlobalConstants {
     public static final String[] SYSTEM_EXCEPTION = {"999", "系统异常"};
     public static final String SESSION_STORE_USER = "session_store_user";
     //商家端api新增信息返回--------end--------
+
+
+
+    //线上商品商户管理员权限，商品添加，修改，删除，商户信息修改，线上线下订单查看
+    public static final String ONLINE_STORE_ADMIN_PERMISSION = "#11#1110#111004#111005#12#1210#121001#1211#121101#";
+
+    //线下扫码商户
+    public static final String OFFLINE_STORE_ADMIN_PERMISSION = "#10#1010#101001#101002#101004#101005#12#1110#111004#111005#12#1210#121001#1211#121101#";
+
+//    public static final String[] STORE_ADMIN_PERMISSION = {"10","1010","101001","101002","101004","101005","11",
+//            "1110","111004","111005","12","1210","121001","1211","121101"};
 }

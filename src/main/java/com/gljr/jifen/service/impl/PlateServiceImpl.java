@@ -11,11 +11,14 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class PlateServiceImpl implements PlateService {
@@ -95,23 +98,79 @@ public class PlateServiceImpl implements PlateService {
                         modulePictureExample.setOrderByClause("id asc");
 
                         List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
+                        if(!ValidCheck.validList(modulePictures)){
+                            for (ModulePicture modulePicture : modulePictures){
+                                if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
+                                    modulePicture.setLinkType("5");
+                                }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
+                                    int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                    int endIndex = modulePicture.getLinkUrl().indexOf("/products");
+                                    String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                    modulePicture.setLinkUrl(result);
+                                    modulePicture.setLinkType("3");
+                                }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("stores")){
+                                    int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                    int endIndex = modulePicture.getLinkUrl().indexOf("/stores");
+                                    String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                    modulePicture.setLinkUrl(result);
+                                    modulePicture.setLinkType("4");
+                                }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
+                                    modulePicture.setLinkType("1");
+                                }else {
+                                    modulePicture.setLinkType("2");
+                                }
+                            }
+                        }
                         module.setPicture(modulePictures);
                     }
 
                     if(module.getType() == DBConstants.ModuleType.PRODUCT.getCode()){
-                        ModuleProductExample moduleProductExample = new ModuleProductExample();
-                        ModuleProductExample.Criteria criteria1 = moduleProductExample.or();
-                        criteria1.andModuleIdEqualTo(module.getId());
-                        moduleProductExample.setOrderByClause("id asc");
+                        if(module.getExtType() == 2 || module.getExtType() == 3 || module.getExtType() == 4 || module.getExtType() == 5) {
+                            ModuleProductExample moduleProductExample = new ModuleProductExample();
+                            ModuleProductExample.Criteria criteria1 = moduleProductExample.or();
+                            criteria1.andModuleIdEqualTo(module.getId());
+                            moduleProductExample.setOrderByClause("id asc");
 
-                        List<ModuleProduct> moduleProducts = moduleProductMapper.selectByExample(moduleProductExample);
-                        for (ModuleProduct moduleProduct : moduleProducts){
-                            Product product = productMapper.selectByPrimaryKey(moduleProduct.getProductId());
-                            if(!ValidCheck.validPojo(product)){
-                                moduleProduct.setLogoKey(product.getLogoKey());
+                            List<ModuleProduct> moduleProducts = moduleProductMapper.selectByExample(moduleProductExample);
+                            for (ModuleProduct moduleProduct : moduleProducts) {
+                                Product product = productMapper.selectByPrimaryKey(moduleProduct.getProductId());
+                                if (!ValidCheck.validPojo(product)) {
+                                    moduleProduct.setLogoKey(product.getLogoKey());
+                                }
                             }
+                            module.setProduct(moduleProducts);
+                        }else {
+                            ModulePictureExample modulePictureExample = new ModulePictureExample();
+                            ModulePictureExample.Criteria criteria1 = modulePictureExample.or();
+                            criteria1.andModuleIdEqualTo(module.getId());
+                            modulePictureExample.setOrderByClause("id asc");
+
+                            List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
+                            if(!ValidCheck.validList(modulePictures)){
+                                for (ModulePicture modulePicture : modulePictures){
+                                    if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
+                                        modulePicture.setLinkType("5");
+                                    }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
+                                        int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                        int endIndex = modulePicture.getLinkUrl().indexOf("/products");
+                                        String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                        modulePicture.setLinkUrl(result);
+                                        modulePicture.setLinkType("3");
+                                    }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("stores")){
+                                        int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                        int endIndex = modulePicture.getLinkUrl().indexOf("/stores");
+                                        String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                        modulePicture.setLinkUrl(result);
+                                        modulePicture.setLinkType("4");
+                                    }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
+                                        modulePicture.setLinkType("1");
+                                    }else {
+                                        modulePicture.setLinkType("2");
+                                    }
+                                }
+                            }
+                            module.setPicture(modulePictures);
                         }
-                        module.setProduct(moduleProducts);
                     }
 
                     if(module.getType() == DBConstants.ModuleType.PICTUREANDPRODUCT.getCode()){
@@ -120,6 +179,29 @@ public class PlateServiceImpl implements PlateService {
                         criteria1.andModuleIdEqualTo(module.getId());
 
                         List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
+                        if(!ValidCheck.validList(modulePictures)){
+                            for (ModulePicture modulePicture : modulePictures){
+                                if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
+                                    modulePicture.setLinkType("5");
+                                }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
+                                    int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                    int endIndex = modulePicture.getLinkUrl().indexOf("/products");
+                                    String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                    modulePicture.setLinkUrl(result);
+                                    modulePicture.setLinkType("3");
+                                }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("stores")){
+                                    int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                    int endIndex = modulePicture.getLinkUrl().indexOf("/stores");
+                                    String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                    modulePicture.setLinkUrl(result);
+                                    modulePicture.setLinkType("4");
+                                }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
+                                    modulePicture.setLinkType("1");
+                                }else {
+                                    modulePicture.setLinkType("2");
+                                }
+                            }
+                        }
                         module.setPicture(modulePictures);
 
                         ModuleProductExample moduleProductExample = new ModuleProductExample();
@@ -144,6 +226,7 @@ public class PlateServiceImpl implements PlateService {
             CommonResult.success(jsonResult);
 
         }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
 

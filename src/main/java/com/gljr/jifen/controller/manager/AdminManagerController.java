@@ -382,7 +382,7 @@ public class AdminManagerController extends BaseController {
         String client_type = httpServletRequest.getHeader("device");
 
 
-        int clientType = ClientType.checkClientType(client_type);
+        //int clientType = ClientType.checkClientType(client_type);
 
 
 //        List<Admin> admins = adminService.login(admin);
@@ -445,7 +445,7 @@ public class AdminManagerController extends BaseController {
 
                     //查询用户在线状态并更新
 
-                    List<AdminOnline> adminOnlines = adminService.selectAdminOnlinesByAid(selectAdmin.getId(), clientType);
+                    List<AdminOnline> adminOnlines = adminService.selectAdminOnlinesByAid(selectAdmin.getId(), DBConstants.ClientType.WEB.getCode());
                     if (adminOnlines != null && adminOnlines.size() != 0) {
                         AdminOnline adminOnline = adminOnlines.get(0);
 
@@ -458,7 +458,7 @@ public class AdminManagerController extends BaseController {
                         AdminOnline adminOnline = new AdminOnline();
 
                         adminOnline.setAid(selectAdmin.getId());
-                        adminOnline.setClientType(clientType);
+                        adminOnline.setClientType(DBConstants.ClientType.WEB.getCode());
                         adminOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
                         adminOnline.setToken(key);
 
@@ -470,7 +470,8 @@ public class AdminManagerController extends BaseController {
                     map.put("username", selectAdmin.getUsername());
                     map.put("token", token);
                     map.put("permission", permission);
-                    map.put("type", selectAdmin.getAccountType()+"");
+                    map.put("accountType", selectAdmin.getAccountType()+"");
+                    map.put("tokenKey", key);
 
                     //把用户信息存入jedis
                     this.redisService.put("admin_" + selectAdmin.getId(), JsonUtil.toJson(map));

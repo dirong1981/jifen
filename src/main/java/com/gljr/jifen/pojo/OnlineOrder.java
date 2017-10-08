@@ -9,6 +9,8 @@ public class OnlineOrder {
 
     private Integer pid;
 
+    private Integer siId;
+
     private Integer trxId;
 
     private String trxCode;
@@ -181,5 +183,13 @@ public class OnlineOrder {
 
     public void setTrxType(Integer trxType) {
         this.trxType = trxType;
+    }
+
+    public Integer getSiId() {
+        return siId;
+    }
+
+    public void setSiId(Integer siId) {
+        this.siId = siId;
     }
 }

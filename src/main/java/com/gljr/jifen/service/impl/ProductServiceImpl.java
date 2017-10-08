@@ -298,7 +298,7 @@ public class ProductServiceImpl implements ProductService{
 
             int userPurchases = 0;
 
-            if(ValidCheck.validList(onlineOrders)){
+            if(!ValidCheck.validList(onlineOrders)){
                 for (OnlineOrder onlineOrder : onlineOrders){
                     userPurchases += onlineOrder.getQuantity();
                 }

@@ -5,6 +5,7 @@
     <id column="id" jdbcType="INTEGER" property="id"/>
     <result column="uid" jdbcType="INTEGER" property="uid"/>
     <result column="pid" jdbcType="INTEGER" property="pid"/>
+    <result column="si_id" jdbcType="INTEGER" property="siId"/>
     <result column="trx_id" jdbcType="INTEGER" property="trxId"/>
     <result column="trx_code" jdbcType="VARCHAR" property="trxCode"/>
     <result column="dtchain_block_id" jdbcType="VARCHAR" property="dtchainBlockId"/>
@@ -77,7 +78,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, uid, pid, trx_id, trx_code, integral, quantity, user_address_id, status, create_time,
+    id, uid, pid, si_id, trx_id, trx_code, integral, quantity, user_address_id, status, create_time,
     update_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.OnlineOrderExample" resultMap="BaseResultMap">
@@ -114,11 +115,11 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into online_order (uid, pid, trx_id,
+    insert into online_order (uid, pid, si_id, trx_id,
     trx_code, dtchain_block_id, ext_order_id, integral, quantity,
     user_address_id, status, create_time,
     update_time)
-    values (#{uid,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, #{trxId,jdbcType=INTEGER},
+    values (#{uid,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, #{siId,jdbcType=INTEGER}, #{trxId,jdbcType=INTEGER},
     #{trxCode,jdbcType=VARCHAR}, #{dtchainBlockId,jdbcType=VARCHAR}, #{extOrderId,jdbcType=VARCHAR},
     #{integral,jdbcType=INTEGER}, #{quantity,jdbcType=INTEGER}, #{userAddressId,jdbcType=INTEGER},
     #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
@@ -223,6 +224,9 @@
       <if test="record.pid != null">
         pid = #{record.pid,jdbcType=INTEGER},
       </if>
+      <if test="record.siId != null">
+        si_id = #{record.siId,jdbcType=INTEGER},
+      </if>
       <if test="record.trxId != null">
         trx_id = #{record.trxId,jdbcType=INTEGER},
       </if>
@@ -263,6 +267,7 @@
     set id = #{record.id,jdbcType=INTEGER},
     uid = #{record.uid,jdbcType=INTEGER},
     pid = #{record.pid,jdbcType=INTEGER},
+    si_id = #{record.siId,jdbcType=INTEGER},
     trx_id = #{record.trxId,jdbcType=INTEGER},
     trx_code = #{record.trxCode,jdbcType=VARCHAR},
     dtchain_block_id = #{dtchainBlockId,jdbcType=VARCHAR},
@@ -285,6 +290,9 @@
       </if>
       <if test="pid != null">
         pid = #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="pid != null">
+        si_id = #{siId,jdbcType=INTEGER},
       </if>
       <if test="trxId != null">
         trx_id = #{trxId,jdbcType=INTEGER},
@@ -323,6 +331,7 @@
     update online_order
     set uid = #{uid,jdbcType=INTEGER},
       pid = #{pid,jdbcType=INTEGER},
+      si_id = #{siId,jdbcType=INTEGER},
       trx_id = #{trxId,jdbcType=INTEGER},
       trx_code = #{trxCode,jdbcType=VARCHAR},
       dtchain_block_id = #{dtchainBlockId,jdbcType=VARCHAR},

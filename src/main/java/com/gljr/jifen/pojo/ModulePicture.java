@@ -13,6 +13,8 @@ public class ModulePicture {
 
     private String linkUrl;
 
+    private String linkType;
+
     private Integer sort;
 
     private Date createTime;
@@ -71,5 +73,13 @@ public class ModulePicture {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getLinkType() {
+        return linkType;
+    }
+
+    public void setLinkType(String linkType) {
+        this.linkType = linkType;
     }
 }

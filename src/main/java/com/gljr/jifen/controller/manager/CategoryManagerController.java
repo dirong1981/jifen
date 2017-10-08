@@ -6,6 +6,7 @@ import com.gljr.jifen.common.ValidCheck;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.controller.BaseController;
+import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.Category;
 import com.gljr.jifen.service.CategoryService;
 import com.gljr.jifen.service.StorageService;
@@ -326,6 +327,7 @@ public class CategoryManagerController extends BaseController {
      */
     @GetMapping(value = "/all")
     @ResponseBody
+    @AuthPassport(permission_code = "#10#")
     public JsonResult allCategories(){
         JsonResult jsonResult = new JsonResult();
         Map map = new HashMap();
