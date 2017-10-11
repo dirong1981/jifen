@@ -20,6 +20,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
+import sun.security.provider.PolicyParser;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -123,6 +124,51 @@ public class AdminServiceImpl implements AdminService {
         AdminExample.Criteria  criteria = adminExample.or();
         criteria.andUsernameEqualTo(username);
         return adminMapper.selectByExample(adminExample);
+    }
+
+    @Override
+    public JsonResult selectSystemPermission(JsonResult jsonResult) {
+        try {
+            SystemPermissionExample systemPermissionExample = new SystemPermissionExample();
+            SystemPermissionExample.Criteria criteria = systemPermissionExample.or();
+            criteria.andParentCodeEqualTo(0);
+            systemPermissionExample.setOrderByClause("id asc");
+
+            Map map = new HashMap();
+
+            List<SystemPermission> systemPermissions = systemPermissionMapper.selectByExample(systemPermissionExample);
+
+            map.put("parent", systemPermissions);
+
+            for(SystemPermission systemPermission : systemPermissions){
+                SystemPermissionExample systemPermissionExample1 = new SystemPermissionExample();
+                SystemPermissionExample.Criteria criteria1 = systemPermissionExample1.or();
+                criteria1.andParentCodeEqualTo(systemPermission.getCode());
+                systemPermissionExample1.setOrderByClause("id asc");
+                List <SystemPermission> systemPermissions1 = systemPermissionMapper.selectByExample(systemPermissionExample1);
+
+                map.put(systemPermission.getCode(), systemPermissions1);
+
+                for (SystemPermission systemPermission1 : systemPermissions1){
+                    SystemPermissionExample systemPermissionExample2 = new SystemPermissionExample();
+                    SystemPermissionExample.Criteria criteria2 = systemPermissionExample2.or();
+                    criteria2.andParentCodeEqualTo(systemPermission1.getCode());
+                    systemPermissionExample2.setOrderByClause("id desc");
+                    List<SystemPermission> systemPermissions2 = systemPermissionMapper.selectByExample(systemPermissionExample2);
+
+                    map.put(systemPermission1.getCode(), systemPermissions2);
+                }
+            }
+
+
+
+            CommonResult.success(jsonResult);
+            jsonResult.setItem(map);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+
+        return jsonResult;
     }
 
     @Override

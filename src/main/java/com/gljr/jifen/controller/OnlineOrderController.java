@@ -199,4 +199,83 @@ public class OnlineOrderController {
         return jsonResult;
     }
 
+
+    /**
+     * 添加一条在线虚拟订单，尚未付款
+     * @param onlineOrder
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping(value = "/virtual-product")
+    @ResponseBody
+    public JsonResult insetVirtualProductOnlineOrder(OnlineOrder onlineOrder, HttpServletRequest httpServletRequest){
+        JsonResult jsonResult = new JsonResult();
+
+        String uid = httpServletRequest.getHeader("uid");
+
+        if(StringUtils.isEmpty(uid)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
+        }
+
+        jsonResult = onlineOrderService.insetVirtualProductOnlineOrder(onlineOrder, uid, jsonResult);
+
+        return jsonResult;
+    }
+
+
+    /**
+     * 修改虚拟商品订单，判断订单状态是否为未付款，更新订单和通用交易状态为已付款，并修改用户积分
+     * @param trxCode
+     * @param httpServletRequest
+     * @return
+     */
+    @PutMapping(value = "/{trxCode}/virtual-product")
+    @ResponseBody
+    public JsonResult updateVirtualProductOnlineOrder(@PathVariable(value = "trxCode") String trxCode, HttpServletRequest httpServletRequest){
+        JsonResult jsonResult = new JsonResult();
+
+        String uid = httpServletRequest.getHeader("uid");
+
+        if(StringUtils.isEmpty(uid)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
+        }
+        if(StringUtils.isEmpty(trxCode)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
+        jsonResult = onlineOrderService.updateVirtualProductOnlineOrderByTrxCode(trxCode, uid, jsonResult);
+
+        return jsonResult;
+    }
+
+    /**
+     * 取消一个虚拟商品订单，更新订单，通用交易表，恢复商品库存和销量
+     * @param trxCode
+     * @param httpServletRequest
+     * @return
+     */
+    @PutMapping(value = "/{trxCode}/cancel/virtual-product")
+    @ResponseBody
+    public JsonResult cancelVirtualProductOnlineOrderByTrxCode(@PathVariable(value = "trxCode") String trxCode, HttpServletRequest httpServletRequest){
+        JsonResult jsonResult = new JsonResult();
+
+        String uid = httpServletRequest.getHeader("uid");
+        if(StringUtils.isEmpty(uid)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
+        }
+
+        if(StringUtils.isEmpty(trxCode)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
+        jsonResult = onlineOrderService.cancelVirtualProductOnlineOrderByTrxCode(trxCode, uid, jsonResult);
+
+
+        return jsonResult;
+    }
 }

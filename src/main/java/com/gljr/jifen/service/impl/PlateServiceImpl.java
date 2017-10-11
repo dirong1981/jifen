@@ -38,6 +38,12 @@ public class PlateServiceImpl implements PlateService {
     @Autowired
     private ProductMapper productMapper;
 
+    @Autowired
+    private VirtualProductMapper virtualProductMapper;
+
+    @Autowired
+    private SystemVirtualProductMapper systemVirtualProductMapper;
+
     @Override
     public JsonResult selectPlates(JsonResult jsonResult) {
         try {
@@ -174,47 +180,138 @@ public class PlateServiceImpl implements PlateService {
                     }
 
                     if(module.getType() == DBConstants.ModuleType.PICTUREANDPRODUCT.getCode()){
-                        ModulePictureExample modulePictureExample = new ModulePictureExample();
-                        ModulePictureExample.Criteria criteria1 = modulePictureExample.or();
-                        criteria1.andModuleIdEqualTo(module.getId());
+                        if(module.getExtType() == 2 || module.getExtType() == 3 || module.getExtType() == 4 || module.getExtType() == 5) {
+                            ModulePictureExample modulePictureExample = new ModulePictureExample();
+                            ModulePictureExample.Criteria criteria1 = modulePictureExample.or();
+                            criteria1.andModuleIdEqualTo(module.getId());
 
-                        List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
-                        if(!ValidCheck.validList(modulePictures)){
-                            for (ModulePicture modulePicture : modulePictures){
-                                if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
-                                    modulePicture.setLinkType("5");
-                                }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
-                                    int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
-                                    int endIndex = modulePicture.getLinkUrl().indexOf("/products");
-                                    String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
-                                    modulePicture.setLinkUrl(result);
-                                    modulePicture.setLinkType("3");
-                                }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("stores")){
-                                    int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
-                                    int endIndex = modulePicture.getLinkUrl().indexOf("/stores");
-                                    String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
-                                    modulePicture.setLinkUrl(result);
-                                    modulePicture.setLinkType("4");
-                                }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
-                                    modulePicture.setLinkType("1");
-                                }else {
-                                    modulePicture.setLinkType("2");
+                            List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
+                            if(!ValidCheck.validList(modulePictures)){
+                                for (ModulePicture modulePicture : modulePictures){
+                                    if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
+                                        modulePicture.setLinkType("5");
+                                    }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
+                                        int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                        int endIndex = modulePicture.getLinkUrl().indexOf("/products");
+                                        String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                        modulePicture.setLinkUrl(result);
+                                        modulePicture.setLinkType("3");
+                                    }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("stores")){
+                                        int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                        int endIndex = modulePicture.getLinkUrl().indexOf("/stores");
+                                        String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                        modulePicture.setLinkUrl(result);
+                                        modulePicture.setLinkType("4");
+                                    }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
+                                        modulePicture.setLinkType("1");
+                                    }else {
+                                        modulePicture.setLinkType("2");
+                                    }
                                 }
                             }
-                        }
-                        module.setPicture(modulePictures);
+                            module.setPicture(modulePictures);
 
+                            ModuleProductExample moduleProductExample = new ModuleProductExample();
+                            ModuleProductExample.Criteria criteria2 = moduleProductExample.or();
+                            criteria2.andModuleIdEqualTo(module.getId());
+                            List<ModuleProduct> moduleProducts = moduleProductMapper.selectByExample(moduleProductExample);
+                            for (ModuleProduct moduleProduct : moduleProducts){
+                                Product product = productMapper.selectByPrimaryKey(moduleProduct.getProductId());
+                                if(!ValidCheck.validPojo(product)){
+                                    moduleProduct.setLogoKey(product.getLogoKey());
+                                }
+                            }
+                            module.setProduct(moduleProducts);
+                        }else{
+                            ModulePictureExample modulePictureExample = new ModulePictureExample();
+                            ModulePictureExample.Criteria criteria1 = modulePictureExample.or();
+                            criteria1.andModuleIdEqualTo(module.getId());
+                            criteria1.andBannerEqualTo(1);
+
+                            List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
+                            if(!ValidCheck.validList(modulePictures)){
+                                for (ModulePicture modulePicture : modulePictures){
+                                    if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
+                                        modulePicture.setLinkType("5");
+                                    }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
+                                        int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                        int endIndex = modulePicture.getLinkUrl().indexOf("/products");
+                                        String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                        modulePicture.setLinkUrl(result);
+                                        modulePicture.setLinkType("3");
+                                    }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("stores")){
+                                        int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                        int endIndex = modulePicture.getLinkUrl().indexOf("/stores");
+                                        String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                        modulePicture.setLinkUrl(result);
+                                        modulePicture.setLinkType("4");
+                                    }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
+                                        modulePicture.setLinkType("1");
+                                    }else {
+                                        modulePicture.setLinkType("2");
+                                    }
+                                }
+                            }
+                            module.setPicture(modulePictures);
+
+
+
+                            modulePictureExample = new ModulePictureExample();
+                            criteria1 = modulePictureExample.or();
+                            criteria1.andModuleIdEqualTo(module.getId());
+                            criteria1.andBannerNotEqualTo(1);
+
+                            modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
+                            if(!ValidCheck.validList(modulePictures)){
+                                for (ModulePicture modulePicture : modulePictures){
+                                    if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
+                                        modulePicture.setLinkType("5");
+                                    }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
+                                        int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                        int endIndex = modulePicture.getLinkUrl().indexOf("/products");
+                                        String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                        modulePicture.setLinkUrl(result);
+                                        modulePicture.setLinkType("3");
+                                    }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("stores")){
+                                        int beginIndex = modulePicture.getLinkUrl().indexOf("categories/");
+                                        int endIndex = modulePicture.getLinkUrl().indexOf("/stores");
+                                        String result = modulePicture.getLinkUrl().substring(beginIndex, endIndex).substring("categories/".length());
+                                        modulePicture.setLinkUrl(result);
+                                        modulePicture.setLinkType("4");
+                                    }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
+                                        modulePicture.setLinkType("1");
+                                    }else {
+                                        modulePicture.setLinkType("2");
+                                    }
+                                }
+                            }
+                            module.setProduct(modulePictures);
+                        }
+                    }
+
+                    if(module.getType() == DBConstants.ModuleType.PACKET.getCode()){
                         ModuleProductExample moduleProductExample = new ModuleProductExample();
-                        ModuleProductExample.Criteria criteria2 = moduleProductExample.or();
-                        criteria2.andModuleIdEqualTo(module.getId());
+                        ModuleProductExample.Criteria criteria1 = moduleProductExample.or();
+                        criteria1.andModuleIdEqualTo(module.getId());
+                        moduleProductExample.setOrderByClause("sort asc");
+
+                        List<VirtualProduct> virtualProducts = new ArrayList();
+
                         List<ModuleProduct> moduleProducts = moduleProductMapper.selectByExample(moduleProductExample);
-                        for (ModuleProduct moduleProduct : moduleProducts){
-                            Product product = productMapper.selectByPrimaryKey(moduleProduct.getProductId());
-                            if(!ValidCheck.validPojo(product)){
-                                moduleProduct.setLogoKey(product.getLogoKey());
+                        if(!ValidCheck.validList(moduleProducts)) {
+
+                            for (ModuleProduct moduleProduct : moduleProducts) {
+                                VirtualProduct virtualProduct = virtualProductMapper.selectByPrimaryKey(moduleProduct.getProductId());
+
+                                SystemVirtualProduct systemVirtualProduct = systemVirtualProductMapper.selectByPrimaryKey(virtualProduct.getVpId());
+
+                                virtualProduct.setIntegral(systemVirtualProduct.getIntegral());
+                                virtualProduct.setType(systemVirtualProduct.getType());
+
+                                virtualProducts.add(virtualProduct);
                             }
                         }
-                        module.setProduct(moduleProducts);
+                        module.setProduct(virtualProducts);
                     }
 
                     list.add(module);

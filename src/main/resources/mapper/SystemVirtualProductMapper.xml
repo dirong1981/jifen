@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gljr.jifen.dao.UserCreditsMapper">
-  <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.UserCredits">
+<mapper namespace="com.gljr.jifen.dao.SystemVirtualProductMapper">
+  <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.SystemVirtualProduct">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="owner_type" jdbcType="INTEGER" property="ownerType" />
-    <result column="owner_id" jdbcType="INTEGER" property="ownerId" />
-    <result column="wallet_address" jdbcType="VARCHAR" property="walletAddress" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="integral" jdbcType="INTEGER" property="integral" />
-    <result column="free_payment_limit" jdbcType="INTEGER" property="freePaymentLimit" />
-    <result column="frozen_integral" jdbcType="INTEGER" property="frozenIntegral" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -70,16 +69,15 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, owner_type, owner_id, wallet_address, integral, free_payment_limit, frozen_integral, 
-    create_time
+    id, type, code, title, integral, status, created
   </sql>
-  <select id="selectByExample" parameterType="com.gljr.jifen.pojo.UserCreditsExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.gljr.jifen.pojo.SystemVirtualProductExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from user_credits
+    from system_virtual_product
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -90,114 +88,105 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from user_credits
+    from system_virtual_product
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from user_credits
+    delete from system_virtual_product
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.gljr.jifen.pojo.UserCreditsExample">
-    delete from user_credits
+  <delete id="deleteByExample" parameterType="com.gljr.jifen.pojo.SystemVirtualProductExample">
+    delete from system_virtual_product
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.gljr.jifen.pojo.UserCredits">
+  <insert id="insert" parameterType="com.gljr.jifen.pojo.SystemVirtualProduct">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into user_credits (owner_type, owner_id, wallet_address, 
-      integral, free_payment_limit, frozen_integral, 
-      create_time)
-    values (#{ownerType,jdbcType=INTEGER}, #{ownerId,jdbcType=INTEGER}, #{walletAddress,jdbcType=VARCHAR}, 
-      #{integral,jdbcType=INTEGER}, #{freePaymentLimit,jdbcType=INTEGER}, #{frozenIntegral,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=TIMESTAMP})
+    insert into system_virtual_product (type, code, title, 
+      integral, status, created
+      )
+    values (#{type,jdbcType=INTEGER}, #{code,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+      #{integral,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{created,jdbcType=TIMESTAMP}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.UserCredits">
+  <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.SystemVirtualProduct">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into user_credits
+    insert into system_virtual_product
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="ownerType != null">
-        owner_type,
+      <if test="type != null">
+        type,
       </if>
-      <if test="ownerId != null">
-        owner_id,
+      <if test="code != null">
+        code,
       </if>
-      <if test="walletAddress != null">
-        wallet_address,
+      <if test="title != null">
+        title,
       </if>
       <if test="integral != null">
         integral,
       </if>
-      <if test="freePaymentLimit != null">
-        free_payment_limit,
+      <if test="status != null">
+        status,
       </if>
-      <if test="frozenIntegral != null">
-        frozen_integral,
-      </if>
-      <if test="createTime != null">
-        create_time,
+      <if test="created != null">
+        created,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="ownerType != null">
-        #{ownerType,jdbcType=INTEGER},
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
       </if>
-      <if test="ownerId != null">
-        #{ownerId,jdbcType=INTEGER},
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
       </if>
-      <if test="walletAddress != null">
-        #{walletAddress,jdbcType=VARCHAR},
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
       </if>
       <if test="integral != null">
         #{integral,jdbcType=INTEGER},
       </if>
-      <if test="freePaymentLimit != null">
-        #{freePaymentLimit,jdbcType=INTEGER},
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
       </if>
-      <if test="frozenIntegral != null">
-        #{frozenIntegral,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
+      <if test="created != null">
+        #{created,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.gljr.jifen.pojo.UserCreditsExample" resultType="java.lang.Long">
-    select count(*) from user_credits
+  <select id="countByExample" parameterType="com.gljr.jifen.pojo.SystemVirtualProductExample" resultType="java.lang.Long">
+    select count(*) from system_virtual_product
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update user_credits
+    update system_virtual_product
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=INTEGER},
       </if>
-      <if test="record.ownerType != null">
-        owner_type = #{record.ownerType,jdbcType=INTEGER},
+      <if test="record.type != null">
+        type = #{record.type,jdbcType=INTEGER},
       </if>
-      <if test="record.ownerId != null">
-        owner_id = #{record.ownerId,jdbcType=INTEGER},
+      <if test="record.code != null">
+        code = #{record.code,jdbcType=VARCHAR},
       </if>
-      <if test="record.walletAddress != null">
-        wallet_address = #{record.walletAddress,jdbcType=VARCHAR},
+      <if test="record.title != null">
+        title = #{record.title,jdbcType=VARCHAR},
       </if>
       <if test="record.integral != null">
         integral = #{record.integral,jdbcType=INTEGER},
       </if>
-      <if test="record.freePaymentLimit != null">
-        free_payment_limit = #{record.freePaymentLimit,jdbcType=INTEGER},
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=INTEGER},
       </if>
-      <if test="record.frozenIntegral != null">
-        frozen_integral = #{record.frozenIntegral,jdbcType=INTEGER},
-      </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      <if test="record.created != null">
+        created = #{record.created,jdbcType=TIMESTAMP},
       </if>
     </set>
     <if test="_parameter != null">
@@ -205,55 +194,50 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update user_credits
+    update system_virtual_product
     set id = #{record.id,jdbcType=INTEGER},
-      owner_type = #{record.ownerType,jdbcType=INTEGER},
-      owner_id = #{record.ownerId,jdbcType=INTEGER},
-      wallet_address = #{record.walletAddress,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=INTEGER},
+      code = #{record.code,jdbcType=VARCHAR},
+      title = #{record.title,jdbcType=VARCHAR},
       integral = #{record.integral,jdbcType=INTEGER},
-      free_payment_limit = #{record.freePaymentLimit,jdbcType=INTEGER},
-      frozen_integral = #{record.frozenIntegral,jdbcType=INTEGER},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+      status = #{record.status,jdbcType=INTEGER},
+      created = #{record.created,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.gljr.jifen.pojo.UserCredits">
-    update user_credits
+  <update id="updateByPrimaryKeySelective" parameterType="com.gljr.jifen.pojo.SystemVirtualProduct">
+    update system_virtual_product
     <set>
-      <if test="ownerType != null">
-        owner_type = #{ownerType,jdbcType=INTEGER},
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
       </if>
-      <if test="ownerId != null">
-        owner_id = #{ownerId,jdbcType=INTEGER},
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
       </if>
-      <if test="walletAddress != null">
-        wallet_address = #{walletAddress,jdbcType=VARCHAR},
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
       </if>
       <if test="integral != null">
         integral = #{integral,jdbcType=INTEGER},
       </if>
-      <if test="freePaymentLimit != null">
-        free_payment_limit = #{freePaymentLimit,jdbcType=INTEGER},
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="frozenIntegral != null">
-        frozen_integral = #{frozenIntegral,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
+      <if test="created != null">
+        created = #{created,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.UserCredits">
-    update user_credits
-    set owner_type = #{ownerType,jdbcType=INTEGER},
-      owner_id = #{ownerId,jdbcType=INTEGER},
-      wallet_address = #{walletAddress,jdbcType=VARCHAR},
+  <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.SystemVirtualProduct">
+    update system_virtual_product
+    set type = #{type,jdbcType=INTEGER},
+      code = #{code,jdbcType=VARCHAR},
+      title = #{title,jdbcType=VARCHAR},
       integral = #{integral,jdbcType=INTEGER},
-      free_payment_limit = #{freePaymentLimit,jdbcType=INTEGER},
-      frozen_integral = #{frozenIntegral,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+      status = #{status,jdbcType=INTEGER},
+      created = #{created,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

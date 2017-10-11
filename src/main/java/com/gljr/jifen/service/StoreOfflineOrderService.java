@@ -5,6 +5,7 @@ import com.gljr.jifen.pojo.*;
 import com.qiniu.util.Json;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface StoreOfflineOrderService {
      * 查询所有线下订单
      * @return
      */
-    JsonResult selectOfflineOrders(JsonResult jsonResult);
+    JsonResult selectOfflineOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult);
 
     /**
      * 根据条件查询线下订单

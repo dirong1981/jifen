@@ -76,6 +76,58 @@ public class TokenIntecepter implements HandlerInterceptor {
 
         }else if(device.equals("mobile")){
             //从手机端进入，只能是普通用户
+            String uid = httpServletRequest.getHeader("uid");
+            String token = httpServletRequest.getHeader("token");
+
+            System.out.println("用户的token");
+            System.out.println(token);
+
+            String requestUri = httpServletRequest.getRequestURI();
+            String params = httpServletRequest.getParameter("token");
+            if(!StringUtils.isEmpty(params)){
+                return true;
+            }else {
+
+                if (requestUri.contains("order") || requestUri.contains("users")) {
+
+                    jsonResult.setMessage(GlobalConstants.ADMIN_LOGIN_FAILED);
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+
+                    if (StringUtils.isEmpty(uid) || StringUtils.isEmpty(token)) {
+                        StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.APPDOMAIN);
+                        return false;
+                    }
+
+                    //获取服务器端管理员信息
+                    Map<String, String> tokenMap = this.redisService.getMap("user_" + uid, String.class);
+
+                    System.out.println("系统的token");
+                    System.out.println(tokenMap.get("token"));
+
+                    if (null == tokenMap || !tokenMap.containsKey("tokenKey")) {
+                        StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.APPDOMAIN);
+                        return false;
+                    }
+
+                    String tokenKey = tokenMap.get("tokenKey");
+
+//                    System.out.println(tokenMap.get("token"));
+//
+                    //解密token，失败重新登录，时间过期重新登录
+                    try {
+                        Claims claims = JwtUtil.parseJWT(token, tokenKey);
+                        Date exp = claims.getExpiration();
+                        Date now = new Date(System.currentTimeMillis());
+                        if (exp.before(now)) {
+                            StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.APPDOMAIN);
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.APPDOMAIN);
+                        return false;
+                    }
+                }
+            }
             return true;
 //            String uid = httpServletRequest.getHeader("uid");
 //            String token = httpServletRequest.getHeader("token");
@@ -108,7 +160,7 @@ public class TokenIntecepter implements HandlerInterceptor {
 //                return false;
 //            }
         }else {
-            StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
+            StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.APPDOMAIN);
             return false;
         }
         return true;

@@ -15,6 +15,8 @@ public class ModulePicture {
 
     private String linkType;
 
+    private Integer banner;
+
     private Integer sort;
 
     private Date createTime;
@@ -57,6 +59,14 @@ public class ModulePicture {
 
     public void setLinkUrl(String linkUrl) {
         this.linkUrl = linkUrl == null ? null : linkUrl.trim();
+    }
+
+    public Integer getBanner() {
+        return banner;
+    }
+
+    public void setBanner(Integer banner) {
+        this.banner = banner;
     }
 
     public Integer getSort() {

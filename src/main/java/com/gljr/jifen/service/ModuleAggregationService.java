@@ -35,7 +35,7 @@ public interface ModuleAggregationService {
      * 查询所有聚合页
      * @return
      */
-    JsonResult selectModuleAggregations(JsonResult jsonResult);
+    JsonResult selectModuleAggregations(Integer page, Integer per_page, JsonResult jsonResult);
 
 
     /**

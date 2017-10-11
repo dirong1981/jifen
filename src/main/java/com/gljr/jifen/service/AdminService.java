@@ -99,6 +99,8 @@ public interface AdminService {
      * 查询所有权限
      * @return
      */
+    JsonResult selectSystemPermission(JsonResult jsonResult);
+
     List<SystemPermission> selectSystemPermission();
 
 

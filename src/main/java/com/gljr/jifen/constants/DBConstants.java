@@ -123,27 +123,6 @@ public class DBConstants {
         }
     }
 
-    public enum MerchantType {
-        ONLINE(1, "线上商品商户"), OFFLINE(2, "线下扫码商户");
-        private int code;
-
-        private String description;
-
-        MerchantType(int code, String description) {
-            this.code = code;
-            this.description = description;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
-
-
     /**
      * 分类状态
      */
@@ -216,33 +195,12 @@ public class DBConstants {
     }
 
     public enum OrderStatus {
-        UNPAID(0, "待付款"), PAID(1, "已付款"), CANCELED(2, "已取消"), REFUND(3, "已退款"), DELETED(-1, "已删除");
+        UNPAID(0, "待付款"), PAID(1, "已付款"), CANCELED(2, "已取消"), REFUND(3, "已退款"), SETTLED(4, "已结算"), DELETED(-1, "已删除");
         private int code;
 
         private String description;
 
         OrderStatus(int code, String description) {
-            this.code = code;
-            this.description = description;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
-
-
-    public enum OfflineOrderStatus {
-        UNPAID(1, "待付款"), PAID(2, "已付款"), CANCELED(4, "已取消"), DELETED(-1, "已删除"), REFUND(3, "已退款");
-        private int code;
-
-        private String description;
-
-        OfflineOrderStatus(int code, String description) {
             this.code = code;
             this.description = description;
         }
@@ -284,6 +242,26 @@ public class DBConstants {
         private String description;
 
         OwnerType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public enum OnlineProductType {
+        NORMAL_PRODUCT(1, "常规商品"), SYSTEM_VIRTUAL_PRODUCT(2, "平台虚拟商品");
+        private int code;
+
+        private String description;
+
+        OnlineProductType(int code, String description) {
             this.code = code;
             this.description = description;
         }
@@ -422,4 +400,27 @@ public class DBConstants {
             return description;
         }
     }
+
+
+    public enum MerchantType {
+        ONLINE(1, "线上商品商户"), OFFLINE(2, "线下扫码商户");
+        private int code;
+
+        private String description;
+
+        MerchantType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
 }
+
+

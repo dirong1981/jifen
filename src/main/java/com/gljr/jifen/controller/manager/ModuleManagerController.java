@@ -1,5 +1,7 @@
 package com.gljr.jifen.controller.manager;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
@@ -75,7 +77,8 @@ public class ModuleManagerController {
     @PostMapping("/{moduleId}/upload")
     @ResponseBody
     public JsonResult uploadPic(@PathVariable(value = "moduleId") Integer moduleId, @RequestParam(value="pic") MultipartFile file,
-                                @RequestParam(value = "title") String title, @RequestParam(value = "linkUrl", required = false) String linkUrl){
+                                @RequestParam(value = "title") String title, @RequestParam(value = "linkUrl", required = false) String linkUrl,
+                                @RequestParam(value = "banner", required = false) String banner){
         JsonResult jsonResult = new JsonResult();
 
         if(StringUtils.isEmpty(moduleId)){
@@ -105,6 +108,9 @@ public class ModuleManagerController {
         modulePicture.setModuleId(moduleId);
         modulePicture.setSort(99);
         modulePicture.setTitle(title);
+        if(!StringUtils.isEmpty(banner)) {
+            modulePicture.setBanner(Integer.parseInt(banner));
+        }
 
         jsonResult = moduleService.uploadFile(file, modulePicture, jsonResult);
 
@@ -239,13 +245,32 @@ public class ModuleManagerController {
      */
     @GetMapping
     @ResponseBody
-    public JsonResult selectModuls(){
+    public JsonResult selectModuls(@RequestParam(value = "page", required = false) Integer page,
+                                   @RequestParam(value = "per_page", required = false) Integer per_page){
         JsonResult jsonResult = new JsonResult();
 
+        if(StringUtils.isEmpty(page)){
+            page = 1;
+        }
+
+        if(StringUtils.isEmpty(per_page)){
+            per_page = 10;
+        }
+
         try {
+            PageHelper.startPage(page,per_page);
             List<Module> modules = moduleService.selectModules();
+            PageInfo pageInfo = new PageInfo(modules);
+
             Map map = new HashMap();
             map.put("data", modules);
+
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
+
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
         }catch (Exception e){
@@ -496,6 +521,25 @@ public class ModuleManagerController {
         }catch (Exception e){
             CommonResult.sqlFailed(jsonResult);
         }
+
+        return jsonResult;
+    }
+
+    @PostMapping(value = "/{moduleId}/virtualproduct")
+    @ResponseBody
+    public JsonResult insertVirtualProduct(@PathVariable(value = "moduleId") Integer moduleId, HttpServletRequest httpServletRequest){
+        JsonResult jsonResult = new JsonResult();
+
+        System.out.println(moduleId);
+
+        String p1 = httpServletRequest.getParameter("p1");
+        String p2 = httpServletRequest.getParameter("p2");
+        String p3 = httpServletRequest.getParameter("p3");
+        String p4 = httpServletRequest.getParameter("p4");
+
+
+
+        moduleService.insertVirtualProduct(p1,p2,p3,p4,moduleId,jsonResult);
 
         return jsonResult;
     }

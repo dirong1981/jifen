@@ -19,28 +19,8 @@ public class UserCreditsServiceImpl implements UserCreditsService {
     private UserCreditsMapper userCreditsMapper;
 
     @Override
-    public int insertUserCredits(UserCredits userCredits) {
-        List<UserCredits> list = selectUserCreditsByUid(userCredits.getOwnerId());
-        if(list.size() == 0){
-            userCreditsMapper.insert(userCredits);
-        }else{
-            userCredits.setId(list.get(0).getId());
-            updateUserCreditsById(userCredits);
-        }
-
-        return 0;
+    public UserCredits getUserCredits(Integer ownerId, DBConstants.OwnerType ownerType) {
+        return this.userCreditsMapper.getUserCredits(ownerId, ownerType.getCode());
     }
 
-    @Override
-    public List<UserCredits> selectUserCreditsByUid(int uid) {
-        UserCreditsExample userCreditsExample = new UserCreditsExample();
-        UserCreditsExample.Criteria criteria = userCreditsExample.or();
-        criteria.andOwnerIdEqualTo(uid);
-        return userCreditsMapper.selectByExample(userCreditsExample);
-    }
-
-    @Override
-    public int updateUserCreditsById(UserCredits userCredits) throws RuntimeException  {
-        return userCreditsMapper.updateByPrimaryKey(userCredits);
-    }
 }

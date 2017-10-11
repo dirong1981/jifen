@@ -18,6 +18,7 @@ public interface ModuleService {
     JsonResult deletePictureByModuleIdAndPictureId(Integer moduleId, Integer pictureId, JsonResult jsonResult);
 
 
+    JsonResult insertVirtualProduct(String p1, String p2, String p3, String p4, Integer moduleId, JsonResult jsonResult);
 
 
 
@@ -131,5 +132,7 @@ public interface ModuleService {
      * @return
      */
     List<Plate> selectPlateByModuleId(Integer id);
+
+
 
 }

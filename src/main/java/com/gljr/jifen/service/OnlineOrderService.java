@@ -5,6 +5,7 @@ import com.gljr.jifen.pojo.*;
 import com.qiniu.util.Json;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 public interface OnlineOrderService {
@@ -57,7 +58,7 @@ public interface OnlineOrderService {
      * 查询所有在线订单，不包含删除
      * @return
      */
-    JsonResult selectOnlineOrders(JsonResult jsonResult);
+    JsonResult selectOnlineOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult);
 
 
     /**
@@ -68,4 +69,16 @@ public interface OnlineOrderService {
      * @return
      */
     JsonResult cancelOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult);
+
+    /**
+     * 添加一个在线虚拟订单
+     * @param onlineOrder 订单信息
+     * @param uid 用户id
+     * @param jsonResult
+     * @return
+     */
+    JsonResult insetVirtualProductOnlineOrder(OnlineOrder onlineOrder, String uid, JsonResult jsonResult);
+    JsonResult updateVirtualProductOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult);
+    JsonResult cancelVirtualProductOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult);
+
 }

@@ -2,10 +2,15 @@ package com.gljr.jifen.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.gljr.jifen.common.*;
+import com.gljr.jifen.common.dtchain.GatewayResponse;
+import com.gljr.jifen.common.dtchain.vo.GouliUserId;
+import com.gljr.jifen.common.dtchain.vo.GouliUserInfo;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.dao.*;
 import com.gljr.jifen.pojo.*;
+import com.gljr.jifen.service.DTChainService;
+import com.gljr.jifen.service.RedisService;
 import com.gljr.jifen.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +41,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private MessageMapper messageMapper;
 
+    @Autowired
+    private DTChainService chainService;
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public JsonResult selecteUserInfoByUid(Integer uid, String gltoken, JsonResult jsonResult) {
@@ -55,9 +65,18 @@ public class UserServiceImpl implements UserService {
             if(!StringUtils.isEmpty(gltoken)){
                 //去沟里验证token
 
+//                GatewayResponse<GouliUserId> gouliUserId = chainService.getUserId(gltoken);
+//
+//                if (null == gouliUserId || gouliUserId.getCode() != 200) {
+//                    CommonResult.userNotExit(jsonResult);
+//                    return jsonResult;
+//                } else {
+//                    CommonResult.success(jsonResult);
+//                }
+//
+//                uid = Integer.parseInt(gouliUserId.getContent().getId() + "");
 
-
-
+                uid  = 15526;
                 UserOnlineExample userOnlineExample = new UserOnlineExample();
                 UserOnlineExample.Criteria criteria = userOnlineExample.or();
                 criteria.andUidEqualTo(uid);
@@ -86,6 +105,13 @@ public class UserServiceImpl implements UserService {
 
                 //生成token
                 token = JwtUtil.createJWT(GlobalConstants.GLJR_PREFIX, jsonObject.toString(), token_key, 60*60*24*365);
+
+                Map map = new HashMap();
+                map.put("token", token);
+                map.put("uid", uid);
+                map.put("tokenKey", token_key);
+
+                this.redisService.put("user_" + uid, JsonUtil.toJson(map));
             }
 
 
@@ -95,10 +121,8 @@ public class UserServiceImpl implements UserService {
             criteria.andOwnerIdEqualTo(uid);
             criteria.andOwnerTypeEqualTo(DBConstants.OwnerType.CUSTOMER.getCode());
 
-            List<UserCredits> userCreditsList = userCreditsMapper.selectByExample(userCreditsExample);
-            UserCredits userCredits = userCreditsList.get(0);
-
-            if(ValidCheck.validList(userCreditsList)){
+            UserCredits userCredits = this.userCreditsMapper.getUserCredits(uid, DBConstants.OwnerType.CUSTOMER.getCode());
+            if(null == userCredits){
                 CommonResult.userNotExit(jsonResult);
                 return jsonResult;
             }
@@ -118,6 +142,7 @@ public class UserServiceImpl implements UserService {
             MessageExample messageExample = new MessageExample();
             MessageExample.Criteria criteria2 = messageExample.or();
             criteria2.andUidEqualTo(uid);
+            criteria2.andReadStatusEqualTo(0);
             List<Message> messages = messageMapper.selectByExample(messageExample);
             if(ValidCheck.validList(messages)){
                 readMessage = 0;
@@ -131,6 +156,7 @@ public class UserServiceImpl implements UserService {
             phone = userExtInfo.getCellphone();
             viewType = userExtInfo.getViewType();
 
+
             Map map = new HashMap();
             map.put("totalValue", totalValue);
             map.put("validValue", validValue);
@@ -142,11 +168,12 @@ public class UserServiceImpl implements UserService {
             map.put("uid", uid);
 
             jsonResult.setItem(map);
+
+
             CommonResult.success(jsonResult);
 
 
         }catch (Exception e){
-            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -207,49 +234,4 @@ public class UserServiceImpl implements UserService {
         return userAddressMapper.selectByPrimaryKey(id);
     }
 
-    @Override
-    @Transactional
-    public int insertUserInfo(UserCredits userCredits, UserExtInfo userExtInfo, UserOnline userOnline) {
-        userCreditsMapper.insert(userCredits);
-
-        userExtInfoMapper.insert(userExtInfo);
-
-        userOnlineMapper.insert(userOnline);
-        return 0;
-    }
-
-    @Override
-    public List<UserOnline> selectUserOnlineByUid(Integer uid) {
-        UserOnlineExample userOnlineExample = new UserOnlineExample();
-        UserOnlineExample.Criteria criteria = userOnlineExample.or();
-        criteria.andUidEqualTo(uid);
-        return userOnlineMapper.selectByExample(userOnlineExample);
-    }
-
-    @Override
-    @Transactional
-    public int updateUserInfo(UserCredits userCredits, UserOnline userOnline) {
-        userCreditsMapper.updateByPrimaryKey(userCredits);
-
-        userOnlineMapper.updateByPrimaryKey(userOnline);
-        return 0;
-    }
-
-    @Override
-    public int insertUserOnline(UserOnline userOnline) {
-        return userOnlineMapper.insert(userOnline);
-    }
-
-    @Override
-    public List<UserExtInfo> selectUserExtInfoByUid(Integer uid) {
-        UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
-        UserExtInfoExample.Criteria criteria = userExtInfoExample.or();
-        criteria.andUidEqualTo(uid);
-        return userExtInfoMapper.selectByExample(userExtInfoExample);
-    }
-
-    @Override
-    public int insertUserExtInfo(UserExtInfo userExtInfo) {
-        return userExtInfoMapper.insert(userExtInfo);
-    }
 }

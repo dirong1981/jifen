@@ -52,14 +52,18 @@ public class ProductServiceImpl implements ProductService{
 
 
     @Override
-    public JsonResult selectAllProduct(JsonResult jsonResult) {
+    public JsonResult selectAllProduct(Integer page, Integer per_page, JsonResult jsonResult) {
 
         try{
             ProductExample productExample = new ProductExample();
             ProductExample.Criteria criteria = productExample.or();
             criteria.andStatusNotEqualTo(DBConstants.ProductStatus.DELETED.getCode());
             productExample.setOrderByClause("id desc");
+
+            PageHelper.startPage(page,per_page);
             List<Product> products = productMapper.selectByExample(productExample);
+            PageInfo pageInfo = new PageInfo(products);
+
             //获取商户名称
             if(!ValidCheck.validList(products)){
                 for (Product product : products){
@@ -74,6 +78,11 @@ public class ProductServiceImpl implements ProductService{
 
             Map map = new HashMap();
             map.put("data", products);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
 
             jsonResult.setItem(map);

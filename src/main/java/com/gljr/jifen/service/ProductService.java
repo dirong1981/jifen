@@ -15,7 +15,7 @@ public interface ProductService {
      * 查找素有商品，包括未审核，但不显示删除商品
      * @return
      */
-    JsonResult selectAllProduct(JsonResult jsonResult);
+    JsonResult selectAllProduct(Integer page, Integer per_page, JsonResult jsonResult);
 
     /**
      * 下架

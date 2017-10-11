@@ -7,6 +7,7 @@
     <result column="picture_key" jdbcType="VARCHAR" property="pictureKey" />
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="link_url" jdbcType="VARCHAR" property="linkUrl" />
+    <result column="banner" jdbcType="INTEGER" property="banner" />
     <result column="sort" jdbcType="INTEGER" property="sort" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -69,7 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, module_id, picture_key, title, link_url, sort, create_time
+    id, module_id, picture_key, title, link_url, banner, sort, create_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.ModulePictureExample" resultMap="BaseResultMap">
     select
@@ -106,11 +107,11 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into module_picture (module_id, picture_key, title, 
-      link_url, sort, create_time
-      )
+      link_url, banner, sort, 
+      create_time)
     values (#{moduleId,jdbcType=INTEGER}, #{pictureKey,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
-      #{linkUrl,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
-      )
+      #{linkUrl,jdbcType=VARCHAR}, #{banner,jdbcType=INTEGER}, #{sort,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.ModulePicture">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -129,6 +130,9 @@
       </if>
       <if test="linkUrl != null">
         link_url,
+      </if>
+      <if test="banner != null">
+        banner,
       </if>
       <if test="sort != null">
         sort,
@@ -149,6 +153,9 @@
       </if>
       <if test="linkUrl != null">
         #{linkUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="banner != null">
+        #{banner,jdbcType=INTEGER},
       </if>
       <if test="sort != null">
         #{sort,jdbcType=INTEGER},
@@ -182,6 +189,9 @@
       <if test="record.linkUrl != null">
         link_url = #{record.linkUrl,jdbcType=VARCHAR},
       </if>
+      <if test="record.banner != null">
+        banner = #{record.banner,jdbcType=INTEGER},
+      </if>
       <if test="record.sort != null">
         sort = #{record.sort,jdbcType=INTEGER},
       </if>
@@ -200,6 +210,7 @@
       picture_key = #{record.pictureKey,jdbcType=VARCHAR},
       title = #{record.title,jdbcType=VARCHAR},
       link_url = #{record.linkUrl,jdbcType=VARCHAR},
+      banner = #{record.banner,jdbcType=INTEGER},
       sort = #{record.sort,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -221,6 +232,9 @@
       <if test="linkUrl != null">
         link_url = #{linkUrl,jdbcType=VARCHAR},
       </if>
+      <if test="banner != null">
+        banner = #{banner,jdbcType=INTEGER},
+      </if>
       <if test="sort != null">
         sort = #{sort,jdbcType=INTEGER},
       </if>
@@ -236,6 +250,7 @@
       picture_key = #{pictureKey,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},
       link_url = #{linkUrl,jdbcType=VARCHAR},
+      banner = #{banner,jdbcType=INTEGER},
       sort = #{sort,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

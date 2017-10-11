@@ -1,5 +1,7 @@
 package com.gljr.jifen.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.*;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
@@ -111,14 +113,16 @@ public class ModuleAggregationServiceImpl implements ModuleAggregationService {
     }
 
     @Override
-    public JsonResult selectModuleAggregations(JsonResult jsonResult) {
+    public JsonResult selectModuleAggregations(Integer page, Integer per_page, JsonResult jsonResult) {
         try{
             ModuleAggregationExample moduleAggregationExample = new ModuleAggregationExample();
             ModuleAggregationExample.Criteria criteria = moduleAggregationExample.or();
             criteria.andStatusNotEqualTo(DBConstants.ModuleAggregationStatus.DELETED.getCode());
             moduleAggregationExample.setOrderByClause("id desc");
 
+            PageHelper.startPage(page,per_page);
             List<ModuleAggregation> moduleAggregations = moduleAggregationMapper.selectByExample(moduleAggregationExample);
+            PageInfo pageInfo = new PageInfo(moduleAggregations);
 
             if(!ValidCheck.validList(moduleAggregations)) {
 
@@ -131,6 +135,12 @@ public class ModuleAggregationServiceImpl implements ModuleAggregationService {
 
             Map map = new HashMap();
             map.put("data", moduleAggregations);
+
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
             CommonResult.success(jsonResult);
             jsonResult.setItem(map);

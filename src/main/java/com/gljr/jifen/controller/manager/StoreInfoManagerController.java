@@ -53,10 +53,19 @@ public class StoreInfoManagerController extends BaseController {
      */
     @GetMapping("/all")
     @ResponseBody
-    public JsonResult getAllStores() {
+    public JsonResult getAllStores(@RequestParam(value = "page", required = false) Integer page,
+                                   @RequestParam(value = "per_page", required = false) Integer per_page) {
         JsonResult jsonResult = new JsonResult();
 
-        jsonResult = storeInfoService.selectAllStoreInfo(jsonResult);
+        if(StringUtils.isEmpty(page)){
+            page = 1;
+        }
+
+        if(StringUtils.isEmpty(per_page)){
+            per_page = 10;
+        }
+
+        jsonResult = storeInfoService.selectAllStoreInfo(page, per_page, jsonResult);
 
         return jsonResult;
     }
@@ -68,10 +77,19 @@ public class StoreInfoManagerController extends BaseController {
      */
     @GetMapping("/online/all")
     @ResponseBody
-    public JsonResult getAllOnlineStores() {
+    public JsonResult getAllOnlineStores(@RequestParam(value = "page", required = false) Integer page,
+                                         @RequestParam(value = "per_page", required = false) Integer per_page) {
         JsonResult jsonResult = new JsonResult();
 
-        jsonResult = storeInfoService.selectAllOnlineStoreInfo(jsonResult);
+        if(StringUtils.isEmpty(page)){
+            page = 1;
+        }
+
+        if(StringUtils.isEmpty(per_page)){
+            per_page = 10;
+        }
+
+        jsonResult = storeInfoService.selectAllOnlineStoreInfo(page, per_page, jsonResult);
 
         return jsonResult;
     }

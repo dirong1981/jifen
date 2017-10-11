@@ -8,7 +8,10 @@ import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.Product;
 import com.gljr.jifen.pojo.ProductPhoto;
+import com.gljr.jifen.pojo.VirtualProduct;
+import com.gljr.jifen.pojo.VirtualProductExample;
 import com.gljr.jifen.service.ProductService;
+import com.gljr.jifen.service.VirtualProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -26,6 +29,9 @@ public class ProductController extends BaseController{
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private VirtualProductService virtualProductService;
 
     /**
      * 查询一个具体的商品
@@ -76,6 +82,16 @@ public class ProductController extends BaseController{
         }
 
         jsonResult = productService.selectProductByKeyword(keyword, page,per_page, sort, jsonResult);
+
+        return jsonResult;
+    }
+
+    @GetMapping("/{virtualId}/virtualproduct")
+    @ResponseBody
+    public JsonResult selectvirtualproduct(@PathVariable(value = "virtualId") Integer virtualId){
+        JsonResult jsonResult = new JsonResult();
+
+        jsonResult = virtualProductService.selectVirtualProductById(virtualId, jsonResult);
 
         return jsonResult;
     }

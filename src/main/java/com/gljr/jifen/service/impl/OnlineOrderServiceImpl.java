@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
-import com.gljr.jifen.common.dtchain.CommonOrderResponse;
+import com.gljr.jifen.common.dtchain.vo.CommonOrderResponse;
 import com.gljr.jifen.common.dtchain.GatewayResponse;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
@@ -16,11 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 
-import java.lang.management.GarbageCollectorMXBean;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,12 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     @Autowired
     private DTChainService chainService;
 
+    @Autowired
+    private VirtualProductMapper virtualProductMapper;
+
+    @Autowired
+    private SystemVirtualProductMapper systemVirtualProductMapper;
+
     private final static int PRODUCT_NOT_FOUND = 403;
 
     private final static int INVALID_PRODUCT_INTEGRAL = 404;
@@ -78,27 +83,38 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
             if(!ValidCheck.validList(onlineOrders)) {
                 for (OnlineOrder onlineOrder : onlineOrders) {
-                    Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());
-                    onlineOrder.setName(product.getName());
-                    onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + product.getUnit());
+
 
                     UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
                     UserExtInfoExample.Criteria criteria1 = userExtInfoExample.or();
                     criteria1.andUidEqualTo(onlineOrder.getUid());
                     List<UserExtInfo> userExtInfos = userExtInfoMapper.selectByExample(userExtInfoExample);
-                    if(ValidCheck.validList(userExtInfos)){
+                    if (ValidCheck.validList(userExtInfos)) {
                         CommonResult.userNotExit(jsonResult);
                         return jsonResult;
                     }
                     onlineOrder.setUserName(userExtInfos.get(0).getCellphone());
 
-                    StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(product.getSiId());
-                    if(ValidCheck.validPojo(storeInfo)){
-                        CommonResult.noObject(jsonResult);
-                        return jsonResult;
+                    if(onlineOrder.getSiId() != 0) {
+                        Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());
+                        onlineOrder.setName(product.getName());
+                        onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + product.getUnit());
+
+
+                        StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(product.getSiId());
+                        if (ValidCheck.validPojo(storeInfo)) {
+                            CommonResult.noObject(jsonResult);
+                            return jsonResult;
+                        }
+                        onlineOrder.setStoreName(storeInfo.getName());
+                        onlineOrder.setTrxType(DBConstants.TrxType.ONLINE.getCode());
+                    }else{
+                        VirtualProduct virtualProduct = virtualProductMapper.selectByPrimaryKey(onlineOrder.getPid());
+                        onlineOrder.setName(virtualProduct.getTitle());
+                        onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + "张");
+                        onlineOrder.setStoreName("够力金融");
+                        onlineOrder.setTrxType(DBConstants.TrxType.OFFLINE.getCode());
                     }
-                    onlineOrder.setStoreName(storeInfo.getName());
-                    onlineOrder.setTrxType(2);
                 }
             }
 
@@ -136,9 +152,6 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
             if(!ValidCheck.validList(onlineOrders)) {
                 for (OnlineOrder onlineOrder : onlineOrders) {
-                    Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());
-                    onlineOrder.setName(product.getName());
-                    onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + product.getUnit());
 
                     UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
                     UserExtInfoExample.Criteria criteria1 = userExtInfoExample.or();
@@ -150,13 +163,26 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                     }
                     onlineOrder.setUserName(userExtInfos.get(0).getCellphone());
 
-                    StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(product.getSiId());
-                    if(ValidCheck.validPojo(storeInfo)){
-                        CommonResult.noObject(jsonResult);
-                        return jsonResult;
+                    if(onlineOrder.getSiId() != 0) {
+                        Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());
+                        onlineOrder.setName(product.getName());
+                        onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + product.getUnit());
+
+
+                        StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(product.getSiId());
+                        if (ValidCheck.validPojo(storeInfo)) {
+                            CommonResult.noObject(jsonResult);
+                            return jsonResult;
+                        }
+                        onlineOrder.setStoreName(storeInfo.getName());
+                        onlineOrder.setTrxType(DBConstants.TrxType.ONLINE.getCode());
+                    }else {
+                        VirtualProduct virtualProduct = virtualProductMapper.selectByPrimaryKey(onlineOrder.getPid());
+                        onlineOrder.setName(virtualProduct.getTitle());
+                        onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + "张");
+                        onlineOrder.setStoreName("够力金融");
+                        onlineOrder.setTrxType(DBConstants.TrxType.OFFLINE.getCode());
                     }
-                    onlineOrder.setStoreName(storeInfo.getName());
-                    onlineOrder.setTrxType(2);
                 }
             }
 
@@ -241,19 +267,16 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             onlineOrder.setIntegral(product.getIntegral()*onlineOrder.getQuantity());
 
             //验证用户积分
-            UserCreditsExample userCreditsExample = new UserCreditsExample();
-            UserCreditsExample.Criteria criteria = userCreditsExample.or();
-            criteria.andOwnerIdEqualTo(Integer.parseInt(uid));
+            UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid),
+                    DBConstants.OwnerType.CUSTOMER.getCode());
 
-            List<UserCredits> userCreditss = userCreditsMapper.selectByExample(userCreditsExample);
-            if(ValidCheck.validList(userCreditss)){
+            if (null == userCredits) {
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 jsonResult.setMessage("用户积分信息不存在！");
                 return jsonResult;
             }
-            UserCredits userCredits = userCreditss.get(0);
-            int integral = userCredits.getIntegral() - onlineOrder.getIntegral();
-            if (integral < 0) {
+
+            if (userCredits.getIntegral() < onlineOrder.getIntegral()) {
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 jsonResult.setMessage(GlobalConstants.INTEGRAL_NOT_ENOUGH);
                 return jsonResult;
@@ -266,6 +289,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             onlineOrder.setCreateTime(new Timestamp(System.currentTimeMillis()));
             onlineOrder.setUid(Integer.parseInt(uid));
             onlineOrder.setStatus(DBConstants.OrderStatus.UNPAID.getCode());
+            onlineOrder.setSiId(product.getSiId());
 
 
             //添加一条通用交易信息
@@ -278,12 +302,10 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             transaction.setStatus(DBConstants.TrxStatus.UNPAID.getCode());
             transaction.setCode(serialNumberService.getNextTrxCode(DBConstants.TrxType.ONLINE.getCode()));
 
-
             transactionMapper.insert(transaction);
 
             onlineOrder.setTrxCode(transaction.getCode());
             onlineOrder.setTrxId(transaction.getId());
-            onlineOrder.setSiId(product.getSiId());
 
             onlineOrderMapper.insert(onlineOrder);
 
@@ -308,14 +330,14 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     @Transactional
     public JsonResult updateOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult) {
 
-
+        System.out.println(trxCode);
+        OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
+        OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
+        criteria.andTrxCodeEqualTo(trxCode);
+        criteria.andUidEqualTo(Integer.parseInt(uid));
 
         try {
             //查询订单
-            OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
-            OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
-            criteria.andTrxCodeEqualTo(trxCode);
-            criteria.andUidEqualTo(Integer.parseInt(uid));
             List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
 
             if(ValidCheck.validList(onlineOrders)){
@@ -327,8 +349,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             if(onlineOrder.getStatus() == DBConstants.OrderStatus.UNPAID.getCode()){
 
                 GatewayResponse<CommonOrderResponse> response = this.chainService.postOrders(onlineOrder.getUid() + 0L,
-                        onlineOrder.getPid() + 0L, onlineOrder.getIntegral());
-
+                        onlineOrder.getPid() + 0L, DBConstants.OnlineProductType.NORMAL_PRODUCT.getCode(), onlineOrder.getIntegral(), onlineOrder.getQuantity());
                 if (null == response) {
                     jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                     return jsonResult;
@@ -376,16 +397,13 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                     return jsonResult;
                 }
 
-                System.out.println("aa");
-                System.out.println(response.getContent().getBlockId());
-                System.out.println("bb");
                 onlineOrder.setDtchainBlockId(response.getContent().getBlockId());
                 onlineOrder.setExtOrderId(response.getContent().getExtOrderId());
                 onlineOrder.setStatus(DBConstants.OrderStatus.PAID.getCode());
                 onlineOrder.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 
                 onlineOrderMapper.updateByPrimaryKey(onlineOrder);
-                System.out.println("aa");
+
                 Transaction transaction = transactionMapper.selectByPrimaryKey(onlineOrder.getTrxId());
                 transaction.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
 
@@ -410,48 +428,74 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     }
 
     @Override
-    public JsonResult selectOnlineOrders(JsonResult jsonResult) {
+    public JsonResult selectOnlineOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult) {
 
         try{
             OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
             OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
             criteria.andStatusNotEqualTo(DBConstants.OrderStatus.DELETED.getCode());
+            if(!StringUtils.isEmpty(trxCode)){
+                criteria.andTrxCodeEqualTo(trxCode);
+            }
+            if(!StringUtils.isEmpty(status)){
+                criteria.andStatusEqualTo(status);
+            }
+            criteria.andCreateTimeBetween(begin, end);
             onlineOrderExample.setOrderByClause("id desc");
+
+
+            PageHelper.startPage(page,per_page);
             List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
+            PageInfo pageInfo = new PageInfo(onlineOrders);
 
             //查询商品名称，商户名称，用户名称
             if(!ValidCheck.validList(onlineOrders)){
                 for (OnlineOrder onlineOrder : onlineOrders){
+
                     UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
                     UserExtInfoExample.Criteria criteria1 = userExtInfoExample.or();
                     criteria1.andUidEqualTo(onlineOrder.getUid());
                     List<UserExtInfo> userExtInfos = userExtInfoMapper.selectByExample(userExtInfoExample);
 
-                    if(ValidCheck.validList(userExtInfos)){
+                    if (ValidCheck.validList(userExtInfos)) {
                         onlineOrder.setUserName("不存在");
-                    }else {
+                    } else {
                         onlineOrder.setUserName(userExtInfos.get(0).getCellphone());
                     }
 
-                    //查找商品名称，商户名称
-                    Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());
-                    if(ValidCheck.validPojo(product)){
-                        onlineOrder.setName("已删除");
-                        onlineOrder.setStoreName("不存在");
-                    }else {
-                        onlineOrder.setName(product.getName());
-                        StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(product.getSiId());
-                        if(ValidCheck.validPojo(storeInfo)){
+                    if(onlineOrder.getSiId() != 0) {
+
+                        //查找商品名称，商户名称
+                        Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());
+                        if (ValidCheck.validPojo(product)) {
+                            onlineOrder.setName("已删除");
                             onlineOrder.setStoreName("不存在");
-                        }else {
-                            onlineOrder.setStoreName(storeInfo.getName());
+                        } else {
+                            onlineOrder.setName(product.getName());
+                            StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(product.getSiId());
+                            if (ValidCheck.validPojo(storeInfo)) {
+                                onlineOrder.setStoreName("不存在");
+                            } else {
+                                onlineOrder.setStoreName(storeInfo.getName());
+                            }
                         }
+                    }else{
+                        VirtualProduct virtualProduct = virtualProductMapper.selectByPrimaryKey(onlineOrder.getPid());
+                        onlineOrder.setName(virtualProduct.getTitle());
+                        onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + "张");
+                        onlineOrder.setStoreName("够力金融");
+                        onlineOrder.setTrxType(DBConstants.TrxType.OFFLINE.getCode());
                     }
                 }
             }
 
             Map map = new HashMap();
             map.put("data", onlineOrders);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
             CommonResult.success(jsonResult);
             jsonResult.setItem(map);
@@ -522,5 +566,256 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
         return jsonResult;
     }
 
+    @Override
+    @Transactional
+    public JsonResult insetVirtualProductOnlineOrder(OnlineOrder onlineOrder, String uid, JsonResult jsonResult) {
+        try {
+            VirtualProduct product = virtualProductMapper.selectByPrimaryKey(onlineOrder.getPid());
+            if(ValidCheck.validPojo(product)){
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+
+            SystemVirtualProduct systemVirtualProduct = systemVirtualProductMapper.selectByPrimaryKey(product.getVpId());
+            product.setIntegral(systemVirtualProduct.getIntegral());
+
+
+            if(product.getStatus() != DBConstants.ProductStatus.ON_SALE.getCode()){
+                jsonResult.setMessage("商品不可销售！");
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                return jsonResult;
+            }
+
+            if(onlineOrder.getQuantity() <= 0){
+                jsonResult.setMessage("购买商品数量必须大于0！");
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                return jsonResult;
+            }
+
+
+            if(onlineOrder.getQuantity() >= product.getRemainingAmount()){
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                jsonResult.setMessage("购买数量大于库存量！");
+                return jsonResult;
+            }
+
+            //确保购买积分正确
+            onlineOrder.setIntegral(product.getIntegral()*onlineOrder.getQuantity());
+
+            //验证用户积分
+            UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid),
+                    DBConstants.OwnerType.CUSTOMER.getCode());
+
+            if (null == userCredits) {
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                jsonResult.setMessage("用户积分信息不存在！");
+                return jsonResult;
+            }
+
+            if (userCredits.getIntegral() < onlineOrder.getIntegral()) {
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                jsonResult.setMessage(GlobalConstants.INTEGRAL_NOT_ENOUGH);
+                return jsonResult;
+            }
+
+            //更新商品数量
+            product.setRemainingAmount(product.getRemainingAmount() - onlineOrder.getQuantity());
+
+            onlineOrder.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            onlineOrder.setUid(Integer.parseInt(uid));
+            onlineOrder.setStatus(DBConstants.OrderStatus.UNPAID.getCode());
+            onlineOrder.setSiId(0);
+
+
+            //添加一条通用交易信息
+            Transaction transaction = new Transaction();
+            transaction.setType(DBConstants.TrxType.ONLINE.getCode());
+            transaction.setOwnerType(DBConstants.OwnerType.CUSTOMER.getCode());
+            transaction.setOwnerId(Integer.parseInt(uid));
+            transaction.setIntegral(-1 * onlineOrder.getIntegral());
+            transaction.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            transaction.setStatus(DBConstants.TrxStatus.UNPAID.getCode());
+            transaction.setCode(serialNumberService.getNextTrxCode(DBConstants.TrxType.ONLINE.getCode()));
+
+            transactionMapper.insert(transaction);
+
+            onlineOrder.setTrxCode(transaction.getCode());
+            onlineOrder.setTrxId(transaction.getId());
+
+            onlineOrderMapper.insert(onlineOrder);
+
+            virtualProductMapper.updateByPrimaryKey(product);
+
+
+            Map map = new HashMap();
+            map.put("data", onlineOrder);
+
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+            jsonResult.setMessage(onlineOrder.getTrxCode());
+            jsonResult.setItem(map);
+
+        }catch (Exception e){
+            System.out.println(e);
+            CommonResult.sqlFailed(jsonResult);
+        }
+
+        return jsonResult;
+    }
+
+    @Override
+    @Transactional
+    public JsonResult updateVirtualProductOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult) {
+        OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
+        OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
+        criteria.andTrxCodeEqualTo(trxCode);
+        criteria.andUidEqualTo(Integer.parseInt(uid));
+
+        try {
+            //查询订单
+            List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
+
+            if(ValidCheck.validList(onlineOrders)){
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+            OnlineOrder onlineOrder = onlineOrders.get(0);
+            //订单状态为未付款才能继续进行
+            if(onlineOrder.getStatus() == DBConstants.OrderStatus.UNPAID.getCode()){
+
+                GatewayResponse<CommonOrderResponse> response = this.chainService.postOrders(onlineOrder.getUid() + 0L,
+                        onlineOrder.getPid() + 0L, DBConstants.OnlineProductType.SYSTEM_VIRTUAL_PRODUCT.getCode(), onlineOrder.getIntegral(), onlineOrder.getQuantity());
+                if (null == response) {
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if (PRODUCT_NOT_FOUND == response.getCode()) {
+                    jsonResult.setMessage("要付款的商品不存在或已下架！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if (INVALID_PRODUCT_INTEGRAL == response.getCode()) {
+                    jsonResult.setMessage("商品积分与支付积分不匹配！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if (INVALID_STORE_INFO == response.getCode()) {
+                    jsonResult.setMessage("商品对应的商户信息无效！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if (STORE_NOT_FOUND == response.getCode()) {
+                    jsonResult.setMessage("商户信息不存在！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if (INVALID_STORE_TYPE == response.getCode()) {
+                    jsonResult.setMessage("商户类型不匹配！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if(STORE_NOT_ACCEPT_INTEGRAL == response.getCode()) {
+                    jsonResult.setMessage("商户暂不接受积分支付！");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                if(response.getCode() != 200) {
+                    jsonResult.setMessage(response.getMessage());
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                onlineOrder.setDtchainBlockId(response.getContent().getBlockId());
+                onlineOrder.setExtOrderId(response.getContent().getExtOrderId());
+                onlineOrder.setStatus(DBConstants.OrderStatus.PAID.getCode());
+                onlineOrder.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+
+                onlineOrderMapper.updateByPrimaryKey(onlineOrder);
+
+                Transaction transaction = transactionMapper.selectByPrimaryKey(onlineOrder.getTrxId());
+                transaction.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
+
+                transactionMapper.updateByPrimaryKey(transaction);
+
+                Map map = new HashMap();
+                map.put("data", onlineOrder);
+
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+                jsonResult.setMessage(onlineOrder.getTrxCode());
+                jsonResult.setItem(map);
+            }else{
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                jsonResult.setMessage("该订单已付款，请勿重复操作！");
+            }
+
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+
+        return jsonResult;
+    }
+
+
+    @Override
+    @Transactional
+    public JsonResult cancelVirtualProductOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult) {
+
+        OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
+        OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
+        criteria.andUidEqualTo(Integer.parseInt(uid));
+        criteria.andTrxCodeEqualTo(trxCode);
+
+        try {
+            List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
+
+            if (ValidCheck.validList(onlineOrders)) {
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+
+            //更新订单状态
+            OnlineOrder onlineOrder = onlineOrders.get(0);
+
+            if(onlineOrder.getStatus() == DBConstants.OrderStatus.PAID.getCode()){
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                jsonResult.setMessage("已付款订单不能取消！");
+                return jsonResult;
+            }
+
+            onlineOrder.setStatus(DBConstants.OrderStatus.CANCELED.getCode());
+            onlineOrder.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+            onlineOrderMapper.updateByPrimaryKey(onlineOrder);
+
+            //更新通用交易表状态
+            Transaction transaction = transactionMapper.selectByPrimaryKey(onlineOrder.getTrxId());
+            if (ValidCheck.validPojo(transaction)) {
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+            transaction.setStatus(DBConstants.TrxStatus.CANCELED.getCode());
+            transactionMapper.updateByPrimaryKey(transaction);
+
+            //恢复商品的销量和库存
+            VirtualProduct product = virtualProductMapper.selectByPrimaryKey(onlineOrder.getPid());
+            if (ValidCheck.validPojo(product)) {
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+            product.setRemainingAmount(product.getRemainingAmount() + onlineOrder.getQuantity());
+            virtualProductMapper.updateByPrimaryKey(product);
+
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+
+        return jsonResult;
+    }
 
 }

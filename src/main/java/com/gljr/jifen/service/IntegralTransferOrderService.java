@@ -7,6 +7,7 @@ import com.gljr.jifen.pojo.Transaction;
 import com.gljr.jifen.pojo.UserCredits;
 import redis.clients.jedis.Jedis;
 
+import java.util.Date;
 import java.util.List;
 
 public interface IntegralTransferOrderService {
@@ -32,7 +33,7 @@ public interface IntegralTransferOrderService {
      * 查询所有积分转增订单
      * @return
      */
-    JsonResult selectIntegralOrders(JsonResult jsonResult);
+    JsonResult selectIntegralOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult);
 
 
 }

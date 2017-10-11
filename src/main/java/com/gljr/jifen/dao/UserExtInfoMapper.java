@@ -12,10 +12,6 @@ public interface UserExtInfoMapper {
 
     int deleteByPrimaryKey(Integer id);
 
-    int insert(UserExtInfo record);
-
-    int insertSelective(UserExtInfo record);
-
     List<UserExtInfo> selectByExample(UserExtInfoExample example);
 
     UserExtInfo selectByPrimaryKey(Integer id);

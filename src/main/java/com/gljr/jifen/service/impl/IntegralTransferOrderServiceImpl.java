@@ -5,21 +5,20 @@ import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
-import com.gljr.jifen.common.dtchain.CommonOrderResponse;
+import com.gljr.jifen.common.dtchain.vo.CommonOrderResponse;
 import com.gljr.jifen.common.dtchain.GatewayResponse;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.dao.*;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.*;
-import com.gljr.jifen.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,17 +74,14 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
             UserExtInfo userExtInfo = userExtInfos.get(0);
 
             //判断积分是否足够
-            UserCreditsExample userCreditsExample = new UserCreditsExample();
-            UserCreditsExample.Criteria criteria1 = userCreditsExample.or();
-            criteria1.andOwnerIdEqualTo(Integer.parseInt(uid));
+            UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid),
+                    DBConstants.OwnerType.CUSTOMER.getCode());
 
-            List<UserCredits> userCreditss = userCreditsMapper.selectByExample(userCreditsExample);
-            if(ValidCheck.validList(userCreditss)){
-                CommonResult.userNotExit(jsonResult);
+            if (null == userCredits) {
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                jsonResult.setMessage("用户积分信息不存在！");
                 return jsonResult;
             }
-
-            UserCredits userCredits = userCreditss.get(0);
 
             //减少积分
             if(userCredits.getIntegral() < integralTransferOrder.getIntegral()){
@@ -235,12 +231,23 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
     }
 
     @Override
-    public JsonResult selectIntegralOrders(JsonResult jsonResult) {
+    public JsonResult selectIntegralOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult) {
 
         try {
             IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
+            IntegralTransferOrderExample.Criteria criteria1 = integralTransferOrderExample.or();
+            if(!StringUtils.isEmpty(trxCode)){
+                criteria1.andTrxCodeEqualTo(trxCode);
+            }
+            if(!StringUtils.isEmpty(status)){
+                criteria1.andStatusEqualTo(status);
+            }
+            criteria1.andCreateTimeBetween(begin, end);
             integralTransferOrderExample.setOrderByClause("id desc");
+
+            PageHelper.startPage(page,per_page);
             List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderMapper.selectByExample(integralTransferOrderExample);
+            PageInfo pageInfo = new PageInfo(integralTransferOrders);
 
             if(!ValidCheck.validList(integralTransferOrders)){
                 for (IntegralTransferOrder integralTransferOrder : integralTransferOrders){
@@ -268,6 +275,11 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
 
             Map map = new HashMap();
             map.put("data", integralTransferOrders);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
             CommonResult.success(jsonResult);
             jsonResult.setItem(map);

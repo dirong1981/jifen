@@ -1,4 +1,4 @@
-package com.gljr.jifen.common.dtchain;
+package com.gljr.jifen.common.dtchain.vo;
 
 import java.io.Serializable;
 

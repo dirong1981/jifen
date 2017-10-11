@@ -62,10 +62,19 @@ public class ModuleAggregationManagerController {
      */
     @GetMapping
     @ResponseBody
-    public JsonResult selectModuleAggregations(){
+    public JsonResult selectModuleAggregations(@RequestParam(value = "page", required = false) Integer page,
+                                               @RequestParam(value = "per_page", required = false) Integer per_page){
         JsonResult jsonResult = new JsonResult();
 
-        jsonResult = moduleAggregationService.selectModuleAggregations(jsonResult);
+        if(StringUtils.isEmpty(page)){
+            page = 1;
+        }
+
+        if(StringUtils.isEmpty(per_page)){
+            per_page = 10;
+        }
+
+        jsonResult = moduleAggregationService.selectModuleAggregations(page, per_page, jsonResult);
 
         return jsonResult;
     }

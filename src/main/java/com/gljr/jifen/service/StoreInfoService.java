@@ -17,10 +17,10 @@ public interface StoreInfoService
      * @param jsonResult
      * @return
      */
-    JsonResult selectAllStoreInfo(JsonResult jsonResult);
+    JsonResult selectAllStoreInfo(Integer page, Integer per_page, JsonResult jsonResult);
 
 
-    JsonResult selectAllOnlineStoreInfo(JsonResult jsonResult);
+    JsonResult selectAllOnlineStoreInfo(Integer page, Integer per_page, JsonResult jsonResult);
 
     /**
      * 通过审核
@@ -96,4 +96,6 @@ public interface StoreInfoService
     List<StoreInfo> selectStoreInfoByAid(Integer id);
 
     List<StorePhoto> selectStorePhotoById(Integer id);
+
+    StoreInfo selectStoreInfoById(Integer siid);
 }

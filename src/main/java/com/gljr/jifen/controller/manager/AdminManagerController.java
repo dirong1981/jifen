@@ -43,13 +43,11 @@ public class AdminManagerController extends BaseController {
     /**
      * 获取所有管理员
      * @param type 管理员类型 1系统管理员 2商户管理员
-     * @param httpServletResponse
-     * @param httpServletRequest
      * @return 返回管理员列表
      */
     @GetMapping(value = "/type/{type}")
     @ResponseBody
-    public JsonResult getAdmins(@PathVariable(value = "type") int type, HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+    public JsonResult getAdmins(@PathVariable(value = "type") int type){
         JsonResult jsonResult = new JsonResult();
 
         try {
@@ -74,8 +72,8 @@ public class AdminManagerController extends BaseController {
                     //把权限集合放入管理员模型中
                     admin.setPermission(adminPermissions);
                 }else{
-//                    StoreInfo storeInfo = storeInfoService.selectStoreInfoByAid(admin.getId());
-//                    admin.setPermission(storeInfo.getName());
+                    List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(admin.getId());
+                    admin.setPermission(storeInfos.get(0).getName());
                 }
 
                 //查询管理员最后登录时间
@@ -102,41 +100,6 @@ public class AdminManagerController extends BaseController {
 
 
 
-
-    /**
-     * 添加系统权限
-     * @param systemPermission 系统权限模型
-     * @param bindingResult 验证类
-     * @param httpServletRequest
-     * @param httpServletResponse
-     * @return 状态码
-     */
-//    @PostMapping(value = "/permissions")
-//    @ResponseBody
-//    public JsonResult addPermission(@Valid SystemPermission systemPermission, BindingResult bindingResult, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
-//        JsonResult jsonResult = new JsonResult();
-//
-//        if(bindingResult.hasErrors()){
-//            jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
-//            jsonResult.setMessage(GlobalConstants.NOTNULL);
-//            return jsonResult;
-//        }
-//
-//        try{
-//            int code = (int)(Math.random()*1000000);
-//            systemPermission.setCode(code);
-//            adminService.insertSystemPermission(systemPermission);
-//            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-//            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-//        }catch (Exception e){
-//            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-//        }
-//
-//        return  jsonResult;
-//    }
-
-
     /**
      * 获取所有系统权限
      * @param httpServletResponse
@@ -145,22 +108,10 @@ public class AdminManagerController extends BaseController {
      */
     @GetMapping(value = "/permissions")
     @ResponseBody
-    public JsonResult getPermissions(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+    public JsonResult getPermissions(){
         JsonResult jsonResult = new JsonResult();
 
-        try {
-
-            List<SystemPermission> systemPermissions = adminService.selectSystemPermission();
-            Map map = new HashMap();
-            map.put("data", systemPermissions);
-            jsonResult.setItem(map);
-
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-        }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-        }
+            jsonResult = adminService.selectSystemPermission(jsonResult);
 
         return  jsonResult;
     }
@@ -183,7 +134,7 @@ public class AdminManagerController extends BaseController {
             String[] permissions = httpServletRequest.getParameterValues("permissions");
 
             List<Admin> admins = adminService.selectAdminByUsername(admin.getUsername());
-            if (admins.size() != 0){
+            if (!ValidCheck.validList(admins)){
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 jsonResult.setMessage(GlobalConstants.STORE_ADMIN_EXIST);
                 return jsonResult;

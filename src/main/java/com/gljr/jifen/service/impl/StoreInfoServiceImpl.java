@@ -56,7 +56,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
 
 
     @Override
-    public JsonResult selectAllStoreInfo(JsonResult jsonResult) {
+    public JsonResult selectAllStoreInfo(Integer page, Integer per_page, JsonResult jsonResult) {
         try {
             StoreInfoExample storeInfoExample = new StoreInfoExample();
             StoreInfoExample.Criteria criteria = storeInfoExample.or();
@@ -64,7 +64,9 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             criteria.andStoreTypeEqualTo(DBConstants.MerchantType.OFFLINE.getCode());
             storeInfoExample.setOrderByClause("id desc");
 
+            PageHelper.startPage(page,per_page);
             List<StoreInfo> storeInfos = storeInfoMapper.selectByExample(storeInfoExample);
+            PageInfo pageInfo = new PageInfo(storeInfos);
 
             for (StoreInfo storeInfo : storeInfos){
                 CategoryExample categoryExample = new CategoryExample();
@@ -81,6 +83,11 @@ public class StoreInfoServiceImpl implements StoreInfoService {
 
             Map map = new HashMap();
             map.put("data", storeInfos);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
@@ -92,7 +99,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
     }
 
     @Override
-    public JsonResult selectAllOnlineStoreInfo(JsonResult jsonResult) {
+    public JsonResult selectAllOnlineStoreInfo(Integer page, Integer per_page,JsonResult jsonResult) {
         try {
             StoreInfoExample storeInfoExample = new StoreInfoExample();
             StoreInfoExample.Criteria criteria = storeInfoExample.or();
@@ -100,12 +107,18 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             criteria.andStoreTypeEqualTo(DBConstants.MerchantType.ONLINE.getCode());
             storeInfoExample.setOrderByClause("id desc");
 
+            PageHelper.startPage(page,per_page);
             List<StoreInfo> storeInfos = storeInfoMapper.selectByExample(storeInfoExample);
-
+            PageInfo pageInfo = new PageInfo(storeInfos);
 
 
             Map map = new HashMap();
             map.put("data", storeInfos);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
@@ -288,6 +301,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
 
             CommonResult.success(jsonResult);
         } catch (Exception e) {
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -466,6 +480,11 @@ public class StoreInfoServiceImpl implements StoreInfoService {
         StorePhotoExample.Criteria criteria = storePhotoExample.or();
         criteria.andSiIdEqualTo(id);
         return storePhotoMapper.selectByExample(storePhotoExample);
+    }
+
+    @Override
+    public StoreInfo selectStoreInfoById(Integer siid) {
+        return storeInfoMapper.selectByPrimaryKey(siid);
     }
 
     @Override

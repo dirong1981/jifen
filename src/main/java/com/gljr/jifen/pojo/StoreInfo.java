@@ -11,6 +11,8 @@ public class StoreInfo {
 
     private Integer categoryCode;
 
+    private String categoryName;
+
     private String name;
 
     private Integer locationCode;
@@ -30,8 +32,6 @@ public class StoreInfo {
     private Date createTime;
 
     private String description;
-
-    private String categoryName;
 
     public Integer getId() {
         return id;

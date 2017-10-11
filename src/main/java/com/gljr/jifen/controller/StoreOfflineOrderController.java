@@ -1,29 +1,15 @@
 package com.gljr.jifen.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.*;
-import com.gljr.jifen.common.dtchain.GatewayResponse;
-import com.gljr.jifen.common.dtchain.GouliUserInfo;
-import com.gljr.jifen.constants.DBConstants;
-import com.gljr.jifen.constants.GlobalConstants;
-import com.gljr.jifen.exception.ApiServerException;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.*;
-import com.gljr.jifen.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 
@@ -34,7 +20,6 @@ public class StoreOfflineOrderController extends BaseController{
 
     @Autowired
     private StoreOfflineOrderService storeOfflineOrderService;
-
 
     /**
      * 添加一条线下订单，添加一条通用交易信息

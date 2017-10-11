@@ -2,7 +2,7 @@ package com.gljr.jifen.controller;
 
 import com.gljr.jifen.common.*;
 import com.gljr.jifen.common.dtchain.GatewayResponse;
-import com.gljr.jifen.common.dtchain.GouliUserInfo;
+import com.gljr.jifen.common.dtchain.vo.GouliUserInfo;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.pojo.*;
@@ -10,10 +10,7 @@ import com.gljr.jifen.service.DTChainService;
 import com.gljr.jifen.service.RedisService;
 import com.gljr.jifen.service.UserCreditsService;
 import com.gljr.jifen.service.UserService;
-import com.sun.xml.internal.rngom.parse.host.Base;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
@@ -310,14 +307,14 @@ public class UserController extends BaseController{
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 return jsonResult;
             } else {
-                List<UserCredits> userCredits = userCreditsService.selectUserCreditsByUid(Integer.parseInt(uid));
+                UserCredits userCredits = this.userCreditsService.getUserCredits(Integer.parseInt(uid), DBConstants.OwnerType.CUSTOMER);
                 if(userCredits == null){
                     jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
                     jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                     return jsonResult;
                 }else{
                     Map map = new HashMap();
-                    map.put("data", userCredits.get(0));
+                    map.put("data", userCredits);
 
                     jsonResult.setItem(map);
                     jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
@@ -402,8 +399,8 @@ public class UserController extends BaseController{
     @ResponseBody
 
     public JsonResult connectGLJR(@RequestParam(value = "type", required = false) String type, @RequestParam(value = "identify",required = false) String identify,
-                                    @RequestParam(value = "password", required = false) String password,
-                                    HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+                                  @RequestParam(value = "password", required = false) String password,
+                                  HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
         if(StringUtils.isEmpty(type)){
@@ -556,7 +553,7 @@ public class UserController extends BaseController{
         JsonResult jsonResult = new JsonResult();
 
 
-        if(StringUtils.isEmpty(uid)){
+        if(StringUtils.isEmpty(uid) && StringUtils.isEmpty(gltoken)){
             CommonResult.userNotExit(jsonResult);
             return jsonResult;
         }

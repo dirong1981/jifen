@@ -6,7 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.*;
 import com.gljr.jifen.common.dtchain.GatewayResponse;
-import com.gljr.jifen.common.dtchain.GouliUserInfo;
+import com.gljr.jifen.common.dtchain.vo.GouliUserInfo;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.exception.ApiServerException;
@@ -28,7 +28,7 @@ import static com.gljr.jifen.constants.DBConstants.CACHE_USER_PAYMENT_CODE_KEY;
 
 @Controller
 @RequestMapping(value = "/v1/app")
-public class APPStoreOfflineOrderController extends BaseController{
+public class APPStoreOfflineOrderController extends BaseController {
 
 
     @Autowired
@@ -54,7 +54,6 @@ public class APPStoreOfflineOrderController extends BaseController{
     private final String ORDER_DATE_FORMAT = "yyyy/MM/dd HH:mm";
 
 
-
     /**
      * 商户登录
      *
@@ -77,15 +76,15 @@ public class APPStoreOfflineOrderController extends BaseController{
             jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_PASSWORD_IS_BLANK);
         }
         String device = request.getHeader("device");
-        if(org.springframework.util.StringUtils.isEmpty(device)){
+        if (org.springframework.util.StringUtils.isEmpty(device)) {
             CommonResult.failed(jsonResult);
             return jsonResult;
         }
 
         int _device;
-        if(ClientType.checkClientType(device) == 1){
+        if (ClientType.checkClientType(device) == 1) {
             _device = DBConstants.ClientType.APP.getCode();
-        }else{
+        } else {
             _device = DBConstants.ClientType.WEB.getCode();
         }
 
@@ -118,7 +117,7 @@ public class APPStoreOfflineOrderController extends BaseController{
 
         List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(NumberUtils.getInt(uid));
 
-        if(ValidCheck.validList(storeInfos)){
+        if (ValidCheck.validList(storeInfos)) {
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
@@ -146,10 +145,10 @@ public class APPStoreOfflineOrderController extends BaseController{
                 principalName = storeExtInfo.getPrincipalName();
             }
 
-            String blockNo = "";//区块编码
-            List<UserCredits> userCreditsList = userCreditsService.selectUserCreditsByUid(NumberUtils.getInt(uid));
-            if (!userCreditsList.isEmpty()) {
-                blockNo = userCreditsList.get(0).getWalletAddress();
+            String blockNo = "";//钱包地址
+            UserCredits userCredits = this.userCreditsService.getUserCredits(NumberUtils.getInt(uid), DBConstants.OwnerType.MERCHANT);
+            if (null != userCredits && !StringUtils.isEmpty(userCredits.getWalletAddress())) {
+                blockNo = userCredits.getWalletAddress();
             }
             storeInfoMap.put("principalIdNo", principalIdNo);
             storeInfoMap.put("principalPhone", principalPhone);
@@ -172,8 +171,6 @@ public class APPStoreOfflineOrderController extends BaseController{
     }
 
 
-
-
     /**
      * 获取商户交易记录
      *
@@ -187,25 +184,23 @@ public class APPStoreOfflineOrderController extends BaseController{
 
         Integer pageNum = offlineOrderReqParam.getPageNum();
         Integer pageSize = offlineOrderReqParam.getPageSize();
-        if(pageNum == null || pageNum == 0){
+        if (pageNum == null || pageNum == 0) {
             pageNum = 1;
         }
 
-        if(pageSize == null || pageSize == 0){
+        if (pageSize == null || pageSize == 0) {
             pageSize = 10;
         }
-
-
 
 
         PageHelper.startPage(pageNum, pageSize);
         List<StoreOfflineOrder> storeOfflineOrderList = storeOfflineOrderService.selectAllOfflineOrderByExample(NumberUtils.getInt(uid), offlineOrderReqParam);
         PageInfo pageInfo = new PageInfo(storeOfflineOrderList);
-        Map<Object,Object> resultMap = new HashMap<>(7);
+        Map<Object, Object> resultMap = new HashMap<>(7);
         HashMap totalInfo = storeOfflineOrderService.getStoreTotalInfo(NumberUtils.getInt(uid));
         int totalIntegral = 0;
         int totalMoney = 0;
-        if(totalInfo != null){
+        if (totalInfo != null) {
             totalIntegral = NumberUtils.getInt(String.valueOf(totalInfo.get("totalIntegral")));//获得总积分
             totalMoney = NumberUtils.getInt(String.valueOf(totalInfo.get("totalMoney")));//获得总现金
         }
@@ -234,13 +229,13 @@ public class APPStoreOfflineOrderController extends BaseController{
     public JsonResult orderDetail(@RequestParam String orderId) {
         JsonResult jsonResult = new JsonResult();
 
-        if(StringUtils.isBlank(orderId)){
+        if (StringUtils.isBlank(orderId)) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.REQUEST_PARAMETER_ERROR);
             return jsonResult;
         }
 
         List<StoreOfflineOrder> storeOfflineOrderList = storeOfflineOrderService.getStoreTotalInfo(orderId);
-        if(storeOfflineOrderList.isEmpty()){
+        if (storeOfflineOrderList.isEmpty()) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.ORDER_INFO_NOT_EXIST);
             return jsonResult;
         }
@@ -283,16 +278,15 @@ public class APPStoreOfflineOrderController extends BaseController{
         String uid = request.getHeader("uid");
         JsonResult jsonResult = new JsonResult();
 
-        if(StringUtils.isBlank(orderId)){
+        if (StringUtils.isBlank(orderId)) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.REQUEST_PARAMETER_ERROR);
             return jsonResult;
         }
 
 
-
         List<StoreOfflineOrder> storeOfflineOrderList = storeOfflineOrderService
                 .getStoreTotalInfo(NumberUtils.getInt(uid), orderId);
-        if(storeOfflineOrderList.isEmpty()){
+        if (storeOfflineOrderList.isEmpty()) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.ORDER_INFO_NOT_EXIST);
             return jsonResult;
         }
@@ -300,7 +294,7 @@ public class APPStoreOfflineOrderController extends BaseController{
         StoreOfflineOrder storeOfflineOrder = storeOfflineOrderList.get(0);
 
         //只有付款成功订单可退款
-        if (storeOfflineOrder.getStatus() != DBConstants.OfflineOrderStatus.PAID.getCode()) {
+        if (storeOfflineOrder.getStatus() != DBConstants.OrderStatus.PAID.getCode()) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.ORDER_CAN_NOT_REFUND);
             return jsonResult;
         }
@@ -327,7 +321,7 @@ public class APPStoreOfflineOrderController extends BaseController{
     /**
      * 校验用户积分是否足够，把结果存到缓存中供用户app查询，向商户app返回积分校验结果
      *
-     * @param userId 校验用户积分的用户id
+     * @param userId   校验用户积分的用户id
      * @param integral 本次消费积分
      * @return
      */
@@ -338,21 +332,27 @@ public class APPStoreOfflineOrderController extends BaseController{
         String uid = request.getHeader("uid");
         JsonResult jsonResult = new JsonResult();
 
+        List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(Integer.parseInt(uid));
+        if(ValidCheck.validList(storeInfos)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
 
-        if(!paymentCode.equals(redisService.get(CACHE_USER_PAYMENT_CODE_KEY + userId))){
+
+        if (!paymentCode.equals(redisService.get(CACHE_USER_PAYMENT_CODE_KEY + userId))) {
             jsonResult.setMessage("用户数据获取失败！");
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
             return jsonResult;
         }
 
-        List<UserCredits> userCreditsList = userCreditsService.selectUserCreditsByUid(userId);
-        if(ValidCheck.validList(userCreditsList)){
+        UserCredits userCredits = this.userCreditsService.getUserCredits(userId, DBConstants.OwnerType.CUSTOMER);
+        if (null == userCredits) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.CAN_NOT_GET_USER_CREDIT);
             return jsonResult;
         }
 
         //判断用户积分状况
-        UserCredits userCredits = userCreditsList.get(0);
+
         Map<Object, Object> checkResult = new HashMap<>();
         double cash = 0L;
         int exceedLimit = 0;
@@ -369,11 +369,12 @@ public class APPStoreOfflineOrderController extends BaseController{
         checkResult.put("exceedLimit", exceedLimit);//是否超过免密额度 0：未超过 1：超过
         checkResult.put("status", 0);//交易状态 0：待付款 1：已付款 2：取消
         checkResult.put("pwCheck", pwCheck);//是否校验过密码 0：没有 1：已校验（不超过免密额度默认为1）
+        checkResult.put("storeName", storeInfos.get(0).getName());
 
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" +integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
         String cacheKey1 = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId;
         this.redisService.put(cacheKey, JsonUtil.toJson(checkResult), GlobalConstants.CACHE_DATA_FAILURE_TIME, TimeUnit.SECONDS);
-        this.redisService.put(cacheKey1, integral+"", 60, TimeUnit.SECONDS);
+        this.redisService.put(cacheKey1, integral + "", 60, TimeUnit.SECONDS);
 
         jsonResult.setItem(checkResult);
         jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
@@ -383,11 +384,12 @@ public class APPStoreOfflineOrderController extends BaseController{
 
     /**
      * 获取用户积分
+     *
      * @return
      */
     @GetMapping(value = "/store/getIntegral")
     @ResponseBody
-    public JsonResult getIntetral(){
+    public JsonResult getIntetral() {
         JsonResult jsonResult = new JsonResult();
 
         String uid = request.getHeader("uid");
@@ -395,7 +397,7 @@ public class APPStoreOfflineOrderController extends BaseController{
 
         String integral = this.redisService.get(cacheKey);
 
-        if(integral == null){
+        if (integral == null) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
             return jsonResult;
         }
@@ -411,7 +413,7 @@ public class APPStoreOfflineOrderController extends BaseController{
     /**
      * 获取用户积分校验结果
      *
-     * @param userId 校验用户积分的用户id
+     * @param userId   校验用户积分的用户id
      * @param integral 本次消费积分
      * @return
      */
@@ -420,9 +422,9 @@ public class APPStoreOfflineOrderController extends BaseController{
     public JsonResult integralTradResult(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "integral") Integer integral) {
         JsonResult jsonResult = new JsonResult();
 
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" +integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
         String cacheResult = this.redisService.get(cacheKey);
-        if(cacheResult == null){
+        if (cacheResult == null) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
             return jsonResult;
         }
@@ -437,7 +439,7 @@ public class APPStoreOfflineOrderController extends BaseController{
     /**
      * 积分交易密码校验
      *
-     * @param userId 校验用户积分的用户id
+     * @param userId   校验用户积分的用户id
      * @param integral 本次消费积分
      * @return
      */
@@ -445,9 +447,9 @@ public class APPStoreOfflineOrderController extends BaseController{
     @ResponseBody
     public JsonResult pwCheck(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "password") String password, @RequestParam(value = "integral") Integer integral) {
         JsonResult jsonResult = new JsonResult();
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" +integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
         String cacheResult = this.redisService.get(cacheKey);
-        if(cacheResult == null){
+        if (cacheResult == null) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
             return jsonResult;
         }
@@ -471,7 +473,7 @@ public class APPStoreOfflineOrderController extends BaseController{
     /**
      * 积分交易
      *
-     * @param userId 校验用户积分的用户id
+     * @param userId   校验用户积分的用户id
      * @param integral 本次消费积分
      * @return
      */
@@ -481,33 +483,33 @@ public class APPStoreOfflineOrderController extends BaseController{
         String uid = request.getHeader("uid");
         integral = Math.abs(integral);
         JsonResult jsonResult = new JsonResult();
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" +integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
         String cacheResult = this.redisService.get(cacheKey);
-        if(cacheResult == null){
+        if (cacheResult == null) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
             return jsonResult;
         }
 
-        List<UserCredits> userCreditsList = userCreditsService.selectUserCreditsByUid(userId);
-        if(userCreditsList.isEmpty()) {
+        UserCredits userCredits = this.userCreditsService.getUserCredits(userId, DBConstants.OwnerType.CUSTOMER);
+        if (null == userCredits) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.CAN_NOT_GET_USER_CREDIT);
             return jsonResult;
         }
 
         JSONObject cacheJsonObj = JSON.parseObject(cacheResult);
         int orderStatus = NumberUtils.getInt(String.valueOf(cacheJsonObj.get("status")));
-        if(orderStatus != 0){
+        if (orderStatus != 0) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.ORDER_STATUS_EXCEPTION);
             return jsonResult;
         }
         int pwCheck = NumberUtils.getInt(String.valueOf(cacheJsonObj.get("pwCheck")));
-        if(pwCheck == 0){
+        if (pwCheck == 0) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.PASSWORD_NOT_CHECK);
             return jsonResult;
         }
 
         try {
-            jsonResult = storeOfflineOrderService.integralTrad(userCreditsList.get(0), userId, NumberUtils.getInt(uid), integral, jsonResult);
+            jsonResult = storeOfflineOrderService.integralTrad(userCredits, userId, NumberUtils.getInt(uid), integral, jsonResult);
         } catch (ApiServerException e) {
             System.out.println(e);
             jsonResult.setErrorCodeAndMessage(GlobalConstants.SYSTEM_EXCEPTION);
@@ -526,7 +528,7 @@ public class APPStoreOfflineOrderController extends BaseController{
     /**
      * 取消订单
      *
-     * @param userId 用户id
+     * @param userId   用户id
      * @param integral 本次消费积分
      * @return
      */
@@ -535,9 +537,9 @@ public class APPStoreOfflineOrderController extends BaseController{
     public JsonResult orderCancel(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "integral") Integer integral) {
         JsonResult jsonResult = new JsonResult();
 
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" +integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
         String cacheResult = this.redisService.get(cacheKey);
-        if(cacheResult == null){
+        if (cacheResult == null) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
             return jsonResult;
         }
@@ -551,9 +553,9 @@ public class APPStoreOfflineOrderController extends BaseController{
         return jsonResult;
     }
 
-    private List<OffilineOrderDTO> processOffilineOrderDTO(List<StoreOfflineOrder> storeOfflineOrderList){
+    private List<OffilineOrderDTO> processOffilineOrderDTO(List<StoreOfflineOrder> storeOfflineOrderList) {
         List<OffilineOrderDTO> offilineOrderDTOList = new ArrayList<>();
-        for(StoreOfflineOrder soo : storeOfflineOrderList){
+        for (StoreOfflineOrder soo : storeOfflineOrderList) {
             OffilineOrderDTO offilineOrderDTO = new OffilineOrderDTO();
             offilineOrderDTO.setCash(soo.getExtCash());
             offilineOrderDTO.setIntegral(soo.getIntegral());

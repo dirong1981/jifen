@@ -4,6 +4,7 @@ import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
 import com.gljr.jifen.constants.DBConstants;
+import com.gljr.jifen.controller.EchoController;
 import com.gljr.jifen.dao.*;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.ModuleService;
@@ -41,6 +42,9 @@ public class ModuleServiceImpl implements ModuleService {
 
     @Autowired
     private StorageService storageService;
+
+    @Autowired
+    private VirtualProductMapper virtualProductMapper;
 
 
     @Override
@@ -112,6 +116,61 @@ public class ModuleServiceImpl implements ModuleService {
 
             CommonResult.success(jsonResult);
         }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
+    @Override
+    @Transactional
+    public JsonResult insertVirtualProduct(String p1, String p2, String p3, String p4, Integer moduleId, JsonResult jsonResult) {
+        try{
+            VirtualProduct virtualProduct1 = virtualProductMapper.selectByPrimaryKey(Integer.parseInt(p1));
+            VirtualProduct virtualProduct2 = virtualProductMapper.selectByPrimaryKey(Integer.parseInt(p2));
+            VirtualProduct virtualProduct3 = virtualProductMapper.selectByPrimaryKey(Integer.parseInt(p3));
+            VirtualProduct virtualProduct4 = virtualProductMapper.selectByPrimaryKey(Integer.parseInt(p4));
+
+
+            ModuleProduct moduleProduct1 = new ModuleProduct();
+            moduleProduct1.setProductId(Integer.parseInt(p1));
+            moduleProduct1.setSort(1);
+            moduleProduct1.setName(virtualProduct1.getTitle());
+            moduleProduct1.setModuleId(moduleId);
+            moduleProduct1.setIntegral(0);
+            moduleProduct1.setCreateTime(new Timestamp(System.currentTimeMillis()));
+
+            ModuleProduct moduleProduct2 = new ModuleProduct();
+            moduleProduct2.setProductId(Integer.parseInt(p2));
+            moduleProduct2.setSort(2);
+            moduleProduct2.setName(virtualProduct2.getTitle());
+            moduleProduct2.setModuleId(moduleId);
+            moduleProduct2.setIntegral(0);
+            moduleProduct2.setCreateTime(new Timestamp(System.currentTimeMillis()));
+
+            ModuleProduct moduleProduct3 = new ModuleProduct();
+            moduleProduct3.setProductId(Integer.parseInt(p3));
+            moduleProduct3.setSort(3);
+            moduleProduct3.setName(virtualProduct3.getTitle());
+            moduleProduct3.setModuleId(moduleId);
+            moduleProduct3.setIntegral(0);
+            moduleProduct3.setCreateTime(new Timestamp(System.currentTimeMillis()));
+
+            ModuleProduct moduleProduct4 = new ModuleProduct();
+            moduleProduct4.setProductId(Integer.parseInt(p4));
+            moduleProduct4.setSort(4);
+            moduleProduct4.setName(virtualProduct4.getTitle());
+            moduleProduct4.setModuleId(moduleId);
+            moduleProduct4.setIntegral(0);
+            moduleProduct4.setCreateTime(new Timestamp(System.currentTimeMillis()));
+
+
+            moduleProductMapper.insert(moduleProduct1);
+            moduleProductMapper.insert(moduleProduct2);
+            moduleProductMapper.insert(moduleProduct3);
+            moduleProductMapper.insert(moduleProduct4);
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;

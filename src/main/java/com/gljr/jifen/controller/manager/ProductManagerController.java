@@ -53,10 +53,20 @@ public class ProductManagerController extends BaseController {
      */
     @GetMapping("/all")
     @ResponseBody
-    public JsonResult selectProducts(){
+    public JsonResult selectProducts(@RequestParam(value = "page", required = false) Integer page,
+                                     @RequestParam(value = "per_page", required = false) Integer per_page){
         JsonResult jsonResult = new JsonResult();
 
-        jsonResult = productService.selectAllProduct(jsonResult);
+        if(StringUtils.isEmpty(page)){
+            page = 1;
+        }
+
+        if(StringUtils.isEmpty(per_page)){
+            per_page = 10;
+        }
+
+
+        jsonResult = productService.selectAllProduct(page, per_page, jsonResult);
 
         return jsonResult;
     }
