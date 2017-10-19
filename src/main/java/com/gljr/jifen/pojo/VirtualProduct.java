@@ -17,15 +17,19 @@ public class VirtualProduct {
 
     private Integer remainingAmount;
 
+    private Integer allowCancel;
+
+    private String condition;
+
     private Integer status;
 
     private Date createTime;
 
     private String description;
 
-    private Integer integral;
-
     private Integer type;
+
+    private Integer integral;
 
     public Integer getId() {
         return id;
@@ -83,6 +87,22 @@ public class VirtualProduct {
         this.remainingAmount = remainingAmount;
     }
 
+    public Integer getAllowCancel() {
+        return allowCancel;
+    }
+
+    public void setAllowCancel(Integer allowCancel) {
+        this.allowCancel = allowCancel;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition == null ? null : condition.trim();
+    }
+
     public Integer getStatus() {
         return status;
     }
@@ -107,19 +127,19 @@ public class VirtualProduct {
         this.description = description == null ? null : description.trim();
     }
 
-    public Integer getIntegral() {
-        return integral;
-    }
-
-    public void setIntegral(Integer integral) {
-        this.integral = integral;
-    }
-
     public Integer getType() {
         return type;
     }
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public Integer getIntegral() {
+        return integral;
+    }
+
+    public void setIntegral(Integer integral) {
+        this.integral = integral;
     }
 }

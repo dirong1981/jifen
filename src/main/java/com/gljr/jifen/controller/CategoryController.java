@@ -43,34 +43,14 @@ public class CategoryController {
 
 
     /**
-     * 查询所有通过审核的商品分类
-     * @param httpServletRequest
-     * @param httpServletResponse
+     * 查询所有通过审核的分类
      * @return
      */
     @GetMapping
     @ResponseBody
-    public JsonResult getcategories(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
-        JsonResult jsonResult = new JsonResult();
-        Map map = new HashMap();
+    public JsonResult getcategories(){
 
-        try{
-            List<Category> list = null;
-
-            list = categoryService.selectAllShowParentCategory();
-            map.put("parents", list);
-
-            list = categoryService.selectAllShowSonCategory();
-            map.put("sons", list);
-
-            jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-
-        }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-        }
+        JsonResult jsonResult = categoryService.selectCategories();
 
         return  jsonResult;
     }
@@ -82,9 +62,8 @@ public class CategoryController {
     @GetMapping(value = "/products")
     @ResponseBody
     public JsonResult selectProductCategories(){
-        JsonResult jsonResult = new JsonResult();
 
-        jsonResult = categoryService.selectProductCategories(jsonResult);
+        JsonResult jsonResult = categoryService.selectProductCategories();
 
         return  jsonResult;
     }
@@ -92,33 +71,13 @@ public class CategoryController {
 
     /**
      * 获取所有通过审核的商户分类
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return
      */
     @GetMapping("/store")
     @ResponseBody
-    public JsonResult getStorecategories(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
-        JsonResult jsonResult = new JsonResult();
-        Map map = new HashMap();
+    public JsonResult getStorecategories(){
 
-        try{
-            List<Category> list = null;
-
-            list = categoryService.selectShowStoreParentClass();
-            map.put("parents", list);
-
-            list = categoryService.selectShowStoreSonClass();
-            map.put("sons", list);
-
-            jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-
-        }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-        }
+        JsonResult jsonResult = categoryService.selectStorecategories();
 
         return  jsonResult;
     }
@@ -127,29 +86,13 @@ public class CategoryController {
     /**
      * 获取一个分类信息
      * @param id 分类id
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return 返回该分类的信息
      */
     @GetMapping("/{id}")
     @ResponseBody
-    public JsonResult getOneCategories(@PathVariable("id") Integer id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
-        JsonResult jsonResult = new JsonResult();
+    public JsonResult getOneCategories(@PathVariable("id") Integer id){
 
-        try{
-            //通过id查询该分类
-            Category category = categoryService.selectClass(id);
-            Map map = new HashMap();
-            map.put("category", category);
-
-            jsonResult.setItem(map);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
-
-        }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
-        }
+        JsonResult jsonResult = categoryService.selectCategoryById(id);
 
         return  jsonResult;
     }

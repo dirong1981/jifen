@@ -7,6 +7,7 @@ import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.Module;
 import com.gljr.jifen.pojo.ModulePicture;
 import com.gljr.jifen.pojo.ModuleProduct;
@@ -46,6 +47,7 @@ public class ModuleManagerController {
      */
     @PostMapping
     @ResponseBody
+    @AuthPassport(permission_code = "#131105#")
     public JsonResult insertModule(Module module, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
@@ -128,6 +130,7 @@ public class ModuleManagerController {
      */
     @DeleteMapping(value = "/{moduleId}/picture/{id}")
     @ResponseBody
+    @AuthPassport(permission_code = "#131102#")
     public JsonResult deletePictureByModuleIdAndPictureId(@PathVariable(value = "moduleId") Integer moduleId, @PathVariable(value = "id") Integer id,
                                                           HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
@@ -151,6 +154,7 @@ public class ModuleManagerController {
      */
     @PostMapping(value = "/{moduleId}/products")
     @ResponseBody
+    @AuthPassport(permission_code = "#131102#")
     public JsonResult insertModuleProductByModuleId(@PathVariable(value = "moduleId") Integer moduleId, @RequestParam(value = "productIds") String productIds){
         JsonResult jsonResult = new JsonResult();
 
@@ -218,6 +222,7 @@ public class ModuleManagerController {
      */
     @DeleteMapping(value = "/{moduleId}/products/{id}")
     @ResponseBody
+    @AuthPassport(permission_code = "#131102#")
     public JsonResult deleteModuleProductByModuleIdAndId(@PathVariable(value = "moduleId") Integer moduleId, @PathVariable(value = "id") Integer productId,
                                                          HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
         JsonResult jsonResult = new JsonResult();
@@ -281,7 +286,7 @@ public class ModuleManagerController {
     }
 
     /**
-     * 根据id获取一个模型
+     * 根据id获取一个模块
      * @param id
      * @param httpServletRequest
      * @param httpServletResponse

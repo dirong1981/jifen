@@ -50,6 +50,7 @@ public class VirtualProductServiceImpl implements VirtualProductService {
     @Override
     public JsonResult insertVirtualProduct(VirtualProduct virtualProduct, JsonResult jsonResult) {
         try {
+
             virtualProductMapper.insert(virtualProduct);
             CommonResult.success(jsonResult);
         }catch (Exception e){
@@ -68,7 +69,7 @@ public class VirtualProductServiceImpl implements VirtualProductService {
 
             for(VirtualProduct virtualProduct : virtualProducts){
                 SystemVirtualProduct systemVirtualProduct = systemVirtualProductMapper.selectByPrimaryKey(virtualProduct.getVpId());
-                virtualProduct.setType(systemVirtualProduct.getType());
+                virtualProduct.setType(Integer.parseInt(systemVirtualProduct.getCode()));
                 virtualProduct.setIntegral(systemVirtualProduct.getIntegral());
             }
 
@@ -77,6 +78,7 @@ public class VirtualProductServiceImpl implements VirtualProductService {
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
         }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -117,6 +119,7 @@ public class VirtualProductServiceImpl implements VirtualProductService {
             virtualProductMapper.updateByPrimaryKey(virtualProduct);
             CommonResult.success(jsonResult);
         }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -149,7 +152,7 @@ public class VirtualProductServiceImpl implements VirtualProductService {
             VirtualProduct virtualProduct = virtualProductMapper.selectByPrimaryKey(virtualId);
             SystemVirtualProduct systemVirtualProduct = systemVirtualProductMapper.selectByPrimaryKey(virtualProduct.getVpId());
 
-            virtualProduct.setType(systemVirtualProduct.getType());
+            virtualProduct.setType(Integer.parseInt(systemVirtualProduct.getCode()));
             virtualProduct.setIntegral(systemVirtualProduct.getIntegral());
 
             Map map = new HashMap();

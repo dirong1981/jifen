@@ -8,6 +8,8 @@ public class CommonOrderResponse implements Serializable{
 
     private String extOrderId;
 
+    private String refData;
+
     public CommonOrderResponse() {
 
     }
@@ -28,11 +30,20 @@ public class CommonOrderResponse implements Serializable{
         this.extOrderId = extOrderId;
     }
 
+    public String getRefData() {
+        return refData;
+    }
+
+    public void setRefData(String refData) {
+        this.refData = refData;
+    }
+
     @Override
     public String toString() {
         return "CommonOrderResponse{" +
                 "blockId='" + blockId + '\'' +
                 ", extOrderId='" + extOrderId + '\'' +
+                ", refData='" + refData + '\'' +
                 '}';
     }
 }

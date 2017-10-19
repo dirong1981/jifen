@@ -22,10 +22,8 @@ public class Admin {
 
     private String token;
 
-    @JsonIgnore
     private Integer status;
 
-    @JsonIgnore
     private Date createTime;
 
     private String permission;

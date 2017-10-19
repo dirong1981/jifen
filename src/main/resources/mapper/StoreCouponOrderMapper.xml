@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gljr.jifen.dao.UserCouponMapper">
-  <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.UserCoupon">
+<mapper namespace="com.gljr.jifen.dao.StoreCouponOrderMapper">
+  <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.StoreCouponOrder">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="uid" jdbcType="INTEGER" property="uid" />
     <result column="si_id" jdbcType="INTEGER" property="siId" />
-    <result column="sc_id" jdbcType="INTEGER" property="scId" />
-    <result column="coupon_code" jdbcType="VARCHAR" property="couponCode" />
-    <result column="valid_from" jdbcType="DATE" property="validFrom" />
-    <result column="valid_to" jdbcType="DATE" property="validTo" />
-    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="uc_id" jdbcType="INTEGER" property="ucId" />
+    <result column="trx_id" jdbcType="INTEGER" property="trxId" />
+    <result column="trx_code" jdbcType="VARCHAR" property="trxCode" />
+    <result column="dtchain_block_id" jdbcType="VARCHAR" property="dtchainBlockId" />
+    <result column="integral" jdbcType="INTEGER" property="integral" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -71,15 +70,15 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, uid, si_id, sc_id, coupon_code, valid_from, valid_to, status, create_time
+    id, si_id, uc_id, trx_id, trx_code, dtchain_block_id, integral, create_time
   </sql>
-  <select id="selectByExample" parameterType="com.gljr.jifen.pojo.UserCouponExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.gljr.jifen.pojo.StoreCouponOrderExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from user_coupon
+    from store_coupon_order
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -88,124 +87,113 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
-    from user_coupon
+    from store_coupon_order
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from user_coupon
+    delete from store_coupon_order
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.gljr.jifen.pojo.UserCouponExample">
-    delete from user_coupon
+  <delete id="deleteByExample" parameterType="com.gljr.jifen.pojo.StoreCouponOrderExample">
+    delete from store_coupon_order
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.gljr.jifen.pojo.UserCoupon">
+  <insert id="insert" parameterType="com.gljr.jifen.pojo.StoreCouponOrder">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into user_coupon (uid, si_id, sc_id,
-    coupon_code, valid_from,
-    valid_to, status, create_time
-    )
-    values (#{uid,jdbcType=INTEGER}, #{siId,jdbcType=INTEGER}, #{scId,jdbcType=INTEGER},
-    #{couponCode,jdbcType=VARCHAR}, #{validFrom,jdbcType=DATE},
-    #{validTo,jdbcType=DATE}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
-    )
+    insert into store_coupon_order (si_id, uc_id, trx_id, 
+      trx_code, dtchain_block_id, integral, 
+      create_time)
+    values (#{siId,jdbcType=INTEGER}, #{ucId,jdbcType=INTEGER}, #{trxId,jdbcType=INTEGER}, 
+      #{trxCode,jdbcType=VARCHAR}, #{dtchainBlockId,jdbcType=VARCHAR}, #{integral,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.UserCoupon">
+  <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.StoreCouponOrder">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into user_coupon
+    insert into store_coupon_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="uid != null">
-        uid,
-      </if>
       <if test="siId != null">
         si_id,
       </if>
-      <if test="scId != null">
-        sc_id,
+      <if test="ucId != null">
+        uc_id,
       </if>
-      <if test="couponCode != null">
-        coupon_code,
+      <if test="trxId != null">
+        trx_id,
       </if>
-      <if test="validFrom != null">
-        valid_from,
+      <if test="trxCode != null">
+        trx_code,
       </if>
-      <if test="validTo != null">
-        valid_to,
+      <if test="dtchainBlockId != null">
+        dtchain_block_id,
       </if>
-      <if test="status != null">
-        status,
+      <if test="integral != null">
+        integral,
       </if>
       <if test="createTime != null">
         create_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="uid != null">
-        #{uid,jdbcType=INTEGER},
-      </if>
       <if test="siId != null">
         #{siId,jdbcType=INTEGER},
       </if>
-      <if test="scId != null">
-        #{scId,jdbcType=INTEGER},
+      <if test="ucId != null">
+        #{ucId,jdbcType=INTEGER},
       </if>
-      <if test="couponCode != null">
-        #{couponCode,jdbcType=VARCHAR},
+      <if test="trxId != null">
+        #{trxId,jdbcType=INTEGER},
       </if>
-      <if test="validFrom != null">
-        #{validFrom,jdbcType=DATE},
+      <if test="trxCode != null">
+        #{trxCode,jdbcType=VARCHAR},
       </if>
-      <if test="validTo != null">
-        #{validTo,jdbcType=DATE},
+      <if test="dtchainBlockId != null">
+        #{dtchainBlockId,jdbcType=VARCHAR},
       </if>
-      <if test="status != null">
-        #{status,jdbcType=INTEGER},
+      <if test="integral != null">
+        #{integral,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.gljr.jifen.pojo.UserCouponExample" resultType="java.lang.Long">
-    select count(*) from user_coupon
+  <select id="countByExample" parameterType="com.gljr.jifen.pojo.StoreCouponOrderExample" resultType="java.lang.Long">
+    select count(*) from store_coupon_order
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update user_coupon
+    update store_coupon_order
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=INTEGER},
       </if>
-      <if test="record.uid != null">
-        uid = #{record.uid,jdbcType=INTEGER},
-      </if>
       <if test="record.siId != null">
         si_id = #{record.siId,jdbcType=INTEGER},
       </if>
-      <if test="record.scId != null">
-        sc_id = #{record.scId,jdbcType=INTEGER},
+      <if test="record.ucId != null">
+        uc_id = #{record.ucId,jdbcType=INTEGER},
       </if>
-      <if test="record.couponCode != null">
-        coupon_code = #{record.couponCode,jdbcType=VARCHAR},
+      <if test="record.trxId != null">
+        trx_id = #{record.trxId,jdbcType=INTEGER},
       </if>
-      <if test="record.validFrom != null">
-        valid_from = #{record.validFrom,jdbcType=DATE},
+      <if test="record.trxCode != null">
+        trx_code = #{record.trxCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.validTo != null">
-        valid_to = #{record.validTo,jdbcType=DATE},
+      <if test="record.dtchainBlockId != null">
+        dtchain_block_id = #{record.dtchainBlockId,jdbcType=VARCHAR},
       </if>
-      <if test="record.status != null">
-        status = #{record.status,jdbcType=INTEGER},
+      <if test="record.integral != null">
+        integral = #{record.integral,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -216,43 +204,39 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update user_coupon
+    update store_coupon_order
     set id = #{record.id,jdbcType=INTEGER},
-    uid = #{record.uid,jdbcType=INTEGER},
-    si_id = #{record.siId,jdbcType=INTEGER},
-    sc_id = #{record.scId,jdbcType=INTEGER},
-    coupon_code = #{record.couponCode,jdbcType=VARCHAR},
-    valid_from = #{record.validFrom,jdbcType=DATE},
-    valid_to = #{record.validTo,jdbcType=DATE},
-    status = #{record.status,jdbcType=INTEGER},
-    create_time = #{record.createTime,jdbcType=TIMESTAMP}
+      si_id = #{record.siId,jdbcType=INTEGER},
+      uc_id = #{record.ucId,jdbcType=INTEGER},
+      trx_id = #{record.trxId,jdbcType=INTEGER},
+      trx_code = #{record.trxCode,jdbcType=VARCHAR},
+      dtchain_block_id = #{record.dtchainBlockId,jdbcType=VARCHAR},
+      integral = #{record.integral,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.gljr.jifen.pojo.UserCoupon">
-    update user_coupon
+  <update id="updateByPrimaryKeySelective" parameterType="com.gljr.jifen.pojo.StoreCouponOrder">
+    update store_coupon_order
     <set>
-      <if test="uid != null">
-        uid = #{uid,jdbcType=INTEGER},
-      </if>
       <if test="siId != null">
         si_id = #{siId,jdbcType=INTEGER},
       </if>
-      <if test="scId != null">
-        sc_id = #{scId,jdbcType=INTEGER},
+      <if test="ucId != null">
+        uc_id = #{ucId,jdbcType=INTEGER},
       </if>
-      <if test="couponCode != null">
-        coupon_code = #{couponCode,jdbcType=VARCHAR},
+      <if test="trxId != null">
+        trx_id = #{trxId,jdbcType=INTEGER},
       </if>
-      <if test="validFrom != null">
-        valid_from = #{validFrom,jdbcType=DATE},
+      <if test="trxCode != null">
+        trx_code = #{trxCode,jdbcType=VARCHAR},
       </if>
-      <if test="validTo != null">
-        valid_to = #{validTo,jdbcType=DATE},
+      <if test="dtchainBlockId != null">
+        dtchain_block_id = #{dtchainBlockId,jdbcType=VARCHAR},
       </if>
-      <if test="status != null">
-        status = #{status,jdbcType=INTEGER},
+      <if test="integral != null">
+        integral = #{integral,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -260,15 +244,14 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.UserCoupon">
-    update user_coupon
-    set uid = #{uid,jdbcType=INTEGER},
-      si_id = #{siId,jdbcType=INTEGER},
-      sc_id = #{scId,jdbcType=INTEGER},
-      coupon_code = #{couponCode,jdbcType=VARCHAR},
-      valid_from = #{validFrom,jdbcType=DATE},
-      valid_to = #{validTo,jdbcType=DATE},
-      status = #{status,jdbcType=INTEGER},
+  <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.StoreCouponOrder">
+    update store_coupon_order
+    set si_id = #{siId,jdbcType=INTEGER},
+      uc_id = #{ucId,jdbcType=INTEGER},
+      trx_id = #{trxId,jdbcType=INTEGER},
+      trx_code = #{trxCode,jdbcType=VARCHAR},
+      dtchain_block_id = #{dtchainBlockId,jdbcType=VARCHAR},
+      integral = #{integral,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

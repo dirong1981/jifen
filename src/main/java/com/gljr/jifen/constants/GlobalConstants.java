@@ -9,7 +9,7 @@ public class GlobalConstants {
     //设置返回的请求域名
     public static final String WEBDOMAIN = "http://console.iep.dtchain.io";
 //    public static final String WEBDOMAIN = "http://localhost";
-    public static final String APPDOMAIN = "http://joer.pro/Fond/views/shop";
+    public static final String APPDOMAIN = "http://joer.pro";
 
 
     //数据验证错误
@@ -65,6 +65,7 @@ public class GlobalConstants {
 
     public static final String ILLEGAL_OPERATION = "非法操作！";
     public static final String NO_ACTIVATION = "账号未激活！";
+    public static final String NO_ACTIVATION_CODE = "501";
     public static final String IS_DISABLE = "账号已禁用！";
     public static final String NOTHING_SELECT = "请选择内容再提交！";
     public static final String SQL_FAILED = "数据库错误！";

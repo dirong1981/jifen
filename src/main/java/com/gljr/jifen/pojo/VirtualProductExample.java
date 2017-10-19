@@ -562,6 +562,136 @@ public class VirtualProductExample {
             return (Criteria) this;
         }
 
+        public Criteria andAllowCancelIsNull() {
+            addCriterion("allow_cancel is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelIsNotNull() {
+            addCriterion("allow_cancel is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelEqualTo(Integer value) {
+            addCriterion("allow_cancel =", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelNotEqualTo(Integer value) {
+            addCriterion("allow_cancel <>", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelGreaterThan(Integer value) {
+            addCriterion("allow_cancel >", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelGreaterThanOrEqualTo(Integer value) {
+            addCriterion("allow_cancel >=", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelLessThan(Integer value) {
+            addCriterion("allow_cancel <", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelLessThanOrEqualTo(Integer value) {
+            addCriterion("allow_cancel <=", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelIn(List<Integer> values) {
+            addCriterion("allow_cancel in", values, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelNotIn(List<Integer> values) {
+            addCriterion("allow_cancel not in", values, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelBetween(Integer value1, Integer value2) {
+            addCriterion("allow_cancel between", value1, value2, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelNotBetween(Integer value1, Integer value2) {
+            addCriterion("allow_cancel not between", value1, value2, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionIsNull() {
+            addCriterion("condition is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionIsNotNull() {
+            addCriterion("condition is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionEqualTo(String value) {
+            addCriterion("condition =", value, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionNotEqualTo(String value) {
+            addCriterion("condition <>", value, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionGreaterThan(String value) {
+            addCriterion("condition >", value, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionGreaterThanOrEqualTo(String value) {
+            addCriterion("condition >=", value, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionLessThan(String value) {
+            addCriterion("condition <", value, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionLessThanOrEqualTo(String value) {
+            addCriterion("condition <=", value, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionLike(String value) {
+            addCriterion("condition like", value, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionNotLike(String value) {
+            addCriterion("condition not like", value, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionIn(List<String> values) {
+            addCriterion("condition in", values, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionNotIn(List<String> values) {
+            addCriterion("condition not in", values, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionBetween(String value1, String value2) {
+            addCriterion("condition between", value1, value2, "condition");
+            return (Criteria) this;
+        }
+
+        public Criteria andConditionNotBetween(String value1, String value2) {
+            addCriterion("condition not between", value1, value2, "condition");
+            return (Criteria) this;
+        }
+
         public Criteria andStatusIsNull() {
             addCriterion("status is null");
             return (Criteria) this;

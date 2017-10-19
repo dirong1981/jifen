@@ -7,7 +7,13 @@ public class StoreCoupon {
 
     private Integer siId;
 
+    private String storeName;
+
     private Integer maxGenerated;
+
+    private Integer remainingAmount;
+
+    private Integer minConsumption;
 
     private Integer integral;
 
@@ -20,6 +26,8 @@ public class StoreCoupon {
     private Date validTo;
 
     private Integer validDays;
+
+    private Integer allowCancel;
 
     private Integer status;
 
@@ -47,6 +55,14 @@ public class StoreCoupon {
 
     public void setMaxGenerated(Integer maxGenerated) {
         this.maxGenerated = maxGenerated;
+    }
+
+    public Integer getMinConsumption() {
+        return minConsumption;
+    }
+
+    public void setMinConsumption(Integer minConsumption) {
+        this.minConsumption = minConsumption;
     }
 
     public Integer getIntegral() {
@@ -97,6 +113,14 @@ public class StoreCoupon {
         this.validDays = validDays;
     }
 
+    public Integer getAllowCancel() {
+        return allowCancel;
+    }
+
+    public void setAllowCancel(Integer allowCancel) {
+        this.allowCancel = allowCancel;
+    }
+
     public Integer getStatus() {
         return status;
     }
@@ -111,5 +135,21 @@ public class StoreCoupon {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    public Integer getRemainingAmount() {
+        return remainingAmount;
+    }
+
+    public void setRemainingAmount(Integer remainingAmount) {
+        this.remainingAmount = remainingAmount;
     }
 }

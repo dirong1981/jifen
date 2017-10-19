@@ -77,46 +77,6 @@ public class AuthInterceptor implements HandlerInterceptor {
                 }
 
 
-
-
-
-
-//                if (requestUri.contains("/manager/")) {
-//                    if (device.equals(DBConstants.ClientType.WEB.getDescription())) {
-//                        String aid = httpServletRequest.getHeader("aid");
-//                        String permission = httpServletRequest.getHeader("permission");
-//
-//                        Map<String, String> tokenMap = this.redisService.getMap("admin_" + aid, String.class);
-//                        System.out.println(tokenMap.get("permission"));
-//                        if (null == tokenMap || !tokenMap.containsKey("permission")) {
-//                            StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
-//                            return false;
-//                        }
-//
-//                        if (permission == null || permission.equals("") || permission.equals("NULL")) {
-//                            StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
-//                            return false;
-//                        }
-//
-//                        //获取服务器端管理员信息
-//
-//                        String permissions = tokenMap.get("permission");
-//
-//
-//                        if(permissions.contains(permission)){
-//                            return true;
-//                        }
-//
-//
-//
-//                        StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
-//                        return false;
-//
-//                    } else {
-//                        StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
-//                        return false;
-//                    }
-//                }
             }catch (Exception e){
                 StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
                 return false;

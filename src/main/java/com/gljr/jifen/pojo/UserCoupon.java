@@ -9,11 +9,17 @@ public class UserCoupon {
 
     private Integer siId;
 
+    private String storeName;
+
     private Integer scId;
 
-    private String couponCode;
+    private Integer minConsumption;
 
-    private Integer sooId;
+    private Integer integral;
+
+    private Integer equalMoney;
+
+    private String couponCode;
 
     private Date validFrom;
 
@@ -63,14 +69,6 @@ public class UserCoupon {
         this.couponCode = couponCode == null ? null : couponCode.trim();
     }
 
-    public Integer getSooId() {
-        return sooId;
-    }
-
-    public void setSooId(Integer sooId) {
-        this.sooId = sooId;
-    }
-
     public Date getValidFrom() {
         return validFrom;
     }
@@ -101,5 +99,37 @@ public class UserCoupon {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    public Integer getMinConsumption() {
+        return minConsumption;
+    }
+
+    public void setMinConsumption(Integer minConsumption) {
+        this.minConsumption = minConsumption;
+    }
+
+    public Integer getIntegral() {
+        return integral;
+    }
+
+    public void setIntegral(Integer integral) {
+        this.integral = integral;
+    }
+
+    public Integer getEqualMoney() {
+        return equalMoney;
+    }
+
+    public void setEqualMoney(Integer equalMoney) {
+        this.equalMoney = equalMoney;
     }
 }

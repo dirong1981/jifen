@@ -3,6 +3,7 @@ package com.gljr.jifen.service;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.pojo.*;
+import com.qiniu.util.Json;
 
 import java.util.List;
 import java.util.Map;
@@ -14,14 +15,14 @@ public interface AdminService {
      * @param admin
      * @return
      */
-    Admin login(Admin admin);
+    JsonResult login(Admin admin, String client_type, JsonResult jsonResult);
 
     /**
      * 查询管理员拥有的权限
      * @param id
      * @return
      */
-    List<AdminPermissionAssign> selectAdminPermissionAssignByAid(int id);
+    JsonResult selectAdminPermissionAssignByAid(int id, JsonResult jsonResult);
 
     /**
      * 插入管理员在线状态
@@ -103,51 +104,16 @@ public interface AdminService {
 
     List<SystemPermission> selectSystemPermission();
 
-
-
-////    int updataPwd(Admin admin);
-////
-////    Admin getAdmin(Integer id);
-////
-////
-//    List<Admin> selectAdminByUsername(String username);
-//
-//    Admin selectAdminById(Integer id);
-//
-//    int insertAdmin(Admin admin);
-//
-//    int deleteAdminById(Integer id);
-//
-//    int updateAdminById(Admin admin);
-//
-//
-////
-////    int insertAdminPermissionAssign(AdminPermissionAssign adminPermissionAssign);
-////
-////    int updataAdminPermissionAssign(AdminPermissionAssign adminPermissionAssign);
-////
-////    int deleteProduct(Integer id);
-//
     List<Admin> selectAdminsByType(int type);
-//
+
     SystemPermission selectSystemPermission(int code);
-//
-//    int insertSystemPermission(SystemPermission systemPermission);
-//
-//
-//
-//    int deleteSystemPermission(Integer id);
-//
-//    int deleteSonSystemPermission(Integer code);
-//
-//    SystemPermission selectSystemPermissionById(Integer id);
 
     /**
-     * 用户登录
-     * @param username 用户名
-     * @param password 密码
-     * @param accountType 用户类型
-     * @return JsonResult
+     * 商户登录
+     * @param username
+     * @param password
+     * @param type
+     * @return
      */
     JsonResult doLogin(String username, String password, Integer type);
 
@@ -159,8 +125,19 @@ public interface AdminService {
      */
     JsonResult doLogout(String uid, DBConstants.AdminAccountType accountType);
 
-    boolean checkToken(String uid, String token);
 
     List<AdminOnline> selectAdminOnlines(int aId);
+
+    JsonResult selectAllAdminByType(Integer type, Integer page, Integer per_page, JsonResult jsonResult);
+
+
+    JsonResult updateAdminPasswordByAid(Integer aid, String oldpwd, String npwd, JsonResult jsonResult);
+
+    JsonResult modifyAdminByAid(Integer aid, String permissions, String pwd, JsonResult jsonResult);
+
+
+    boolean checkToken(String uid, String jwt);
+
+    JsonResult selectAdminInfo(String uid);
 
 }

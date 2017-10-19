@@ -302,6 +302,7 @@ public class ProductServiceImpl implements ProductService{
             OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
             criteria.andPidEqualTo(productId);
+            criteria.andStatusNotEqualTo(DBConstants.OrderStatus.CANCELED.getCode());
 
             List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
 
@@ -358,6 +359,9 @@ public class ProductServiceImpl implements ProductService{
 
             PageHelper.startPage(page,per_page);
             List<Product> list = productMapper.selectByExample(productExample);
+            for (Product product : list){
+                product.setLogoKey(product.getLogoKey() + "!popular");
+            }
 
             PageInfo pageInfo = new PageInfo(list);
             Map  map = new HashMap();
@@ -402,6 +406,9 @@ public class ProductServiceImpl implements ProductService{
             PageHelper.startPage(page,per_page);
             //查询分类下的商品，按照sort排序
             List<Product> list = productMapper.selectByExample(productExample);
+            for (Product product : list){
+                product.setLogoKey(product.getLogoKey() + "!popular");
+            }
 
             PageInfo pageInfo = new PageInfo(list);
             Map  map = new HashMap();

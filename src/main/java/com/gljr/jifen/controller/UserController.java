@@ -199,6 +199,56 @@ public class UserController extends BaseController{
         return jsonResult;
     }
 
+    @GetMapping("/recommend")
+    @ResponseBody
+    public HttpServletResponse toUserRecommend() {
+
+        String uid = request.getHeader("uid");
+        if (uid == null || uid.equals("")) {
+            super.response.setStatus(401);
+            return super.response;
+        }
+
+        GatewayResponse<Map<String, String>> response = this.chainService.userRecommend(Long.parseLong(uid));
+        if (null == response || response.getCode() != 200
+                || null == response.getContent() || response.getContent().isEmpty()) {
+            super.response.setStatus(404);
+            return super.response;
+        }
+
+        for(String h : response.getContent().keySet()) {
+            super.response.setHeader(h, response.getContent().get(h));
+        }
+        super.response.setStatus(302);
+
+        return null;
+    }
+
+    @GetMapping("/points")
+    @ResponseBody
+    public HttpServletResponse userEarnPoints() {
+
+        String uid = request.getHeader("uid");
+        if (uid == null || uid.equals("")) {
+            super.response.setStatus(401);
+            return super.response;
+        }
+
+        GatewayResponse<Map<String, String>> response = this.chainService.userEarnPoints(Long.parseLong(uid));
+        if (null == response || response.getCode() != 200
+                || null == response.getContent() || response.getContent().isEmpty()) {
+            super.response.setStatus(404);
+            return super.response;
+        }
+
+        for(String h : response.getContent().keySet()) {
+            super.response.setHeader(h, response.getContent().get(h));
+        }
+        super.response.setStatus(302);
+
+        return null;
+    }
+
 
     /**
      * 根据id查询一个收货地址详情
@@ -365,23 +415,6 @@ public class UserController extends BaseController{
     }
 
 
-//    @GetMapping
-//    @ResponseBody
-//    public JsonResult selectUserInfo(@RequestParam(value = "uid", required = false) String uid, @RequestParam(value = "token", required = false) String gltoken){
-//        JsonResult jsonResult = new JsonResult();
-//
-//        if(StringUtils.isEmpty(uid)){
-//            CommonResult.userNotExit(jsonResult);
-//            return jsonResult;
-//        }
-//
-//        GatewayResponse<GouliUserInfo> gouliUserInfo = chainService.getUserInfo(uid);
-//        jsonResult.setMessage(gouliUserInfo.getContent().getUserName()+","+gouliUserInfo.getContent().getTotalValue());
-//
-//        return  jsonResult;
-//
-//    }
-
 
 
     /**
@@ -422,7 +455,6 @@ public class UserController extends BaseController{
             Integer validValue;
             String phone;
             Integer uid;
-            String token_key = StrUtil.randomKey(32);
 
             try {
                 //去够力那边取数据
@@ -441,63 +473,9 @@ public class UserController extends BaseController{
                 phone = gouliUserInfo.getContent().getPhone();
                 uid = Integer.parseInt(String.valueOf(gouliUserInfo.getContent().getId()));
 
-            }catch (Exception e){
-                CommonResult.userNotExit(jsonResult);
-                return jsonResult;
-            }
-
-            try {
-//                List<UserCredits> userCreditss = userCreditsService.selectUserCreditsByUid(uid);
-//                if(ValidCheck.validList(userCreditss)) {
-//                    //用户不存在
-//
-//                    UserCredits userCredits = new UserCredits();
-//                    userCredits.setIntegral(validValue);
-//                    userCredits.setOwnerType(DBConstants.OwnerType.CUSTOMER.getCode());
-//                    userCredits.setWalletAddress("xxxxx");
-//                    userCredits.setOwnerId(uid);
-//                    userCredits.setFrozenIntegral(totalValue);
-//                    userCredits.setCreateTime(new Timestamp(System.currentTimeMillis()));
-//
-//                    UserExtInfo userExtInfo = new UserExtInfo();
-//                    userExtInfo.setCellphone(phone);
-//                    userExtInfo.setViewType(1);
-//                    userExtInfo.setUid(uid);
-//
-//                    UserOnline userOnline = new UserOnline();
-//                    userOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
-//                    userOnline.setToken(token_key);
-//                    userOnline.setUid(uid);
-//
-//                    userService.insertUserInfo(userCredits, userExtInfo, userOnline);
-//
-//                }else{
-//
-//                    //积分表数据存在，更新
-//                    UserCredits userCredits = userCreditss.get(0);
-//                    userCredits.setFrozenIntegral(totalValue);
-//                    userCredits.setIntegral(validValue);
-//
-//                    userCreditsService.updateUserCreditsById(userCredits);
-//
-//
-//                    List<UserExtInfo> userExtInfos = userService.selectUserExtInfoByUid(uid);
-//                    //不存在新添加
-//                    if(ValidCheck.validList(userExtInfos)){
-//                        UserExtInfo userExtInfo = new UserExtInfo();
-//                        userExtInfo.setViewType(1);
-//                        userExtInfo.setCellphone(phone);
-//                        userExtInfo.setUid(uid);
-//
-//                        userService.insertUserExtInfo(userExtInfo);
-//                    }
-//
-//                }
-
                 User user = new User();
                 user.setCellPhone(phone);
                 user.setIntegral(totalValue);
-                user.setWallet_address("xxxxx");
                 user.setRealName(realName);
                 user.setUid(uid+"");
 
@@ -508,7 +486,8 @@ public class UserController extends BaseController{
                 CommonResult.success(jsonResult);
 
             }catch (Exception e){
-                CommonResult.sqlFailed(jsonResult);
+                CommonResult.userNotExit(jsonResult);
+                return jsonResult;
             }
         }else if (type.equals("1")){
             //验证密码
@@ -559,116 +538,6 @@ public class UserController extends BaseController{
         }
 
         jsonResult = userService.selecteUserInfoByUid(uid, gltoken, jsonResult);
-
-
-//        try {
-//            //去够力那边取数据
-//            GatewayResponse<GouliUserInfo> gouliUserInfo = chainService.getUserInfo(uid);
-//
-//            if (null == gouliUserInfo || gouliUserInfo.getCode() != 200) {
-//                CommonResult.passwordError(jsonResult);
-//            } else {
-//                CommonResult.success(jsonResult);
-//            }
-//
-//            realName = gouliUserInfo.getContent().getRealName();
-//            totalValue = Integer.parseInt(String.valueOf(gouliUserInfo.getContent().getTotalValue()));
-//            validValue = Integer.parseInt(String.valueOf(gouliUserInfo.getContent().getValidValue()));
-//            phone = gouliUserInfo.getContent().getPhone();
-//
-//        }catch (Exception e){
-//            CommonResult.userNotExit(jsonResult);
-//            return jsonResult;
-//        }
-//
-//        try {
-//            List<UserCredits> userCreditss = userCreditsService.selectUserCreditsByUid(Integer.parseInt(uid));
-//            if(ValidCheck.validList(userCreditss)) {
-//                //用户不存在
-//
-//                    UserCredits userCredits = new UserCredits();
-//                    userCredits.setIntegral(validValue);
-//                    userCredits.setOwnerType(DBConstants.OwnerType.CUSTOMER.getCode());
-//                    userCredits.setWalletAddress("xxxxx");
-//                    userCredits.setOwnerId(Integer.parseInt(uid));
-//                    userCredits.setFrozenIntegral(totalValue);
-//                    userCredits.setCreateTime(new Timestamp(System.currentTimeMillis()));
-//
-//                    UserExtInfo userExtInfo = new UserExtInfo();
-//                    userExtInfo.setCellphone(phone);
-//                    userExtInfo.setViewType(1);
-//                    userExtInfo.setUid(Integer.parseInt(uid));
-//
-//                    UserOnline userOnline = new UserOnline();
-//                    userOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
-//                    userOnline.setToken(token_key);
-//                    userOnline.setUid(Integer.parseInt(uid));
-//
-//                    userService.insertUserInfo(userCredits, userExtInfo, userOnline);
-//
-//            }else{
-//
-//                UserCredits userCredits = userCreditss.get(0);
-//                userCredits.setFrozenIntegral(totalValue);
-//                userCredits.setIntegral(validValue);
-//
-//                List<UserOnline> userOnlines = userService.selectUserOnlineByUid(Integer.parseInt(uid));
-//
-//                if(ValidCheck.validList(userOnlines)){
-//                    //不存在新添加
-//                    UserOnline userOnline = new UserOnline();
-//                    userOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
-//                    userOnline.setToken(token_key);
-//                    userOnline.setUid(Integer.parseInt(uid));
-//
-//                    userService.insertUserOnline(userOnline);
-//                }else{
-//                    //用户存在更新
-//                    UserOnline userOnline = userOnlines.get(0);
-//                    userOnline.setLoginTime(new Timestamp(System.currentTimeMillis()));
-//
-//                    userService.updateUserInfo(userCredits, userOnline);
-//
-//                }
-//
-//                List<UserExtInfo> userExtInfos = userService.selectUserExtInfoByUid(Integer.parseInt(uid));
-//                //不存在新添加
-//                if(ValidCheck.validList(userExtInfos)){
-//                    UserExtInfo userExtInfo = new UserExtInfo();
-//                    userExtInfo.setViewType(1);
-//                    userExtInfo.setCellphone(phone);
-//                    userExtInfo.setUid(Integer.parseInt(uid));
-//
-//                    userService.insertUserExtInfo(userExtInfo);
-//                }
-//
-//            }
-//
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("uid", uid);
-//            jsonObject.put("role", "USER");
-//
-//            //生成token
-//            String token = JwtUtil.createJWT(GlobalConstants.GLJR_PREFIX, jsonObject.toString(), token_key, GlobalConstants.TOKEN_FAILURE_TIME);
-//
-//            User user = new User();
-//            user.setCellPhone(phone);
-//            user.setIntegral(validValue);
-//            user.setToken(token);
-//            user.setWallet_address("xxxxx");
-//            user.setRealName(realName);
-//            user.setUid(uid);
-//
-//            Map map = new HashMap();
-//            map.put("data", user);
-//
-//            jsonResult.setItem(map);
-//            CommonResult.success(jsonResult);
-//
-//        }catch (Exception e){
-//            System.out.println(e);
-//            CommonResult.sqlFailed(jsonResult);
-//        }
 
         return jsonResult;
     }

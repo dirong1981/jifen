@@ -89,6 +89,9 @@ public class FeaturedActivityServiceImpl implements FeaturedActivityService {
             PageHelper.startPage(page,per_page);
             List<FeaturedActivity> featuredActivities = featuredActivityMapper.selectByExample(featuredActivityExample);
 
+            for(FeaturedActivity featuredActivity : featuredActivities){
+                featuredActivity.setPictureKey(featuredActivity.getPictureKey() + "!featured");
+            }
 
             PageInfo pageInfo = new PageInfo(featuredActivities);
 

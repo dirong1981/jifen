@@ -52,8 +52,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
     private DTChainService chainService;
 
     @Autowired
-    private AdminPermissionAssignMapper adminPermissionAssignMapper;
-
+    private StoreCouponMapper storeCouponMapper;
 
     @Override
     public JsonResult selectAllStoreInfo(Integer page, Integer per_page, JsonResult jsonResult) {
@@ -224,13 +223,15 @@ public class StoreInfoServiceImpl implements StoreInfoService {
 
     @Override
     @Transactional
-    public JsonResult insertStoreInfo(StoreInfo storeInfo, MultipartFile file, String username, Integer random, JsonResult jsonResult) {
+    public JsonResult insertStoreInfo(StoreInfo storeInfo, MultipartFile file, String username, Integer random, JsonResult jsonResult, String type) {
         try {
 
             //添加商户管理员账号
             AdminExample adminExample = new AdminExample();
             AdminExample.Criteria criteria = adminExample.or();
             criteria.andUsernameEqualTo(username);
+
+            System.out.println(storeInfo.getStoreType());
 
             List<Admin> admins = adminMapper.selectByExample(adminExample);
             if(!ValidCheck.validList(admins)){
@@ -267,17 +268,19 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             storeInfo.setAid(admin.getId());
             storeInfo.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
-            storeInfoMapper.insert(storeInfo);
+            String[] types = type.split(",");
 
-
-//            for (String permission : GlobalConstants.STORE_ADMIN_PERMISSION){
-//                AdminPermissionAssign adminPermissionAssign = new AdminPermissionAssign();
-//                adminPermissionAssign.setPermissionCode(NumberUtils.getInt(permission));
-//                adminPermissionAssign.setAssignTime(new Timestamp(System.currentTimeMillis()));
-//                adminPermissionAssign.setAid(admin.getId());
-//
-//                adminPermissionAssignMapper.insert(adminPermissionAssign);
-//            }
+            for(String _type : types){
+                if(_type.equals("1")){
+                    storeInfo.setCategoryCode(-1);
+                    storeInfo.setStoreType(DBConstants.MerchantType.ONLINE.getCode());
+                    storeInfoMapper.insert(storeInfo);
+                }
+                if(_type.equals("2")){
+                    storeInfo.setStoreType(DBConstants.MerchantType.OFFLINE.getCode());
+                    storeInfoMapper.insert(storeInfo);
+                }
+            }
 
             //添加商户的积分信息
             GatewayResponse response = this.chainService.initStoreAccount(storeInfo.getId() + 0L);
@@ -378,6 +381,15 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             List<StorePhoto> storePhotos = storePhotoMapper.selectByExample(storePhotoExample);
             map.put("photos", storePhotos);
 
+            StoreCouponExample storeCouponExample = new StoreCouponExample();
+            StoreCouponExample.Criteria criteria1 = storeCouponExample.or();
+            criteria1.andSiIdEqualTo(storeId);
+            criteria1.andStatusEqualTo(1);
+            List<StoreCoupon> storeCoupons = storeCouponMapper.selectByExample(storeCouponExample);
+
+            map.put("coupons",storeCoupons);
+
+
             jsonResult.setItem(map);
 
             CommonResult.success(jsonResult);
@@ -394,7 +406,47 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             StoreInfoExample storeInfoExample = new StoreInfoExample();
             StoreInfoExample.Criteria criteria = storeInfoExample.or();
             criteria.andStatusEqualTo(DBConstants.MerchantStatus.ACTIVED.getCode());
-            criteria.andStoreTypeEqualTo(1);
+            criteria.andStoreTypeEqualTo(DBConstants.MerchantType.ONLINE.getCode());
+            criteria.andNameLike("%" + keyword + "%");
+
+            PageHelper.startPage(page,per_page);
+            List<StoreInfo> storeInfos = storeInfoMapper.selectByExample(storeInfoExample);
+
+            for (StoreInfo storeInfo : storeInfos){
+                storeInfo.setLogoKey(storeInfo.getLogoKey() + "!popular");
+            }
+
+            if(ValidCheck.validList(storeInfos)){
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                jsonResult.setMessage("没有找到商铺信息，请更换关键字！");
+                return jsonResult;
+            }
+
+            PageInfo pageInfo = new PageInfo(storeInfos);
+            Map map = new HashMap();
+            map.put("data", storeInfos);
+
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
+
+            jsonResult.setItem(map);
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult selectOfflineStoreInfoByKeyword(String keyword, Integer page, Integer per_page, Integer sort, JsonResult jsonResult) {
+        try {
+            StoreInfoExample storeInfoExample = new StoreInfoExample();
+            StoreInfoExample.Criteria criteria = storeInfoExample.or();
+            criteria.andStatusEqualTo(DBConstants.MerchantStatus.ACTIVED.getCode());
+            criteria.andStoreTypeEqualTo(DBConstants.MerchantType.OFFLINE.getCode());
             criteria.andNameLike("%" + keyword + "%");
 
             PageHelper.startPage(page,per_page);
@@ -435,16 +487,18 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             if(sort == 0){
                 storeInfoExample.setOrderByClause("id desc");
             }else if (sort == 1){
-                criteria.andPayStatusEqualTo(1);
-                storeInfoExample.setOrderByClause("id desc");
+                storeInfoExample.setOrderByClause("pay_status desc");
             }else if (sort == 2){
-                criteria.andPayStatusEqualTo(0);
-                storeInfoExample.setOrderByClause("id desc");
+                storeInfoExample.setOrderByClause("pay_status asc");
             }
 
             PageHelper.startPage(page,per_page);
             //查询分类下的商品，按照sort排序
             List<StoreInfo> storeInfos = storeInfoMapper.selectByExample(storeInfoExample);
+
+            for (StoreInfo storeInfo : storeInfos){
+                storeInfo.setLogoKey(storeInfo.getLogoKey() + "!popular");
+            }
 
             PageInfo pageInfo = new PageInfo(storeInfos);
             Map  map = new HashMap();
@@ -461,6 +515,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             CommonResult.success(jsonResult);
 
         }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;

@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.StoreInfo">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="serial_code" jdbcType="VARCHAR" property="serialCode" />
-    <result column="store_type" jdbcType="INTEGER" property="storeType"/>
+    <result column="store_type" jdbcType="INTEGER" property="storeType" />
     <result column="category_code" jdbcType="INTEGER" property="categoryCode" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="location_code" jdbcType="INTEGER" property="locationCode" />
@@ -78,8 +78,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, serial_code, store_type, category_code, name, location_code, address, contact_phone, logo_key,
-    pay_status, aid, status, create_time
+    id, serial_code, store_type, category_code, name, location_code, address, contact_phone, 
+    logo_key, pay_status, aid, status, create_time
   </sql>
   <sql id="Blob_Column_List">
     description
@@ -115,7 +115,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
-    select
+    select 
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -136,16 +136,16 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into store_info (serial_code, category_code, name,
-    location_code, address, contact_phone,
-    logo_key, pay_status, aid,
-    status, create_time, description
-    )
-    values (#{serialCode,jdbcType=VARCHAR}, #{categoryCode,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
-    #{locationCode,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR},
-    #{logoKey,jdbcType=VARCHAR}, #{payStatus,jdbcType=INTEGER}, #{aid,jdbcType=INTEGER},
-    #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
-    )
+    insert into store_info (serial_code, store_type, category_code, 
+      name, location_code, address, 
+      contact_phone, logo_key, pay_status, 
+      aid, status, create_time, 
+      description)
+    values (#{serialCode,jdbcType=VARCHAR}, #{storeType,jdbcType=INTEGER}, #{categoryCode,jdbcType=INTEGER}, 
+      #{name,jdbcType=VARCHAR}, #{locationCode,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, 
+      #{contactPhone,jdbcType=VARCHAR}, #{logoKey,jdbcType=VARCHAR}, #{payStatus,jdbcType=INTEGER}, 
+      #{aid,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{description,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.StoreInfo">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -155,6 +155,9 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="serialCode != null">
         serial_code,
+      </if>
+      <if test="storeType != null">
+        store_type,
       </if>
       <if test="categoryCode != null">
         category_code,
@@ -193,6 +196,9 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="serialCode != null">
         #{serialCode,jdbcType=VARCHAR},
+      </if>
+      <if test="storeType != null">
+        #{storeType,jdbcType=INTEGER},
       </if>
       <if test="categoryCode != null">
         #{categoryCode,jdbcType=INTEGER},
@@ -244,6 +250,9 @@
       <if test="record.serialCode != null">
         serial_code = #{record.serialCode,jdbcType=VARCHAR},
       </if>
+      <if test="record.storeType != null">
+        store_type = #{record.storeType,jdbcType=INTEGER},
+      </if>
       <if test="record.categoryCode != null">
         category_code = #{record.categoryCode,jdbcType=INTEGER},
       </if>
@@ -285,18 +294,19 @@
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update store_info
     set id = #{record.id,jdbcType=INTEGER},
-    serial_code = #{record.serialCode,jdbcType=VARCHAR},
-    category_code = #{record.categoryCode,jdbcType=INTEGER},
-    name = #{record.name,jdbcType=VARCHAR},
-    location_code = #{record.locationCode,jdbcType=INTEGER},
-    address = #{record.address,jdbcType=VARCHAR},
-    contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
-    logo_key = #{record.logoKey,jdbcType=VARCHAR},
-    pay_status = #{record.payStatus,jdbcType=INTEGER},
-    aid = #{record.aid,jdbcType=INTEGER},
-    status = #{record.status,jdbcType=INTEGER},
-    create_time = #{record.createTime,jdbcType=TIMESTAMP},
-    description = #{record.description,jdbcType=LONGVARCHAR}
+      serial_code = #{record.serialCode,jdbcType=VARCHAR},
+      store_type = #{record.storeType,jdbcType=INTEGER},
+      category_code = #{record.categoryCode,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR},
+      location_code = #{record.locationCode,jdbcType=INTEGER},
+      address = #{record.address,jdbcType=VARCHAR},
+      contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
+      logo_key = #{record.logoKey,jdbcType=VARCHAR},
+      pay_status = #{record.payStatus,jdbcType=INTEGER},
+      aid = #{record.aid,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      description = #{record.description,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -304,17 +314,18 @@
   <update id="updateByExample" parameterType="map">
     update store_info
     set id = #{record.id,jdbcType=INTEGER},
-    serial_code = #{record.serialCode,jdbcType=VARCHAR},
-    category_code = #{record.categoryCode,jdbcType=INTEGER},
-    name = #{record.name,jdbcType=VARCHAR},
-    location_code = #{record.locationCode,jdbcType=INTEGER},
-    address = #{record.address,jdbcType=VARCHAR},
-    contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
-    logo_key = #{record.logoKey,jdbcType=VARCHAR},
-    pay_status = #{record.payStatus,jdbcType=INTEGER},
-    aid = #{record.aid,jdbcType=INTEGER},
-    status = #{record.status,jdbcType=INTEGER},
-    create_time = #{record.createTime,jdbcType=TIMESTAMP}
+      serial_code = #{record.serialCode,jdbcType=VARCHAR},
+      store_type = #{record.storeType,jdbcType=INTEGER},
+      category_code = #{record.categoryCode,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR},
+      location_code = #{record.locationCode,jdbcType=INTEGER},
+      address = #{record.address,jdbcType=VARCHAR},
+      contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
+      logo_key = #{record.logoKey,jdbcType=VARCHAR},
+      pay_status = #{record.payStatus,jdbcType=INTEGER},
+      aid = #{record.aid,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -324,6 +335,9 @@
     <set>
       <if test="serialCode != null">
         serial_code = #{serialCode,jdbcType=VARCHAR},
+      </if>
+      <if test="storeType != null">
+        store_type = #{storeType,jdbcType=INTEGER},
       </if>
       <if test="categoryCode != null">
         category_code = #{categoryCode,jdbcType=INTEGER},
@@ -364,22 +378,24 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.gljr.jifen.pojo.StoreInfo">
     update store_info
     set serial_code = #{serialCode,jdbcType=VARCHAR},
-    category_code = #{categoryCode,jdbcType=INTEGER},
-    name = #{name,jdbcType=VARCHAR},
-    location_code = #{locationCode,jdbcType=INTEGER},
-    address = #{address,jdbcType=VARCHAR},
-    contact_phone = #{contactPhone,jdbcType=VARCHAR},
-    logo_key = #{logoKey,jdbcType=VARCHAR},
-    pay_status = #{payStatus,jdbcType=INTEGER},
-    aid = #{aid,jdbcType=INTEGER},
-    status = #{status,jdbcType=INTEGER},
-    create_time = #{createTime,jdbcType=TIMESTAMP},
-    description = #{description,jdbcType=LONGVARCHAR}
+      store_type = #{storeType,jdbcType=INTEGER},
+      category_code = #{categoryCode,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      location_code = #{locationCode,jdbcType=INTEGER},
+      address = #{address,jdbcType=VARCHAR},
+      contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      logo_key = #{logoKey,jdbcType=VARCHAR},
+      pay_status = #{payStatus,jdbcType=INTEGER},
+      aid = #{aid,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.StoreInfo">
     update store_info
     set serial_code = #{serialCode,jdbcType=VARCHAR},
+      store_type = #{storeType,jdbcType=INTEGER},
       category_code = #{categoryCode,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
       location_code = #{locationCode,jdbcType=INTEGER},

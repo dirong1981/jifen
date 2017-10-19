@@ -40,6 +40,50 @@ public class OnlineOrderController {
      * @param httpServletRequest
      * @return
      */
+    @GetMapping("/all")
+    @ResponseBody
+    public JsonResult selectAllOrder(@RequestParam(value = "page", required = false) Integer page,
+                                           @RequestParam(value = "per_page", required = false) Integer per_page, @RequestParam(value = "sort", required = false) Integer sort,
+                                           @RequestParam(value = "start_time", required = false) String start_time, @RequestParam(value = "end_time", required = false) String end_time,
+                                           HttpServletRequest httpServletRequest) {
+
+        JsonResult jsonResult = new JsonResult();
+
+        String uid = httpServletRequest.getHeader("uid");
+
+        if(StringUtils.isEmpty(uid)){
+            CommonResult.userNotExit(jsonResult);
+            return jsonResult;
+        }
+
+        if(StringUtils.isEmpty(start_time)){
+            start_time = "0";
+        }
+
+        if(StringUtils.isEmpty(end_time)){
+            end_time = "0";
+        }
+
+        if(StringUtils.isEmpty(sort) || sort > 4 || sort < 0){
+            sort = 0;
+        }
+
+        jsonResult = onlineOrderService.selectOrdersByUid(uid, page, per_page, sort, start_time, end_time, jsonResult);
+
+        return jsonResult;
+    }
+
+
+    /**
+     * 查询用户所有在线订单
+     * @param page
+     * @param per_page
+     * @param sort
+     * @param start_time
+     * @param end_time
+     * @param httpServletRequest
+     * @return
+     */
     @GetMapping
     @ResponseBody
     public JsonResult selectAllOnlineOrder(@RequestParam(value = "page", required = false) Integer page,

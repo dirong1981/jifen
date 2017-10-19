@@ -59,6 +59,8 @@
             <mvc:exclude-mapping path="/v1/stores/manager/logout"/>
             <mvc:exclude-mapping path="/v1/store/manager/login"/>
             <mvc:exclude-mapping path="/v1/store/manager/logout"/>
+            <mvc:exclude-mapping path="/v1/manager/admins/pwd"/>
+
             <mvc:exclude-mapping path="/**/uploadFiles"/>
             <bean class="com.gljr.jifen.filter.TokenIntecepter"></bean>
         </mvc:interceptor>
@@ -74,10 +76,10 @@
             <mvc:exclude-mapping path="/v1/stores/manager/logout"/>
             <mvc:exclude-mapping path="/v1/store/manager/login"/>
             <mvc:exclude-mapping path="/v1/store/manager/logout"/>
+            <mvc:exclude-mapping path="/v1/manager/admins/pwd"/>
             <mvc:exclude-mapping path="/**/uploadFiles"/>
             <bean class="com.gljr.jifen.filter.AuthInterceptor"></bean>
         </mvc:interceptor>
-
     </mvc:interceptors>
 
 </beans>

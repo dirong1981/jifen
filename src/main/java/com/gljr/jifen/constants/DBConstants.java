@@ -256,7 +256,7 @@ public class DBConstants {
     }
 
     public enum OnlineProductType {
-        NORMAL_PRODUCT(1, "常规商品"), SYSTEM_VIRTUAL_PRODUCT(2, "平台虚拟商品");
+        NORMAL_PRODUCT(1, "常规商品"), SYSTEM_VIRTUAL_PRODUCT(2, "平台虚拟商品"), STORE_COUPON(3, "商户代金券");
         private int code;
 
         private String description;
@@ -402,6 +402,31 @@ public class DBConstants {
     }
 
 
+    /**
+     * 聚合页查询内容
+     */
+    public enum ModuleAggregationType {
+
+        PRODUCT(1, "商品"), STORE(2, "商户"), CONDITION(3, "条件");
+        private int code;
+
+        private String description;
+
+        ModuleAggregationType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+
     public enum MerchantType {
         ONLINE(1, "线上商品商户"), OFFLINE(2, "线下扫码商户");
         private int code;
@@ -409,6 +434,47 @@ public class DBConstants {
         private String description;
 
         MerchantType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public enum StoreCouponStatus {
+        INVALID(0, "未激活"), ACTIVED(1, "已激活"), SOLD_OUT(2, "已兑完"), DELETED(-1, "已删除");
+        private int code;
+
+        private String description;
+
+        StoreCouponStatus(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public enum CouponStatus {
+        VALID(1, "有效的"), USED(2, "已使用"), EXPIRED(3, "已过期"), REFUND(4, "已退款");
+
+        private int code;
+
+        private String description;
+
+        CouponStatus(int code, String description) {
             this.code = code;
             this.description = description;
         }

@@ -79,4 +79,10 @@ public interface ModuleAggregationService {
     JsonResult acceptanceModuleAggregationById(Integer moduleAggregationId, JsonResult jsonResult);
 
 
+
+    JsonResult showModuleAggregationByLink(Integer id, JsonResult jsonResult);
+
+    JsonResult insertModuleAggregationCondition(Integer id, Integer from, Integer to);
+
+    JsonResult deleteModuleAggregationById(Integer id);
 }

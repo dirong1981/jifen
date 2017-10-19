@@ -5,12 +5,14 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="si_id" jdbcType="INTEGER" property="siId" />
     <result column="max_generated" jdbcType="INTEGER" property="maxGenerated" />
+    <result column="min_consumption" jdbcType="INTEGER" property="minConsumption" />
     <result column="integral" jdbcType="INTEGER" property="integral" />
     <result column="equal_money" jdbcType="INTEGER" property="equalMoney" />
     <result column="validity_type" jdbcType="INTEGER" property="validityType" />
     <result column="valid_from" jdbcType="DATE" property="validFrom" />
     <result column="valid_to" jdbcType="DATE" property="validTo" />
     <result column="valid_days" jdbcType="INTEGER" property="validDays" />
+    <result column="allow_cancel" jdbcType="INTEGER" property="allowCancel" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -73,8 +75,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, si_id, max_generated, integral, equal_money, validity_type, valid_from, valid_to, 
-    valid_days, status, create_time
+    id, si_id, max_generated, min_consumption, integral, equal_money, validity_type, 
+    valid_from, valid_to, valid_days, allow_cancel, status, create_time
   </sql>
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.StoreCouponExample" resultMap="BaseResultMap">
     select
@@ -110,14 +112,16 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into store_coupon (si_id, max_generated, integral, 
-      equal_money, validity_type, valid_from, 
-      valid_to, valid_days, status, 
-      create_time)
-    values (#{siId,jdbcType=INTEGER}, #{maxGenerated,jdbcType=INTEGER}, #{integral,jdbcType=INTEGER}, 
-      #{equalMoney,jdbcType=INTEGER}, #{validityType,jdbcType=INTEGER}, #{validFrom,jdbcType=DATE}, 
-      #{validTo,jdbcType=DATE}, #{validDays,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=TIMESTAMP})
+    insert into store_coupon (si_id, max_generated, min_consumption, 
+      integral, equal_money, validity_type, 
+      valid_from, valid_to, valid_days, 
+      allow_cancel, status, create_time
+      )
+    values (#{siId,jdbcType=INTEGER}, #{maxGenerated,jdbcType=INTEGER}, #{minConsumption,jdbcType=INTEGER}, 
+      #{integral,jdbcType=INTEGER}, #{equalMoney,jdbcType=INTEGER}, #{validityType,jdbcType=INTEGER}, 
+      #{validFrom,jdbcType=DATE}, #{validTo,jdbcType=DATE}, #{validDays,jdbcType=INTEGER}, 
+      #{allowCancel,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.StoreCoupon">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -130,6 +134,9 @@
       </if>
       <if test="maxGenerated != null">
         max_generated,
+      </if>
+      <if test="minConsumption != null">
+        min_consumption,
       </if>
       <if test="integral != null">
         integral,
@@ -149,6 +156,9 @@
       <if test="validDays != null">
         valid_days,
       </if>
+      <if test="allowCancel != null">
+        allow_cancel,
+      </if>
       <if test="status != null">
         status,
       </if>
@@ -162,6 +172,9 @@
       </if>
       <if test="maxGenerated != null">
         #{maxGenerated,jdbcType=INTEGER},
+      </if>
+      <if test="minConsumption != null">
+        #{minConsumption,jdbcType=INTEGER},
       </if>
       <if test="integral != null">
         #{integral,jdbcType=INTEGER},
@@ -180,6 +193,9 @@
       </if>
       <if test="validDays != null">
         #{validDays,jdbcType=INTEGER},
+      </if>
+      <if test="allowCancel != null">
+        #{allowCancel,jdbcType=INTEGER},
       </if>
       <if test="status != null">
         #{status,jdbcType=INTEGER},
@@ -207,6 +223,9 @@
       <if test="record.maxGenerated != null">
         max_generated = #{record.maxGenerated,jdbcType=INTEGER},
       </if>
+      <if test="record.minConsumption != null">
+        min_consumption = #{record.minConsumption,jdbcType=INTEGER},
+      </if>
       <if test="record.integral != null">
         integral = #{record.integral,jdbcType=INTEGER},
       </if>
@@ -225,6 +244,9 @@
       <if test="record.validDays != null">
         valid_days = #{record.validDays,jdbcType=INTEGER},
       </if>
+      <if test="record.allowCancel != null">
+        allow_cancel = #{record.allowCancel,jdbcType=INTEGER},
+      </if>
       <if test="record.status != null">
         status = #{record.status,jdbcType=INTEGER},
       </if>
@@ -241,12 +263,14 @@
     set id = #{record.id,jdbcType=INTEGER},
       si_id = #{record.siId,jdbcType=INTEGER},
       max_generated = #{record.maxGenerated,jdbcType=INTEGER},
+      min_consumption = #{record.minConsumption,jdbcType=INTEGER},
       integral = #{record.integral,jdbcType=INTEGER},
       equal_money = #{record.equalMoney,jdbcType=INTEGER},
       validity_type = #{record.validityType,jdbcType=INTEGER},
       valid_from = #{record.validFrom,jdbcType=DATE},
       valid_to = #{record.validTo,jdbcType=DATE},
       valid_days = #{record.validDays,jdbcType=INTEGER},
+      allow_cancel = #{record.allowCancel,jdbcType=INTEGER},
       status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -261,6 +285,9 @@
       </if>
       <if test="maxGenerated != null">
         max_generated = #{maxGenerated,jdbcType=INTEGER},
+      </if>
+      <if test="minConsumption != null">
+        min_consumption = #{minConsumption,jdbcType=INTEGER},
       </if>
       <if test="integral != null">
         integral = #{integral,jdbcType=INTEGER},
@@ -280,6 +307,9 @@
       <if test="validDays != null">
         valid_days = #{validDays,jdbcType=INTEGER},
       </if>
+      <if test="allowCancel != null">
+        allow_cancel = #{allowCancel,jdbcType=INTEGER},
+      </if>
       <if test="status != null">
         status = #{status,jdbcType=INTEGER},
       </if>
@@ -293,12 +323,14 @@
     update store_coupon
     set si_id = #{siId,jdbcType=INTEGER},
       max_generated = #{maxGenerated,jdbcType=INTEGER},
+      min_consumption = #{minConsumption,jdbcType=INTEGER},
       integral = #{integral,jdbcType=INTEGER},
       equal_money = #{equalMoney,jdbcType=INTEGER},
       validity_type = #{validityType,jdbcType=INTEGER},
       valid_from = #{validFrom,jdbcType=DATE},
       valid_to = #{validTo,jdbcType=DATE},
       valid_days = #{validDays,jdbcType=INTEGER},
+      allow_cancel = #{allowCancel,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

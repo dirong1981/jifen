@@ -1,15 +1,21 @@
 package com.gljr.jifen.service;
 
+import com.gljr.jifen.common.Md5Util;
 import com.gljr.jifen.common.RandomUtil;
 import com.gljr.jifen.constants.DBConstants;
+import com.gljr.jifen.dao.CouponMapper;
 import com.gljr.jifen.dao.SerialNumberMapper;
 import com.gljr.jifen.pojo.Category;
+import com.gljr.jifen.pojo.StoreCoupon;
+import com.gljr.jifen.pojo.User;
 import com.gljr.jifen.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -19,6 +25,9 @@ public class SerialNumberService {
 
     @Autowired
     private SerialNumberMapper serialNumberMapper;
+
+    @Autowired
+    private CouponMapper couponMapper;
 
     /**
      * 获取下一个系统权限Code
@@ -43,7 +52,7 @@ public class SerialNumberService {
     /**
      * 产生商铺序列号 （城市代码+时间戳+随机4位数）
      *
-     * @param cityCode     城市代码（需详细到区，如450202）
+     * @param cityCode 城市代码（需详细到区，如450202）
      * @return 商铺序列号
      */
     public String gextNextStoreSerialCode(Integer cityCode) {
@@ -79,6 +88,5 @@ public class SerialNumberService {
 
         return _trxCode;
     }
-
 
 }

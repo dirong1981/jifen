@@ -2,28 +2,15 @@ package com.gljr.jifen.pojo;
 
 import java.util.Date;
 
-public class StoreOfflineOrder {
+public class UserOrder {
+
     private Integer id;
-
-    private Integer siId;
-
-    private Integer ucId;
-
-    private Integer uid;
-
-    private Integer trxId;
 
     private String trxCode;
 
-    private String dtchainBlockId;
-
-    private String extOrderId;
-
-    private Integer totalMoney;
-
     private Integer integral;
 
-    private Integer extCash;
+    private Integer quantity;
 
     private Integer status;
 
@@ -35,7 +22,12 @@ public class StoreOfflineOrder {
 
     private String description;
 
+    private String userName;
+
+    private String storeName;
+
     private Integer trxType;
+
 
     public Integer getId() {
         return id;
@@ -45,68 +37,12 @@ public class StoreOfflineOrder {
         this.id = id;
     }
 
-    public Integer getSiId() {
-        return siId;
-    }
-
-    public void setSiId(Integer siId) {
-        this.siId = siId;
-    }
-
-    public Integer getUcId() {
-        return ucId;
-    }
-
-    public void setUcId(Integer ucId) {
-        this.ucId = ucId;
-    }
-
-    public Integer getUid() {
-        return uid;
-    }
-
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
-
-    public Integer getTrxId() {
-        return trxId;
-    }
-
-    public void setTrxId(Integer trxId) {
-        this.trxId = trxId;
-    }
-
     public String getTrxCode() {
         return trxCode;
     }
 
     public void setTrxCode(String trxCode) {
-        this.trxCode = trxCode == null ? null : trxCode.trim();
-    }
-
-    public String getDtchainBlockId() {
-        return dtchainBlockId;
-    }
-
-    public void setDtchainBlockId(String dtchainBlockId) {
-        this.dtchainBlockId = dtchainBlockId;
-    }
-
-    public String getExtOrderId() {
-        return extOrderId;
-    }
-
-    public void setExtOrderId(String extOrderId) {
-        this.extOrderId = extOrderId;
-    }
-
-    public Integer getTotalMoney() {
-        return totalMoney;
-    }
-
-    public void setTotalMoney(Integer totalMoney) {
-        this.totalMoney = totalMoney;
+        this.trxCode = trxCode;
     }
 
     public Integer getIntegral() {
@@ -117,12 +53,12 @@ public class StoreOfflineOrder {
         this.integral = integral;
     }
 
-    public Integer getExtCash() {
-        return extCash;
+    public Integer getQuantity() {
+        return quantity;
     }
 
-    public void setExtCash(Integer extCash) {
-        this.extCash = extCash;
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public Integer getStatus() {
@@ -163,6 +99,22 @@ public class StoreOfflineOrder {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 
     public Integer getTrxType() {

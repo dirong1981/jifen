@@ -9,6 +9,7 @@ import com.gljr.jifen.controller.BaseController;
 import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.Category;
 import com.gljr.jifen.service.CategoryService;
+import com.gljr.jifen.service.SerialNumberService;
 import com.gljr.jifen.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -38,30 +39,22 @@ public class CategoryManagerController extends BaseController {
     private StorageService storageService;
 
     @Autowired
-    private HttpServletResponse httpServletResponse;
-
-    @Autowired
-    private HttpServletRequest httpServletRequest;
+    private SerialNumberService serialNumberService;
 
     /**
      * 添加分类
      *
      * @param category      分类模型
-     * @param bindingResult 验证类
      * @param file          上传的图片
      * @return
      * @throws Exception
      */
     @PostMapping
     @ResponseBody
-    public JsonResult addCategory(@Valid Category category, BindingResult bindingResult,
-                                  @RequestParam(value = "pic", required = false) MultipartFile file){
+    @AuthPassport(permission_code = "#16100101#")
+    public JsonResult insertCategory(Category category, @RequestParam(value = "pic", required = false) MultipartFile file){
         JsonResult jsonResult = new JsonResult();
 
-        if (bindingResult.hasErrors()) {
-            CommonResult.notNull(jsonResult);
-            return jsonResult;
-        }
 
         if (file != null && !file.isEmpty()) {
             String _key = storageService.uploadToPublicBucket("category", file);
@@ -74,12 +67,11 @@ public class CategoryManagerController extends BaseController {
             category.setLogoKey("category/default.png");
         }
 
-        try {
-            categoryService.insertClass(category);
-            CommonResult.success(jsonResult);
-        } catch (Exception e) {
-            CommonResult.sqlFailed(jsonResult);
-        }
+        category.setCode(this.serialNumberService.getNextCategoryCode(category));
+        category.setStatus(DBConstants.CategoryStatus.INACTIVE.getCode());
+        category.setCreateTime(new Timestamp(System.currentTimeMillis()));
+
+        jsonResult = categoryService.insertCategory(category);
 
         return jsonResult;
     }
@@ -92,7 +84,8 @@ public class CategoryManagerController extends BaseController {
      */
     @GetMapping(value = "/{id}/acceptance")
     @ResponseBody
-    public JsonResult approveCategory(@PathVariable("id") Integer id) {
+    @AuthPassport(permission_code = "#16100102#")
+    public JsonResult startCategory(@PathVariable("id") Integer id) {
         JsonResult jsonResult = new JsonResult();
 
         if(StringUtils.isEmpty(id)){
@@ -100,22 +93,7 @@ public class CategoryManagerController extends BaseController {
             return jsonResult;
         }
 
-        try {
-            //通过id查询该分类
-            Category category = categoryService.selectClass(id);
-
-            if(ValidCheck.validPojo(category)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            category.setStatus(DBConstants.CategoryStatus.ACTIVED.getCode());
-            categoryService.updateClass(category);
-
-            CommonResult.success(jsonResult);
-        } catch (Exception e) {
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = categoryService.startCategoryById(id);
 
         return jsonResult;
     }
@@ -128,6 +106,7 @@ public class CategoryManagerController extends BaseController {
      */
     @GetMapping(value = "/{id}/rejection")
     @ResponseBody
+    @AuthPassport(permission_code = "#16100102#")
     public JsonResult stopCategories(@PathVariable("id") Integer id) {
         JsonResult jsonResult = new JsonResult();
 
@@ -136,21 +115,7 @@ public class CategoryManagerController extends BaseController {
             return jsonResult;
         }
 
-        try {
-            //通过id查询该分类
-            Category category = categoryService.selectClass(id);
-            if(ValidCheck.validPojo(category)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            category.setStatus(DBConstants.CategoryStatus.INACTIVE.getCode());
-
-            categoryService.updateClass(category);
-            CommonResult.success(jsonResult);
-        } catch (Exception e) {
-            CommonResult.sqlFailed(jsonResult);
-        }
+        jsonResult = categoryService.stopCategoryById(id);
 
         return jsonResult;
     }
@@ -163,6 +128,7 @@ public class CategoryManagerController extends BaseController {
      */
     @DeleteMapping(value = "/{id}")
     @ResponseBody
+    @AuthPassport(permission_code = "#16100104#")
     public JsonResult deleteCategories(@PathVariable("id") Integer id) {
         JsonResult jsonResult = new JsonResult();
 
@@ -171,182 +137,21 @@ public class CategoryManagerController extends BaseController {
             return jsonResult;
         }
 
-        try {
-
-            //通过id查询该分类
-            Category category = categoryService.selectClass(id);
-            if(ValidCheck.validPojo(category)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            //判断该分类有没有子分类被使用
-            List<Category> categories = categoryService.selectShowSonClass(category.getCode());
-            if(!ValidCheck.validList(categories)){
-                CommonResult.objIsUsed(jsonResult);
-                return jsonResult;
-            }
-
-            //查询该分类有没有添加商品
-            long count = categoryService.selectProductCountByCode(category.getCode());
-            if(count > 0){
-                CommonResult.objIsUsed(jsonResult);
-                return jsonResult;
-            }
-
-            count = categoryService.selectStoreCountByCode(category.getCode());
-            if(count > 0){
-                CommonResult.objIsUsed(jsonResult);
-                return jsonResult;
-            }
-
-
-            //通过code删除该分类和该分类下的子分类
-            categoryService.deleteClass(category.getCode());
-
-            CommonResult.success(jsonResult);
-
-        } catch (Exception e) {
-            CommonResult.sqlFailed(jsonResult);
-        }
-
+        jsonResult = categoryService.deleteCategoryById(id);
         return jsonResult;
     }
 
 
     /**
-     * 给一个分类排序
-     * @param id 分类id
-     * @param sort 排序值
-     * @return 返回状态码
-     */
-    @GetMapping(value = "/{id}/order/{sort}")
-    @ResponseBody
-    public JsonResult sortCategories(@PathVariable("id") Integer id, @PathVariable("sort") Integer sort){
-        JsonResult jsonResult = new JsonResult();
-
-        if(StringUtils.isEmpty(id) || StringUtils.isEmpty(sort)){
-            CommonResult.noObject(jsonResult);
-            return jsonResult;
-        }
-
-        try{
-            //通过id查询该分类
-            Category category = categoryService.selectClass(id);
-
-            if(ValidCheck.validPojo(category)){
-                CommonResult.noObject(jsonResult);
-                return jsonResult;
-            }
-
-            category.setSort(sort);
-
-            categoryService.updateClass(category);
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
-
-        return  jsonResult;
-    }
-
-
-
-
-    /**
-     * 修改分类信息
-     * @param category 分类模型
-     * @param bindingResult 验证类
-     * @param uploadfile 原分类图片名称
-     * @param file 新上传的图片
-     * @return 返回状态值
-     */
-    @PutMapping
-    @ResponseBody
-    public JsonResult updateClass(@Valid Category category, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile,
-                                  @RequestParam(value="pic",required=false) MultipartFile file){
-        JsonResult jsonResult = new JsonResult();
-
-
-        category.setCreateTime(new Timestamp(System.currentTimeMillis()));
-
-//        if(bindingResult.hasErrors()){
-//            jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
-//            return jsonResult;
-//        }
-
-        //上传图片
-
-        //获得物理路径webapp所在路径
-        String pathRoot = httpServletRequest.getSession().getServletContext().getRealPath("");
-        String path="";
-
-        try {
-            if (file != null && !file.isEmpty()) {
-                //System.out.println("aaa");
-                //获得文件类型（可以判断如果不是图片，禁止上传）
-                String contentType=file.getContentType();
-                //获得文件后缀名称
-                String imageName=contentType.substring(contentType.indexOf("/")+1);
-                String pic = UUID.randomUUID().toString().replaceAll("-","");
-                String fileName = pic + "." + imageName;
-                path="/WEB-INF/static/image/class-images/"+fileName;
-                file.transferTo(new File(pathRoot+path));
-
-                category.setLogoKey(fileName);
-
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-
-            } else {
-                category.setLogoKey(uploadfile);
-            }
-        }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
-        }
-
-        try{
-            categoryService.updateClass(category);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-            Map map = new HashMap();
-            map.put("cate", category);
-            jsonResult.setItem(map);
-
-        }catch (Exception e){
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-        }
-
-        return jsonResult;
-    }
-
-
-
-    /**
-     * 查询所有分类，包括未审核通过分类
+     * 查询所有商品分类，包括未审核通过分类
      * @return
      */
     @GetMapping(value = "/all")
     @ResponseBody
-    @AuthPassport(permission_code = "#10#")
-    public JsonResult allCategories(){
-        JsonResult jsonResult = new JsonResult();
-        Map map = new HashMap();
+    @AuthPassport(permission_code = "#161001#")
+    public JsonResult allProductCategories(){
 
-        try{
-            List<Category> list = null;
-
-            list = categoryService.selectParentClass();
-            map.put("parents", list);
-
-            list = categoryService.selectSonClass();
-            map.put("sons", list);
-
-            jsonResult.setItem(map);
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        JsonResult jsonResult = categoryService.selectAllProductCategories();
 
         return  jsonResult;
     }
@@ -358,25 +163,10 @@ public class CategoryManagerController extends BaseController {
      */
     @GetMapping(value = "/all/store")
     @ResponseBody
+    @AuthPassport(permission_code = "#161002#")
     public JsonResult allStoreCategories(){
-        JsonResult jsonResult = new JsonResult();
-        Map map = new HashMap();
 
-        try{
-            List<Category> list = null;
-
-            list = categoryService.selectStoreParentClass();
-            map.put("parents", list);
-
-            list = categoryService.selectStoreSonClass();
-            map.put("sons", list);
-
-            jsonResult.setItem(map);
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
+        JsonResult jsonResult = categoryService.selectAllStoreCategories();
 
         return  jsonResult;
     }
@@ -386,16 +176,21 @@ public class CategoryManagerController extends BaseController {
      * 查询所有通过审核商户和商品分类
      * @return
      */
-    @GetMapping(value = "/sort")
+    @GetMapping
     @ResponseBody
     public JsonResult allCategoriesIncludeProductStore(){
-        JsonResult jsonResult = new JsonResult();
 
-        jsonResult = categoryService.allCategoriesIncludeProductStore(jsonResult);
+        JsonResult jsonResult = categoryService.selectCategories();
 
         return  jsonResult;
     }
 
+    /**
+     * 排序
+     * @param cur
+     * @param prev
+     * @return
+     */
     @PutMapping(value = "/order")
     @ResponseBody
     public JsonResult changeCategoryOrder(@RequestParam(value = "cur") Integer cur, @RequestParam(value = "prev") Integer prev){
@@ -409,5 +204,30 @@ public class CategoryManagerController extends BaseController {
         jsonResult = categoryService.changeCategoryOrder(cur, prev, jsonResult);
 
         return  jsonResult;
+    }
+
+
+    /**
+     * 查询通过审核的商品分类
+     * @return
+     */
+    @GetMapping(value = "/products")
+    @ResponseBody
+    public JsonResult selectEnabelProductCategory(){
+
+        JsonResult jsonResult = categoryService.selectProductCategories();
+        return jsonResult;
+    }
+
+
+    /**
+     * 查询通过审核的商户分类
+     * @return
+     */
+    @GetMapping(value = "/stores")
+    @ResponseBody
+    public JsonResult selectEnabelStoresCategory(){
+        JsonResult jsonResult = categoryService.selectStorecategories();
+        return jsonResult;
     }
 }

@@ -135,11 +135,11 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
             transactionMapper.insert(transaction);
 
 
-            String title = "向" + userExtInfo.getCellphone() + "转账" + integralTransferOrder.getIntegral() + "分";
+
             //添加一个积分转增订单
             integralTransferOrder.setUid(Integer.parseInt(uid));
             integralTransferOrder.setStatus(DBConstants.OrderStatus.PAID.getCode());
-            integralTransferOrder.setTitle(title);
+            //integralTransferOrder.setTitle(title);
             integralTransferOrder.setCreateTime(new Timestamp(System.currentTimeMillis()));
             integralTransferOrder.setTrxId(transaction.getId());
             integralTransferOrder.setTrxCode(transaction.getCode());
@@ -159,12 +159,21 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
             userExtInfos = userExtInfoMapper.selectByExample(userExtInfoExample);
             userExtInfo = userExtInfos.get(0);
 
-            title = userExtInfo.getCellphone() + "向您转账" + integralTransferOrder.getIntegral() + "分";
+            String title = userExtInfo.getCellphone() + "向您转账" + integralTransferOrder.getIntegral() + "分";
             Message message = new Message();
             message.setReadStatus(0);
             message.setContent(title);
             message.setCreateTime(new Timestamp(System.currentTimeMillis()));
             message.setUid(integralTransferOrder.getgUid());
+
+            messageMapper.insert(message);
+
+            title = "您向" + userExtInfo.getCellphone() + "转账" + integralTransferOrder.getIntegral() + "分";
+            message = new Message();
+            message.setReadStatus(0);
+            message.setContent(title);
+            message.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            message.setUid(integralTransferOrder.getUid());
 
             messageMapper.insert(message);
 

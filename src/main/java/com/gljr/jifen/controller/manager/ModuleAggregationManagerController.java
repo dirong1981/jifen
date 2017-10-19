@@ -4,9 +4,11 @@ package com.gljr.jifen.controller.manager;
 import com.gljr.jifen.common.*;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.*;
 import com.google.gson.Gson;
+import com.qiniu.util.Json;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -37,6 +39,7 @@ public class ModuleAggregationManagerController {
      */
     @PostMapping
     @ResponseBody
+    @AuthPassport(permission_code = "#131202#")
     public JsonResult insertModuleAggregations(ModuleAggregation moduleAggregation, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
@@ -48,7 +51,7 @@ public class ModuleAggregationManagerController {
 
         moduleAggregation.setCreateTime(new Timestamp(System.currentTimeMillis()));
         moduleAggregation.setManagerId(Integer.parseInt(aid));
-        moduleAggregation.setLinkCode(StrUtil.randomKey(16));
+        moduleAggregation.setLinkCode(StrUtil.randomKey(5));
 
         jsonResult = moduleAggregationService.insertModuleAggregation(moduleAggregation, jsonResult);
 
@@ -102,6 +105,7 @@ public class ModuleAggregationManagerController {
      */
     @GetMapping(value = "/{moduleAggregationId}/rejection")
     @ResponseBody
+    @AuthPassport(permission_code = "#131202#")
     public JsonResult stopModuleAggregation(@PathVariable("moduleAggregationId") Integer moduleAggregationId){
         JsonResult jsonResult = new JsonResult();
 
@@ -119,11 +123,26 @@ public class ModuleAggregationManagerController {
      */
     @GetMapping(value = "/{moduleAggregationId}/acceptance")
     @ResponseBody
+    @AuthPassport(permission_code = "#131202#")
     public JsonResult startModuleAggregation(@PathVariable("moduleAggregationId") Integer moduleAggregationId){
         JsonResult jsonResult = new JsonResult();
 
         jsonResult = moduleAggregationService.acceptanceModuleAggregationById(moduleAggregationId, jsonResult);
 
+
+        return jsonResult;
+    }
+
+    /**
+     * 删除一个聚合页
+     * @param id
+     * @return
+     */
+    @DeleteMapping(value = "/{id}")
+    @ResponseBody
+    public JsonResult deleteModuleAggregationById(@PathVariable("id") Integer id){
+
+        JsonResult jsonResult = moduleAggregationService.deleteModuleAggregationById(id);
 
         return jsonResult;
     }
@@ -153,6 +172,7 @@ public class ModuleAggregationManagerController {
      */
     @PostMapping(value = "/{moduleAggregationId}/products/{type}")
     @ResponseBody
+    @AuthPassport(permission_code = "#131202#")
     public JsonResult insertModuleAggregationProducts(@PathVariable(value = "moduleAggregationId") Integer moduleAggregationId, @PathVariable(value = "type") Integer type,
                                                       HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
@@ -172,6 +192,47 @@ public class ModuleAggregationManagerController {
         jsonResult = moduleAggregationService.insertModuleAggregationProduct(moduleAggregationId, productIds, type, jsonResult);
 
 
+
+        return jsonResult;
+    }
+
+
+
+
+
+    /**
+     * 通过路径获取一个聚合页
+     * @return
+     */
+    @GetMapping(value = "/show/{id}")
+    @ResponseBody
+    public JsonResult selectModuleAggregations(@PathVariable(value = "id") Integer id){
+        JsonResult jsonResult = new JsonResult();
+
+        jsonResult = moduleAggregationService.showModuleAggregationByLink(id, jsonResult);
+
+        return jsonResult;
+    }
+
+    /**
+     * 添加条件聚合页
+     * @param id
+     * @param from
+     * @param to
+     * @return
+     */
+    @PostMapping(value = "/{moduleAggregationId}/condition")
+    @ResponseBody
+    public JsonResult insertModuleAggregationCondition(@PathVariable(value = "moduleAggregationId") Integer id, @RequestParam("from") Integer from, @RequestParam(value = "to") Integer to){
+        JsonResult jsonResult = new JsonResult();
+
+        if(StringUtils.isEmpty(from) || StringUtils.isEmpty(to)){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage("请填写搜索条件！");
+            return jsonResult;
+        }
+
+        jsonResult = moduleAggregationService.insertModuleAggregationCondition(id, from, to);
 
         return jsonResult;
     }

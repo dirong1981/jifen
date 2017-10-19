@@ -39,6 +39,9 @@ public class UserServiceImpl implements UserService {
     private UserExtInfoMapper userExtInfoMapper;
 
     @Autowired
+    private OnlineOrderMapper onlineOrderMapper;
+
+    @Autowired
     private MessageMapper messageMapper;
 
     @Autowired
@@ -76,7 +79,7 @@ public class UserServiceImpl implements UserService {
 //
 //                uid = Integer.parseInt(gouliUserId.getContent().getId() + "");
 
-                uid  = 15526;
+                uid  = 15470;
                 UserOnlineExample userOnlineExample = new UserOnlineExample();
                 UserOnlineExample.Criteria criteria = userOnlineExample.or();
                 criteria.andUidEqualTo(uid);
@@ -156,6 +159,13 @@ public class UserServiceImpl implements UserService {
             phone = userExtInfo.getCellphone();
             viewType = userExtInfo.getViewType();
 
+            OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
+            OnlineOrderExample.Criteria criteria3 = onlineOrderExample.or();
+            criteria3.andStatusEqualTo(DBConstants.OrderStatus.UNPAID.getCode());
+            criteria3.andUidEqualTo(uid);
+
+            long count = onlineOrderMapper.countByExample(onlineOrderExample);
+
 
             Map map = new HashMap();
             map.put("totalValue", totalValue);
@@ -166,6 +176,8 @@ public class UserServiceImpl implements UserService {
             map.put("token", token);
             map.put("readMessage", readMessage);
             map.put("uid", uid);
+            map.put("unpaid", Integer.parseInt(count + ""));
+            map.put("url", "http://www.gouli.com");
 
             jsonResult.setItem(map);
 

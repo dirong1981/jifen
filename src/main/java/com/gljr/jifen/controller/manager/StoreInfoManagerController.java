@@ -169,18 +169,16 @@ public class StoreInfoManagerController extends BaseController {
      */
     @PostMapping
     @ResponseBody
-    public JsonResult addAdminAjax(@Valid StoreInfo storeInfo, BindingResult bindingResult, @RequestParam(value = "username") String username,
-                                   @RequestParam(value = "pic", required = false) MultipartFile file, @RequestParam(value = "random") Integer random) {
+    public JsonResult addAdminAjax(StoreInfo storeInfo, @RequestParam(value = "username") String username,
+                                   @RequestParam(value = "pic", required = false) MultipartFile file, @RequestParam(value = "random") Integer random,
+                                   @RequestParam(value = "type") String type) {
 
         JsonResult jsonResult = new JsonResult();
 
-        if(bindingResult.hasErrors()){
-            CommonResult.notNull(jsonResult);
-            return jsonResult;
-        }
+        System.out.println(type);
 
         //线下扫码商户要进分类，线上商户不进分类，分类-1
-        if(storeInfo.getStoreType() == DBConstants.MerchantType.OFFLINE.getCode() && storeInfo.getCategoryCode() == -1){
+        if(type.contains("2") && storeInfo.getCategoryCode() == -1){
             jsonResult.setMessage("请选择商户分类！");
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
             return jsonResult;
@@ -204,7 +202,7 @@ public class StoreInfoManagerController extends BaseController {
             return jsonResult;
         }
 
-        jsonResult = storeInfoService.insertStoreInfo(storeInfo, file, username, random, jsonResult);
+        jsonResult = storeInfoService.insertStoreInfo(storeInfo, file, username, random, jsonResult, type);
 
 
         return jsonResult;
@@ -291,15 +289,13 @@ public class StoreInfoManagerController extends BaseController {
 
 
     /**
-     * 根据关键字查询商户
+     * 根据关键字查询线上商品销售商户
      * @param keyword
-     * @param httpServletRequest
-     * @param httpServletResponse
      * @return
      */
     @PostMapping("/keywords")
     @ResponseBody
-    public JsonResult selectStoreInfoByKeyword(@RequestParam(value = "keyword") String keyword, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult selectStoreInfoByKeyword(@RequestParam(value = "keyword") String keyword){
         JsonResult jsonResult = new JsonResult();
         if(StringUtils.isEmpty(keyword)){
             CommonResult.notNull(jsonResult);
@@ -307,6 +303,26 @@ public class StoreInfoManagerController extends BaseController {
         }
 
         jsonResult = storeInfoService.selectStoreInfoByKeyword(keyword, 1, 100, 0, jsonResult);
+
+
+        return jsonResult;
+    }
+
+    /**
+     * 根据关键字查询线下扫码商户
+     * @param keyword
+     * @return
+     */
+    @PostMapping("/offline/keywords")
+    @ResponseBody
+    public JsonResult selectOfflineStoreInfoByKeyword(@RequestParam(value = "keyword") String keyword){
+        JsonResult jsonResult = new JsonResult();
+        if(StringUtils.isEmpty(keyword)){
+            CommonResult.notNull(jsonResult);
+            return jsonResult;
+        }
+
+        jsonResult = storeInfoService.selectOfflineStoreInfoByKeyword(keyword, 1, 100, 0, jsonResult);
 
 
         return jsonResult;

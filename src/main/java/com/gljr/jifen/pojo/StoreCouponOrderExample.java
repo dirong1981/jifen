@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class StoreOfflineOrderExample {
+public class StoreCouponOrderExample {
     protected String orderByClause;
 
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
 
-    public StoreOfflineOrderExample() {
+    public StoreCouponOrderExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
@@ -180,11 +180,6 @@ public class StoreOfflineOrderExample {
             return (Criteria) this;
         }
 
-        public Criteria andUcIdEqualTo(Integer value) {
-            addCriterion("uc_id =", value, "ucId");
-            return (Criteria) this;
-        }
-
         public Criteria andSiIdNotEqualTo(Integer value) {
             addCriterion("si_id <>", value, "siId");
             return (Criteria) this;
@@ -230,63 +225,63 @@ public class StoreOfflineOrderExample {
             return (Criteria) this;
         }
 
-        public Criteria andUidIsNull() {
-            addCriterion("uid is null");
+        public Criteria andUcIdIsNull() {
+            addCriterion("uc_id is null");
             return (Criteria) this;
         }
 
-        public Criteria andUidIsNotNull() {
-            addCriterion("uid is not null");
+        public Criteria andUcIdIsNotNull() {
+            addCriterion("uc_id is not null");
             return (Criteria) this;
         }
 
-        public Criteria andUidEqualTo(Integer value) {
-            addCriterion("uid =", value, "uid");
+        public Criteria andUcIdEqualTo(Integer value) {
+            addCriterion("uc_id =", value, "ucId");
             return (Criteria) this;
         }
 
-        public Criteria andUidNotEqualTo(Integer value) {
-            addCriterion("uid <>", value, "uid");
+        public Criteria andUcIdNotEqualTo(Integer value) {
+            addCriterion("uc_id <>", value, "ucId");
             return (Criteria) this;
         }
 
-        public Criteria andUidGreaterThan(Integer value) {
-            addCriterion("uid >", value, "uid");
+        public Criteria andUcIdGreaterThan(Integer value) {
+            addCriterion("uc_id >", value, "ucId");
             return (Criteria) this;
         }
 
-        public Criteria andUidGreaterThanOrEqualTo(Integer value) {
-            addCriterion("uid >=", value, "uid");
+        public Criteria andUcIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("uc_id >=", value, "ucId");
             return (Criteria) this;
         }
 
-        public Criteria andUidLessThan(Integer value) {
-            addCriterion("uid <", value, "uid");
+        public Criteria andUcIdLessThan(Integer value) {
+            addCriterion("uc_id <", value, "ucId");
             return (Criteria) this;
         }
 
-        public Criteria andUidLessThanOrEqualTo(Integer value) {
-            addCriterion("uid <=", value, "uid");
+        public Criteria andUcIdLessThanOrEqualTo(Integer value) {
+            addCriterion("uc_id <=", value, "ucId");
             return (Criteria) this;
         }
 
-        public Criteria andUidIn(List<Integer> values) {
-            addCriterion("uid in", values, "uid");
+        public Criteria andUcIdIn(List<Integer> values) {
+            addCriterion("uc_id in", values, "ucId");
             return (Criteria) this;
         }
 
-        public Criteria andUidNotIn(List<Integer> values) {
-            addCriterion("uid not in", values, "uid");
+        public Criteria andUcIdNotIn(List<Integer> values) {
+            addCriterion("uc_id not in", values, "ucId");
             return (Criteria) this;
         }
 
-        public Criteria andUidBetween(Integer value1, Integer value2) {
-            addCriterion("uid between", value1, value2, "uid");
+        public Criteria andUcIdBetween(Integer value1, Integer value2) {
+            addCriterion("uc_id between", value1, value2, "ucId");
             return (Criteria) this;
         }
 
-        public Criteria andUidNotBetween(Integer value1, Integer value2) {
-            addCriterion("uid not between", value1, value2, "uid");
+        public Criteria andUcIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("uc_id not between", value1, value2, "ucId");
             return (Criteria) this;
         }
 
@@ -420,63 +415,73 @@ public class StoreOfflineOrderExample {
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyIsNull() {
-            addCriterion("total_money is null");
+        public Criteria andDtchainBlockIdIsNull() {
+            addCriterion("dtchain_block_id is null");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyIsNotNull() {
-            addCriterion("total_money is not null");
+        public Criteria andDtchainBlockIdIsNotNull() {
+            addCriterion("dtchain_block_id is not null");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyEqualTo(Integer value) {
-            addCriterion("total_money =", value, "totalMoney");
+        public Criteria andDtchainBlockIdEqualTo(String value) {
+            addCriterion("dtchain_block_id =", value, "dtchainBlockId");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyNotEqualTo(Integer value) {
-            addCriterion("total_money <>", value, "totalMoney");
+        public Criteria andDtchainBlockIdNotEqualTo(String value) {
+            addCriterion("dtchain_block_id <>", value, "dtchainBlockId");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyGreaterThan(Integer value) {
-            addCriterion("total_money >", value, "totalMoney");
+        public Criteria andDtchainBlockIdGreaterThan(String value) {
+            addCriterion("dtchain_block_id >", value, "dtchainBlockId");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyGreaterThanOrEqualTo(Integer value) {
-            addCriterion("total_money >=", value, "totalMoney");
+        public Criteria andDtchainBlockIdGreaterThanOrEqualTo(String value) {
+            addCriterion("dtchain_block_id >=", value, "dtchainBlockId");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyLessThan(Integer value) {
-            addCriterion("total_money <", value, "totalMoney");
+        public Criteria andDtchainBlockIdLessThan(String value) {
+            addCriterion("dtchain_block_id <", value, "dtchainBlockId");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyLessThanOrEqualTo(Integer value) {
-            addCriterion("total_money <=", value, "totalMoney");
+        public Criteria andDtchainBlockIdLessThanOrEqualTo(String value) {
+            addCriterion("dtchain_block_id <=", value, "dtchainBlockId");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyIn(List<Integer> values) {
-            addCriterion("total_money in", values, "totalMoney");
+        public Criteria andDtchainBlockIdLike(String value) {
+            addCriterion("dtchain_block_id like", value, "dtchainBlockId");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyNotIn(List<Integer> values) {
-            addCriterion("total_money not in", values, "totalMoney");
+        public Criteria andDtchainBlockIdNotLike(String value) {
+            addCriterion("dtchain_block_id not like", value, "dtchainBlockId");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyBetween(Integer value1, Integer value2) {
-            addCriterion("total_money between", value1, value2, "totalMoney");
+        public Criteria andDtchainBlockIdIn(List<String> values) {
+            addCriterion("dtchain_block_id in", values, "dtchainBlockId");
             return (Criteria) this;
         }
 
-        public Criteria andTotalMoneyNotBetween(Integer value1, Integer value2) {
-            addCriterion("total_money not between", value1, value2, "totalMoney");
+        public Criteria andDtchainBlockIdNotIn(List<String> values) {
+            addCriterion("dtchain_block_id not in", values, "dtchainBlockId");
+            return (Criteria) this;
+        }
+
+        public Criteria andDtchainBlockIdBetween(String value1, String value2) {
+            addCriterion("dtchain_block_id between", value1, value2, "dtchainBlockId");
+            return (Criteria) this;
+        }
+
+        public Criteria andDtchainBlockIdNotBetween(String value1, String value2) {
+            addCriterion("dtchain_block_id not between", value1, value2, "dtchainBlockId");
             return (Criteria) this;
         }
 
@@ -540,126 +545,6 @@ public class StoreOfflineOrderExample {
             return (Criteria) this;
         }
 
-        public Criteria andExtCashIsNull() {
-            addCriterion("ext_cash is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashIsNotNull() {
-            addCriterion("ext_cash is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashEqualTo(Integer value) {
-            addCriterion("ext_cash =", value, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashNotEqualTo(Integer value) {
-            addCriterion("ext_cash <>", value, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashGreaterThan(Integer value) {
-            addCriterion("ext_cash >", value, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashGreaterThanOrEqualTo(Integer value) {
-            addCriterion("ext_cash >=", value, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashLessThan(Integer value) {
-            addCriterion("ext_cash <", value, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashLessThanOrEqualTo(Integer value) {
-            addCriterion("ext_cash <=", value, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashIn(List<Integer> values) {
-            addCriterion("ext_cash in", values, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashNotIn(List<Integer> values) {
-            addCriterion("ext_cash not in", values, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashBetween(Integer value1, Integer value2) {
-            addCriterion("ext_cash between", value1, value2, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andExtCashNotBetween(Integer value1, Integer value2) {
-            addCriterion("ext_cash not between", value1, value2, "extCash");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusIsNull() {
-            addCriterion("status is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusIsNotNull() {
-            addCriterion("status is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusEqualTo(Integer value) {
-            addCriterion("status =", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusNotEqualTo(Integer value) {
-            addCriterion("status <>", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusGreaterThan(Integer value) {
-            addCriterion("status >", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusGreaterThanOrEqualTo(Integer value) {
-            addCriterion("status >=", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusLessThan(Integer value) {
-            addCriterion("status <", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusLessThanOrEqualTo(Integer value) {
-            addCriterion("status <=", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusIn(List<Integer> values) {
-            addCriterion("status in", values, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusNotIn(List<Integer> values) {
-            addCriterion("status not in", values, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusBetween(Integer value1, Integer value2) {
-            addCriterion("status between", value1, value2, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusNotBetween(Integer value1, Integer value2) {
-            addCriterion("status not between", value1, value2, "status");
-            return (Criteria) this;
-        }
-
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;
@@ -717,66 +602,6 @@ public class StoreOfflineOrderExample {
 
         public Criteria andCreateTimeNotBetween(Date value1, Date value2) {
             addCriterion("create_time not between", value1, value2, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeIsNull() {
-            addCriterion("update_time is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeIsNotNull() {
-            addCriterion("update_time is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeEqualTo(Date value) {
-            addCriterion("update_time =", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeNotEqualTo(Date value) {
-            addCriterion("update_time <>", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeGreaterThan(Date value) {
-            addCriterion("update_time >", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("update_time >=", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeLessThan(Date value) {
-            addCriterion("update_time <", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeLessThanOrEqualTo(Date value) {
-            addCriterion("update_time <=", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeIn(List<Date> values) {
-            addCriterion("update_time in", values, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeNotIn(List<Date> values) {
-            addCriterion("update_time not in", values, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeBetween(Date value1, Date value2) {
-            addCriterion("update_time between", value1, value2, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeNotBetween(Date value1, Date value2) {
-            addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
     }

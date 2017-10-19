@@ -312,6 +312,66 @@ public class StoreCouponExample {
             return (Criteria) this;
         }
 
+        public Criteria andMinConsumptionIsNull() {
+            addCriterion("min_consumption is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionIsNotNull() {
+            addCriterion("min_consumption is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionEqualTo(Integer value) {
+            addCriterion("min_consumption =", value, "minConsumption");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionNotEqualTo(Integer value) {
+            addCriterion("min_consumption <>", value, "minConsumption");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionGreaterThan(Integer value) {
+            addCriterion("min_consumption >", value, "minConsumption");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionGreaterThanOrEqualTo(Integer value) {
+            addCriterion("min_consumption >=", value, "minConsumption");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionLessThan(Integer value) {
+            addCriterion("min_consumption <", value, "minConsumption");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionLessThanOrEqualTo(Integer value) {
+            addCriterion("min_consumption <=", value, "minConsumption");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionIn(List<Integer> values) {
+            addCriterion("min_consumption in", values, "minConsumption");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionNotIn(List<Integer> values) {
+            addCriterion("min_consumption not in", values, "minConsumption");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionBetween(Integer value1, Integer value2) {
+            addCriterion("min_consumption between", value1, value2, "minConsumption");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinConsumptionNotBetween(Integer value1, Integer value2) {
+            addCriterion("min_consumption not between", value1, value2, "minConsumption");
+            return (Criteria) this;
+        }
+
         public Criteria andIntegralIsNull() {
             addCriterion("integral is null");
             return (Criteria) this;
@@ -669,6 +729,66 @@ public class StoreCouponExample {
 
         public Criteria andValidDaysNotBetween(Integer value1, Integer value2) {
             addCriterion("valid_days not between", value1, value2, "validDays");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelIsNull() {
+            addCriterion("allow_cancel is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelIsNotNull() {
+            addCriterion("allow_cancel is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelEqualTo(Integer value) {
+            addCriterion("allow_cancel =", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelNotEqualTo(Integer value) {
+            addCriterion("allow_cancel <>", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelGreaterThan(Integer value) {
+            addCriterion("allow_cancel >", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelGreaterThanOrEqualTo(Integer value) {
+            addCriterion("allow_cancel >=", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelLessThan(Integer value) {
+            addCriterion("allow_cancel <", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelLessThanOrEqualTo(Integer value) {
+            addCriterion("allow_cancel <=", value, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelIn(List<Integer> values) {
+            addCriterion("allow_cancel in", values, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelNotIn(List<Integer> values) {
+            addCriterion("allow_cancel not in", values, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelBetween(Integer value1, Integer value2) {
+            addCriterion("allow_cancel between", value1, value2, "allowCancel");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllowCancelNotBetween(Integer value1, Integer value2) {
+            addCriterion("allow_cancel not between", value1, value2, "allowCancel");
             return (Criteria) this;
         }
 

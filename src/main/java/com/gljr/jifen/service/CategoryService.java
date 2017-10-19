@@ -10,65 +10,18 @@ import java.util.List;
 
 public interface CategoryService {
 
-    //查询所有父类型
-    List<Category> selectParentClass();
-
-    //查询所有父类型
-    List<Category> selectStoreParentClass();
-
-    //插入一个分类
-    int insertClass(Category category);
-
-    //查询所有子类型
-    List<Category> selectSonClass();
-
-    //查询所有子类型
-    List<Category> selectStoreSonClass();
-
-    //删除一个分类,同时删除子分类
-    int deleteClass(int code);
-
-
-
-    //更新一个分类状态
-    int updateClass(Category category);
-
-    //查找一个分类
-    Category selectClass(int id);
-
-
-    //查询所有通过审核的父分类
-    List<Category> selectShowParentClass();
-
-    //查询所有通过审核的子分类
-    List<Category> selectShowSonClass();
-
-
-    //查询所有通过审核的父分类
-    List<Category> selectShowStoreParentClass();
-
-    //查询所有通过审核的子分类
-    List<Category> selectShowStoreSonClass();
-
-    //通过父分类code查询通过审核的子分类
-    List<Category> selectShowSonClass(Integer parentcode);
-
-    //通过code查询该分类下是否有商品
-    Long selectProductCountByCode(Integer code);
-
-    //通过code查询该分类下是否有商户
-    Long selectStoreCountByCode(Integer code);
-
-    //查询所有启用的分类，包括商品，商户
-    List<Category> selectAllShowParentCategory();
-    List<Category> selectAllShowSonCategory();
+    /**
+     * 通过id查询一个分类
+     * @param id
+     * @return
+     */
+    JsonResult selectCategoryById(Integer id);
 
     /**
      * 所有分类包括商品和商户
-     * @param jsonResult
      * @return
      */
-    JsonResult allCategoriesIncludeProductStore(JsonResult jsonResult);
+    JsonResult selectCategories();
 
     /**
      * 更改分类顺序
@@ -81,9 +34,55 @@ public interface CategoryService {
 
     /**
      * 查找通过审核商品分类
-     * @param jsonResult
      * @return
      */
-    JsonResult selectProductCategories(JsonResult jsonResult);
+    JsonResult selectProductCategories();
+
+    /**
+     * 查询通过审核的商户分类
+     * @return
+     */
+    JsonResult selectStorecategories();
+
+
+    /**
+     * 启用分类
+     * @param id
+     * @return
+     */
+    JsonResult startCategoryById(Integer id);
+
+    /**
+     * 停用分类
+     * @param id
+     * @return
+     */
+    JsonResult stopCategoryById(Integer id);
+
+    /**
+     * 添加分类
+     * @param category
+     * @return
+     */
+    JsonResult insertCategory(Category category);
+
+    /**
+     * 删除分类
+     * @param id
+     * @return
+     */
+    JsonResult deleteCategoryById(int id);
+
+    /**
+     * 查询所有商品分类
+     * @return
+     */
+    JsonResult selectAllProductCategories();
+
+    /**
+     * 查询所有商户分类
+     * @return
+     */
+    JsonResult selectAllStoreCategories();
 
 }

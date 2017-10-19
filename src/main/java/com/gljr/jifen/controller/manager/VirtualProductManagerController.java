@@ -47,7 +47,6 @@ public class VirtualProductManagerController extends BaseController{
         //获取开始结束时间
         String start = httpServletRequest.getParameter("start");
         String end = httpServletRequest.getParameter("end");
-        System.out.println(start);
         //时间转换
         try {
             if(!StringUtils.isEmpty(start) && !StringUtils.isEmpty(end)){
@@ -63,6 +62,7 @@ public class VirtualProductManagerController extends BaseController{
             return jsonResult;
         }
 
+        virtualProduct.setAllowCancel(0);
         virtualProduct.setCreateTime(new Timestamp(System.currentTimeMillis()));
         virtualProduct.setRemainingAmount(virtualProduct.getAmount());
 

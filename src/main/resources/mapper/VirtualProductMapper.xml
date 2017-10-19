@@ -9,6 +9,8 @@
     <result column="valid_to" jdbcType="DATE" property="validTo" />
     <result column="amount" jdbcType="INTEGER" property="amount" />
     <result column="remaining_amount" jdbcType="INTEGER" property="remainingAmount" />
+    <result column="allow_cancel" jdbcType="INTEGER" property="allowCancel" />
+    <result column="condition" jdbcType="VARCHAR" property="condition" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -74,7 +76,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, vp_id, title, valid_from, valid_to, amount, remaining_amount, status, create_time
+    id, vp_id, title, valid_from, valid_to, amount, remaining_amount, allow_cancel, `condition`,
+    status, create_time
   </sql>
   <sql id="Blob_Column_List">
     description
@@ -133,12 +136,12 @@
     </selectKey>
     insert into virtual_product (vp_id, title, valid_from, 
       valid_to, amount, remaining_amount, 
-      status, create_time, description
-      )
+      allow_cancel, `condition`, status,
+      create_time, description)
     values (#{vpId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{validFrom,jdbcType=DATE}, 
       #{validTo,jdbcType=DATE}, #{amount,jdbcType=INTEGER}, #{remainingAmount,jdbcType=INTEGER}, 
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
-      )
+      #{allowCancel,jdbcType=INTEGER}, #{condition,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.VirtualProduct">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -163,6 +166,12 @@
       </if>
       <if test="remainingAmount != null">
         remaining_amount,
+      </if>
+      <if test="allowCancel != null">
+        allow_cancel,
+      </if>
+      <if test="condition != null">
+        'condition',
       </if>
       <if test="status != null">
         status,
@@ -192,6 +201,12 @@
       </if>
       <if test="remainingAmount != null">
         #{remainingAmount,jdbcType=INTEGER},
+      </if>
+      <if test="allowCancel != null">
+        #{allowCancel,jdbcType=INTEGER},
+      </if>
+      <if test="condition != null">
+        #{condition,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
         #{status,jdbcType=INTEGER},
@@ -234,6 +249,12 @@
       <if test="record.remainingAmount != null">
         remaining_amount = #{record.remainingAmount,jdbcType=INTEGER},
       </if>
+      <if test="record.allowCancel != null">
+        allow_cancel = #{record.allowCancel,jdbcType=INTEGER},
+      </if>
+      <if test="record.condition != null">
+        `condition` = #{record.condition,jdbcType=VARCHAR},
+      </if>
       <if test="record.status != null">
         status = #{record.status,jdbcType=INTEGER},
       </if>
@@ -257,6 +278,8 @@
       valid_to = #{record.validTo,jdbcType=DATE},
       amount = #{record.amount,jdbcType=INTEGER},
       remaining_amount = #{record.remainingAmount,jdbcType=INTEGER},
+      allow_cancel = #{record.allowCancel,jdbcType=INTEGER},
+      `condition` = #{record.condition,jdbcType=VARCHAR},
       status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       description = #{record.description,jdbcType=LONGVARCHAR}
@@ -273,6 +296,8 @@
       valid_to = #{record.validTo,jdbcType=DATE},
       amount = #{record.amount,jdbcType=INTEGER},
       remaining_amount = #{record.remainingAmount,jdbcType=INTEGER},
+      allow_cancel = #{record.allowCancel,jdbcType=INTEGER},
+      `condition` = #{record.condition,jdbcType=VARCHAR},
       status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -300,6 +325,12 @@
       <if test="remainingAmount != null">
         remaining_amount = #{remainingAmount,jdbcType=INTEGER},
       </if>
+      <if test="allowCancel != null">
+        allow_cancel = #{allowCancel,jdbcType=INTEGER},
+      </if>
+      <if test="condition != null">
+        `condition` = #{condition,jdbcType=VARCHAR},
+      </if>
       <if test="status != null">
         status = #{status,jdbcType=INTEGER},
       </if>
@@ -320,6 +351,8 @@
       valid_to = #{validTo,jdbcType=DATE},
       amount = #{amount,jdbcType=INTEGER},
       remaining_amount = #{remainingAmount,jdbcType=INTEGER},
+      allow_cancel = #{allowCancel,jdbcType=INTEGER},
+      `condition` = #{condition,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       description = #{description,jdbcType=LONGVARCHAR}
@@ -333,6 +366,8 @@
       valid_to = #{validTo,jdbcType=DATE},
       amount = #{amount,jdbcType=INTEGER},
       remaining_amount = #{remainingAmount,jdbcType=INTEGER},
+      allow_cancel = #{allowCancel,jdbcType=INTEGER},
+      `condition` = #{condition,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

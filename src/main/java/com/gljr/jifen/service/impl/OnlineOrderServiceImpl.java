@@ -19,10 +19,7 @@ import org.springframework.util.StringUtils;
 
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class OnlineOrderServiceImpl implements OnlineOrderService {
@@ -57,6 +54,13 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     @Autowired
     private SystemVirtualProductMapper systemVirtualProductMapper;
 
+    @Autowired
+    private StoreOfflineOrderMapper storeOfflineOrderMapper;
+
+    @Autowired
+    private IntegralTransferOrderMapper integralTransferOrderMapper;
+
+
     private final static int PRODUCT_NOT_FOUND = 403;
 
     private final static int INVALID_PRODUCT_INTEGRAL = 404;
@@ -70,8 +74,194 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     private final static int STORE_NOT_ACCEPT_INTEGRAL = 408;
 
     @Override
+    public JsonResult selectOrdersByUid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
+        try {
+
+            //在线订单
+            OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
+            OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
+            criteria.andUidEqualTo(Integer.parseInt(uid));
+            onlineOrderExample.setOrderByClause("id desc");
+
+
+            List<OnlineOrder> onlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
+
+
+
+            List<UserOrder> userOrders = new ArrayList<>();
+
+
+            if(!ValidCheck.validList(onlineOrders)) {
+                for (OnlineOrder onlineOrder : onlineOrders) {
+
+                    UserOrder userOrder = new UserOrder();
+
+
+                    UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
+                    UserExtInfoExample.Criteria criteria1 = userExtInfoExample.or();
+                    criteria1.andUidEqualTo(onlineOrder.getUid());
+                    List<UserExtInfo> userExtInfos = userExtInfoMapper.selectByExample(userExtInfoExample);
+                    if (ValidCheck.validList(userExtInfos)) {
+                        CommonResult.userNotExit(jsonResult);
+                        return jsonResult;
+                    }
+
+                    userOrder.setCreateTime(onlineOrder.getCreateTime());
+                    userOrder.setId(onlineOrder.getId());
+                    userOrder.setIntegral(onlineOrder.getIntegral());
+                    userOrder.setQuantity(onlineOrder.getQuantity());
+                    userOrder.setStatus(onlineOrder.getStatus());
+                    userOrder.setTrxCode(onlineOrder.getTrxCode());
+                    userOrder.setUpdateTime(onlineOrder.getUpdateTime());
+                    userOrder.setUserName(userExtInfos.get(0).getCellphone());
+                    userOrder.setTrxType(DBConstants.TrxType.OFFLINE.getCode());
+
+                    if(onlineOrder.getSiId() != 0) {
+                        Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());
+                        userOrder.setName(product.getName());
+                        userOrder.setDescription("数量：" + onlineOrder.getQuantity() + product.getUnit());
+
+
+                        StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(product.getSiId());
+                        if (ValidCheck.validPojo(storeInfo)) {
+                            CommonResult.noObject(jsonResult);
+                            return jsonResult;
+                        }
+                        userOrder.setStoreName(storeInfo.getName());
+                        userOrder.setTrxType(DBConstants.TrxType.ONLINE.getCode());
+                    }else{
+                        VirtualProduct virtualProduct = virtualProductMapper.selectByPrimaryKey(onlineOrder.getPid());
+                        userOrder.setName(virtualProduct.getTitle());
+                        userOrder.setDescription("数量：" + onlineOrder.getQuantity() + "张");
+                        userOrder.setStoreName("够力金融");
+                    }
+
+                    userOrders.add(userOrder);
+                }
+            }
+
+
+            //线下订单
+            StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
+            StoreOfflineOrderExample.Criteria criteria1 = storeOfflineOrderExample.or();
+            criteria1.andUidEqualTo(Integer.parseInt(uid));
+            storeOfflineOrderExample.setOrderByClause("id desc");
+
+            List<StoreOfflineOrder> storeOfflineOrders = storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);
+
+            if (!ValidCheck.validList(storeOfflineOrders)) {
+
+
+                for (StoreOfflineOrder storeOfflineOrder : storeOfflineOrders) {
+
+                    UserOrder userOrder = new UserOrder();
+
+                    userOrder.setUpdateTime(storeOfflineOrder.getUpdateTime());
+                    userOrder.setTrxType(DBConstants.TrxType.OFFLINE.getCode());
+                    userOrder.setTrxCode(storeOfflineOrder.getTrxCode());
+                    userOrder.setStatus(storeOfflineOrder.getStatus());
+                    userOrder.setQuantity(0);
+                    userOrder.setIntegral(storeOfflineOrder.getIntegral());
+                    userOrder.setId(storeOfflineOrder.getId());
+                    userOrder.setCreateTime(storeOfflineOrder.getCreateTime());
+
+                    StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeOfflineOrder.getSiId());
+                    userOrder.setName(storeInfo.getName());
+                    if (storeOfflineOrder.getExtCash() == 0) {
+                        userOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分");
+                    } else {
+                        userOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分，现金支付" + storeOfflineOrder.getExtCash() + "元");
+                    }
+
+                    userOrders.add(userOrder);
+
+                }
+            }
+
+
+            //转增订单
+            IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
+            IntegralTransferOrderExample.Criteria criteria2 = integralTransferOrderExample.or();
+            criteria2.andUidEqualTo(Integer.parseInt(uid));
+            integralTransferOrderExample.setOrderByClause("id desc");
+
+            List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderMapper.selectByExample(integralTransferOrderExample);
+
+            if(!ValidCheck.validList(integralTransferOrders)) {
+                for (IntegralTransferOrder integralTransferOrder : integralTransferOrders) {
+
+                    UserOrder userOrder = new UserOrder();
+
+                    userOrder.setTrxType(DBConstants.TrxType.TRANSFER.getCode());
+                    userOrder.setTrxCode(integralTransferOrder.getTrxCode());
+                    userOrder.setStatus(integralTransferOrder.getStatus());
+                    userOrder.setQuantity(0);
+                    userOrder.setIntegral(integralTransferOrder.getIntegral());
+                    userOrder.setId(integralTransferOrder.getId());
+                    userOrder.setCreateTime(integralTransferOrder.getCreateTime());
+
+                    UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
+                    UserExtInfoExample.Criteria criteria3 = userExtInfoExample.or();
+                    criteria3.andUidEqualTo(integralTransferOrder.getgUid());
+
+                    List<UserExtInfo> userExtInfos = userExtInfoMapper.selectByExample(userExtInfoExample);
+                    if(ValidCheck.validList(userExtInfos)){
+                        userOrder.setName("用户不存在");
+                    }else {
+                        userOrder.setName(userExtInfos.get(0).getCellphone());
+                        userOrder.setDescription("转账" + integralTransferOrder.getIntegral() + "分");
+                    }
+                    userOrders.add(userOrder);
+                }
+            }
+
+
+            //排序
+            //积分低到高
+            Collections.sort(userOrders, new Comparator<UserOrder>() {
+
+                @Override
+                public int compare(UserOrder o1, UserOrder o2) {
+                    //按照学生的年龄进行升序排列
+                    if (o1.getCreateTime().before(o2.getCreateTime())) {
+                        return 1;
+                    }
+                    if (o1.getIntegral() == o2.getIntegral()) {
+                        return 0;
+                    }
+                    return -1;
+                }
+
+            });
+
+
+
+
+            PageInfo pageInfo = new PageInfo(userOrders);
+
+            Map  map = new HashMap();
+            map.put("data", userOrders);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
+
+            jsonResult.setItem(map);
+            CommonResult.success(jsonResult);
+
+        } catch (Exception e) {
+            System.out.println(e);
+            CommonResult.sqlFailed(jsonResult);
+        }
+
+        return jsonResult;
+    }
+
+    @Override
     public JsonResult selectOnlineOrdersByUid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
         try {
+
             OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
             OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
@@ -84,12 +274,11 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             if(!ValidCheck.validList(onlineOrders)) {
                 for (OnlineOrder onlineOrder : onlineOrders) {
 
-
                     UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
                     UserExtInfoExample.Criteria criteria1 = userExtInfoExample.or();
                     criteria1.andUidEqualTo(onlineOrder.getUid());
                     List<UserExtInfo> userExtInfos = userExtInfoMapper.selectByExample(userExtInfoExample);
-                    if (ValidCheck.validList(userExtInfos)) {
+                    if(ValidCheck.validList(userExtInfos)){
                         CommonResult.userNotExit(jsonResult);
                         return jsonResult;
                     }
@@ -108,7 +297,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                         }
                         onlineOrder.setStoreName(storeInfo.getName());
                         onlineOrder.setTrxType(DBConstants.TrxType.ONLINE.getCode());
-                    }else{
+                    }else {
                         VirtualProduct virtualProduct = virtualProductMapper.selectByPrimaryKey(onlineOrder.getPid());
                         onlineOrder.setName(virtualProduct.getTitle());
                         onlineOrder.setDescription("数量：" + onlineOrder.getQuantity() + "张");
@@ -135,6 +324,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
         return jsonResult;
     }
+
 
     @Override
     public JsonResult selectOnlineOrdersByUidNotPay(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
@@ -240,6 +430,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                 OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
                 criteria.andUidEqualTo(Integer.parseInt(uid));
                 criteria.andPidEqualTo(onlineOrder.getPid());
+                criteria.andStatusNotEqualTo(DBConstants.OrderStatus.CANCELED.getCode());
                 //查询已经购买该商品的数量
                 int alreadyNum = 0;
                 List<OnlineOrder> exitOnlineOrders = onlineOrderMapper.selectByExample(onlineOrderExample);
@@ -500,6 +691,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             CommonResult.success(jsonResult);
             jsonResult.setItem(map);
         }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
 

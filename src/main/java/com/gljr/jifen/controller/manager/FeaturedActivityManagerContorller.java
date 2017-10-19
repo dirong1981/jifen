@@ -4,6 +4,7 @@ package com.gljr.jifen.controller.manager;
 import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.filter.AuthPassport;
 import com.gljr.jifen.pojo.FeaturedActivity;
 import com.gljr.jifen.service.FeaturedActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +159,12 @@ public class FeaturedActivityManagerContorller {
         return jsonResult;
     }
 
+    /**
+     * 排序
+     * @param cur
+     * @param prev
+     * @return
+     */
     @PutMapping(value = "/order")
     @ResponseBody
     public JsonResult changeFeaturedActivitysOrder(@RequestParam(value = "cur") Integer cur, @RequestParam(value = "prev") Integer prev){

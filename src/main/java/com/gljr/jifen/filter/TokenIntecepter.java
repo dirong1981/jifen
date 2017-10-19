@@ -79,8 +79,6 @@ public class TokenIntecepter implements HandlerInterceptor {
             String uid = httpServletRequest.getHeader("uid");
             String token = httpServletRequest.getHeader("token");
 
-            System.out.println("用户的token");
-            System.out.println(token);
 
             String requestUri = httpServletRequest.getRequestURI();
             String params = httpServletRequest.getParameter("token");
@@ -101,8 +99,6 @@ public class TokenIntecepter implements HandlerInterceptor {
                     //获取服务器端管理员信息
                     Map<String, String> tokenMap = this.redisService.getMap("user_" + uid, String.class);
 
-                    System.out.println("系统的token");
-                    System.out.println(tokenMap.get("token"));
 
                     if (null == tokenMap || !tokenMap.containsKey("tokenKey")) {
                         StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.APPDOMAIN);
@@ -129,36 +125,8 @@ public class TokenIntecepter implements HandlerInterceptor {
                 }
             }
             return true;
-//            String uid = httpServletRequest.getHeader("uid");
-//            String token = httpServletRequest.getHeader("token");
-//            if(StringUtils.isEmpty(uid) || StringUtils.isEmpty(token)){
-//                StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
-//                return false;
-//            }
-//
-//            //获取服务器端商城用户信息
-//            Map<String, String> tokenMap = this.redisService.getMap("user_" + uid, String.class);
-//
-//            if(null == tokenMap || !tokenMap.containsKey("tokenKey") || !tokenMap.containsKey("uid")){
-//                StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
-//                return false;
-//            }
-//
-//            String tokenKey = tokenMap.get("tokenKey");
-//
-//            //解密token，失败重新登录，时间过期重新登录
-//            try {
-//                Claims claims = JwtUtil.parseJWT(token, tokenKey);
-//                Date exp = claims.getExpiration();
-//                Date now = new Date(System.currentTimeMillis());
-//                if (exp.before(now)) {
-//                    StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
-//                    return false;
-//                }
-//            }catch (Exception e){
-//                StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
-//                return false;
-//            }
+        }else if(device.equals(DBConstants.ClientType.APP.getDescription())) {
+            return true;
         }else {
             StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.APPDOMAIN);
             return false;

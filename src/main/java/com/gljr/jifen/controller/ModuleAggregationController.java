@@ -1,11 +1,17 @@
 package com.gljr.jifen.controller;
 
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.gljr.jifen.common.CommonResult;
 
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
-import com.gljr.jifen.pojo.ModuleAggregation;
+import com.gljr.jifen.constants.DBConstants;
+import com.gljr.jifen.dao.ModuleAggregationConditionMapper;
+import com.gljr.jifen.dao.ModuleAggregationMapper;
+import com.gljr.jifen.dao.ProductMapper;
+import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.ModuleAggregationService;
 import com.gljr.jifen.service.RedisService;
 import com.google.gson.Gson;
@@ -30,6 +36,15 @@ public class ModuleAggregationController {
     private ModuleAggregationService moduleAggregationService;
 
     @Autowired
+    private ModuleAggregationMapper moduleAggregationMapper;
+
+    @Autowired
+    private ModuleAggregationConditionMapper moduleAggregationConditionMapper;
+
+    @Autowired
+    private ProductMapper productMapper;
+
+    @Autowired
     private RedisService redisService;
 
     /**
@@ -48,12 +63,78 @@ public class ModuleAggregationController {
         try {
             Map map = new HashMap();
 
+            if(StringUtils.isEmpty(page)){
+                page = 1;
+            }
+
+            if(StringUtils.isEmpty(per_page)){
+                per_page = 10;
+            }
+
             String _sort;
             //如果没有设置排序，按照默认读取数据
             if(sort == null || sort > 4 || sort < 0 || sort == 0){
                 _sort = "";
+                sort = 0;
             }else {
                 _sort = sort +"";
+            }
+
+            ModuleAggregationExample moduleAggregationExample = new ModuleAggregationExample();
+            ModuleAggregationExample.Criteria criteria = moduleAggregationExample.or();
+            criteria.andLinkCodeEqualTo(link);
+            List<ModuleAggregation> moduleAggregations = moduleAggregationMapper.selectByExample(moduleAggregationExample);
+
+            if(ValidCheck.validList(moduleAggregations)){
+                CommonResult.noObject(jsonResult);
+                return jsonResult;
+            }
+
+            ModuleAggregation moduleAggregation = moduleAggregations.get(0);
+
+            if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.CONDITION.getCode()){
+
+                ModuleAggregationConditionExample moduleAggregationConditionExample = new ModuleAggregationConditionExample();
+                ModuleAggregationConditionExample.Criteria criteria1 = moduleAggregationConditionExample.or();
+                criteria1.andAggregationIdEqualTo(moduleAggregation.getId());
+
+                List<ModuleAggregationCondition> moduleAggregationConditions = moduleAggregationConditionMapper.selectByExampleWithBLOBs(moduleAggregationConditionExample);
+
+                String str = moduleAggregationConditions.get(0).getExpStr();
+
+                String[] conditions = str.split(",");
+                String from = conditions[0];
+                String to = conditions[1];
+
+                ProductExample productExample = new ProductExample();
+                ProductExample.Criteria criteria2 = productExample.or();
+                criteria2.andIntegralBetween(Integer.parseInt(from), Integer.parseInt(to));
+
+                if(sort == 0){
+                    productExample.setOrderByClause("id desc");
+                }else if (sort == 1 || sort == 2){
+                    productExample.setOrderByClause("sales desc, id desc");
+                }else if (sort == 3){
+                    productExample.setOrderByClause("integral desc, id desc");
+                }else if (sort == 4){
+                    productExample.setOrderByClause("integral asc, id desc");
+                }
+
+                PageHelper.startPage(page,per_page);
+                List<Product> products = productMapper.selectByExample(productExample);
+                PageInfo pageInfo = new PageInfo(products);
+
+                map = new HashMap();
+                map.put("data", products);
+                map.put("pages", pageInfo.getPages());
+
+                map.put("total", pageInfo.getTotal());
+                //当前页
+                map.put("pageNum", pageInfo.getPageNum());
+
+                jsonResult.setItem(map);
+                CommonResult.success(jsonResult);
+                return jsonResult;
             }
 
 

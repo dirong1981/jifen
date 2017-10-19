@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 @Service
@@ -47,6 +48,12 @@ public class DTChainService {
     @Value("${dtchain.api.ext.gouli.user.userId}")
     private String apiGLUserId;
 
+    @Value("${dtchain.api.ext.gouli.user.recommend}")
+    private String apiGLUserRecommend;
+
+    @Value("${dtchain.api.ext.gouli.user.earnPoints}")
+    private String apiGLUserEarnPoints;
+
     @Value("${dtchain.api.integral.transfer}")
     private String apiIntegralTransfer;
 
@@ -67,6 +74,12 @@ public class DTChainService {
 
     @Value("${dtchain.api.settle.integral.issued.history}")
     private String apiSettleIntegralIssuedHistory;
+
+    @Value("${dtchain.api.store.coupons}")
+    private String apiStoreCoupons;
+
+    @Value("${dtchain.api.orders.coupon.refund}")
+    private String apiCouponRefund;
 
     private TreeMap<String, Object> _buildParams() {
         TreeMap<String, Object> params = new TreeMap<>();
@@ -119,6 +132,38 @@ public class DTChainService {
                             HttpClientHelper.doGetSSL(apiEndpoint + userInfoAPI, params)
                             : HttpClientHelper.doGet(apiEndpoint + userInfoAPI, params),
                     new TypeToken<GatewayResponse<GouliUserInfo>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse<Map<String, String>> userRecommend(Long userId) {
+        TreeMap<String, Object> params = _buildParams();
+        String userRecommendAPI = String.format(apiGLUserRecommend, userId);
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_GET, userRecommendAPI), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doGetSSL(apiEndpoint + userRecommendAPI, params)
+                            : HttpClientHelper.doGet(apiEndpoint + userRecommendAPI, params),
+                    new TypeToken<GatewayResponse<Map<String, String>>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse<Map<String, String>> userEarnPoints(Long userId) {
+        TreeMap<String, Object> params = _buildParams();
+        String userEarnPointsAPI = String.format(apiGLUserEarnPoints, userId);
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_GET, userEarnPointsAPI), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doGetSSL(apiEndpoint + userEarnPointsAPI, params)
+                            : HttpClientHelper.doGet(apiEndpoint + userEarnPointsAPI, params),
+                    new TypeToken<GatewayResponse<Map<String, String>>>(){}.getType());
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -259,6 +304,42 @@ public class DTChainService {
                             HttpClientHelper.doGetSSL(apiEndpoint + apiSettleIntegralIssuedHistory, params)
                             : HttpClientHelper.doGet(apiEndpoint + apiSettleIntegralIssuedHistory, params),
                     new TypeToken<GatewayResponse<List<IntegralIssuedHistory>>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse<CommonOrderResponse> verifyCoupon(Long storeId, String couponCode) {
+        TreeMap<String, Object> params = _buildParams();
+        params.put("store_id", storeId);
+        params.put("coupon_code", couponCode);
+
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_POST, apiStoreCoupons), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doPostSSL(apiEndpoint + apiStoreCoupons, params)
+                            : HttpClientHelper.doPost(apiEndpoint + apiStoreCoupons, params),
+                    new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse<CommonOrderResponse> couponRefund(Long storeId, String couponCode) {
+        TreeMap<String, Object> params = _buildParams();
+        params.put("store_id", storeId);
+        params.put("coupon_code", couponCode);
+
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_POST, apiCouponRefund), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doPostSSL(apiEndpoint + apiCouponRefund, params)
+                            : HttpClientHelper.doPost(apiEndpoint + apiCouponRefund, params),
+                    new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }

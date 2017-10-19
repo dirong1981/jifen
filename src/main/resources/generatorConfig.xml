@@ -147,6 +147,9 @@
         <!--<table schema="" tableName="system_virtual_product">-->
         <!--<generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         <!--</table>-->
+        <table schema="" tableName="store_coupon_order">
+        <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
 
 
     </context>

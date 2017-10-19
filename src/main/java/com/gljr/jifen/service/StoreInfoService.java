@@ -56,7 +56,7 @@ public interface StoreInfoService
      * @param jsonResult
      * @return
      */
-    JsonResult insertStoreInfo(StoreInfo storeInfo, MultipartFile file, String username, Integer random, JsonResult jsonResult);
+    JsonResult insertStoreInfo(StoreInfo storeInfo, MultipartFile file, String username, Integer random, JsonResult jsonResult, String type);
 
     /**
      * 上传图片
@@ -87,6 +87,17 @@ public interface StoreInfoService
      * @return
      */
     JsonResult selectStoreInfoByKeyword(String keyword, Integer page, Integer per_page, Integer sort, JsonResult jsonResult);
+
+    /**
+     * 查询线下扫码商户
+     * @param keyword
+     * @param page
+     * @param per_page
+     * @param sort
+     * @param jsonResult
+     * @return
+     */
+    JsonResult selectOfflineStoreInfoByKeyword(String keyword, Integer page, Integer per_page, Integer sort, JsonResult jsonResult);
 
 
     JsonResult selectStoreInfoByCode(Integer code, Integer page, Integer per_page, Integer sort, JsonResult jsonResult);

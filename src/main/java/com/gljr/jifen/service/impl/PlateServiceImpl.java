@@ -97,6 +97,7 @@ public class PlateServiceImpl implements PlateService {
 
 
 
+                    //图片形式，包括banner和4图片导航
                     if(module.getType() == DBConstants.ModuleType.PICTURE.getCode()){
                         ModulePictureExample modulePictureExample = new ModulePictureExample();
                         ModulePictureExample.Criteria criteria1 = modulePictureExample.or();
@@ -106,6 +107,13 @@ public class PlateServiceImpl implements PlateService {
                         List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
                         if(!ValidCheck.validList(modulePictures)){
                             for (ModulePicture modulePicture : modulePictures){
+                                if(module.getExtType() == 1){
+                                    modulePicture.setPictureKey(modulePicture.getPictureKey() + "!banner");
+                                }
+                                if(module.getExtType() == 11){
+                                    modulePicture.setPictureKey(modulePicture.getPictureKey() + "!avatar");
+                                }
+
                                 if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
                                     modulePicture.setLinkType("5");
                                 }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
@@ -130,6 +138,7 @@ public class PlateServiceImpl implements PlateService {
                         module.setPicture(modulePictures);
                     }
 
+                    //商品模式，包括商品图片和图片导航
                     if(module.getType() == DBConstants.ModuleType.PRODUCT.getCode()){
                         if(module.getExtType() == 2 || module.getExtType() == 3 || module.getExtType() == 4 || module.getExtType() == 5) {
                             ModuleProductExample moduleProductExample = new ModuleProductExample();
@@ -141,7 +150,7 @@ public class PlateServiceImpl implements PlateService {
                             for (ModuleProduct moduleProduct : moduleProducts) {
                                 Product product = productMapper.selectByPrimaryKey(moduleProduct.getProductId());
                                 if (!ValidCheck.validPojo(product)) {
-                                    moduleProduct.setLogoKey(product.getLogoKey());
+                                    moduleProduct.setLogoKey(product.getLogoKey() + "!popular");
                                 }
                             }
                             module.setProduct(moduleProducts);
@@ -154,6 +163,9 @@ public class PlateServiceImpl implements PlateService {
                             List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
                             if(!ValidCheck.validList(modulePictures)){
                                 for (ModulePicture modulePicture : modulePictures){
+
+                                    modulePicture.setPictureKey(modulePicture.getPictureKey() + "!popular");
+
                                     if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
                                         modulePicture.setLinkType("5");
                                     }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
@@ -179,6 +191,7 @@ public class PlateServiceImpl implements PlateService {
                         }
                     }
 
+                    //图片+商品模式，包括banner图片和下面的商品图片以及图片导航
                     if(module.getType() == DBConstants.ModuleType.PICTUREANDPRODUCT.getCode()){
                         if(module.getExtType() == 2 || module.getExtType() == 3 || module.getExtType() == 4 || module.getExtType() == 5) {
                             ModulePictureExample modulePictureExample = new ModulePictureExample();
@@ -188,6 +201,9 @@ public class PlateServiceImpl implements PlateService {
                             List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
                             if(!ValidCheck.validList(modulePictures)){
                                 for (ModulePicture modulePicture : modulePictures){
+
+                                    modulePicture.setPictureKey(modulePicture.getPictureKey() + "!banner");
+
                                     if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
                                         modulePicture.setLinkType("5");
                                     }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
@@ -218,7 +234,7 @@ public class PlateServiceImpl implements PlateService {
                             for (ModuleProduct moduleProduct : moduleProducts){
                                 Product product = productMapper.selectByPrimaryKey(moduleProduct.getProductId());
                                 if(!ValidCheck.validPojo(product)){
-                                    moduleProduct.setLogoKey(product.getLogoKey());
+                                    moduleProduct.setLogoKey(product.getLogoKey() + "!popular");
                                 }
                             }
                             module.setProduct(moduleProducts);
@@ -231,6 +247,9 @@ public class PlateServiceImpl implements PlateService {
                             List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
                             if(!ValidCheck.validList(modulePictures)){
                                 for (ModulePicture modulePicture : modulePictures){
+
+                                    modulePicture.setPictureKey(modulePicture.getPictureKey() + "!banner");
+
                                     if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
                                         modulePicture.setLinkType("5");
                                     }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
@@ -264,6 +283,9 @@ public class PlateServiceImpl implements PlateService {
                             modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
                             if(!ValidCheck.validList(modulePictures)){
                                 for (ModulePicture modulePicture : modulePictures){
+
+                                    modulePicture.setPictureKey(modulePicture.getPictureKey() + "!popular");
+
                                     if(StringUtils.isEmpty(modulePicture.getLinkUrl())){
                                         modulePicture.setLinkType("5");
                                     }else if(modulePicture.getLinkUrl().contains("categories") && modulePicture.getLinkUrl().contains("products")){
@@ -306,7 +328,7 @@ public class PlateServiceImpl implements PlateService {
                                 SystemVirtualProduct systemVirtualProduct = systemVirtualProductMapper.selectByPrimaryKey(virtualProduct.getVpId());
 
                                 virtualProduct.setIntegral(systemVirtualProduct.getIntegral());
-                                virtualProduct.setType(systemVirtualProduct.getType());
+                                virtualProduct.setType(Integer.parseInt(systemVirtualProduct.getCode()));
 
                                 virtualProducts.add(virtualProduct);
                             }

@@ -20,10 +20,21 @@ public interface OnlineOrderService {
      * @param jsonResult
      * @return
      */
+    JsonResult selectOrdersByUid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult);
+
+    /**
+     * 查询用户所有在线订单信息
+     * @param uid 用户id
+     * @param sort 排序
+     * @param start_time 开始时间
+     * @param end_time 结束时间
+     * @param jsonResult
+     * @return
+     */
     JsonResult selectOnlineOrdersByUid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult);
 
     /**
-     * 查询用户未付款订单
+     * 查询用户未付款在线订单
      * @param uid 用户id
      * @param sort 排序
      * @param start_time 开始时间

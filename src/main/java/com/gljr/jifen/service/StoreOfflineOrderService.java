@@ -33,6 +33,8 @@ public interface StoreOfflineOrderService {
      */
     JsonResult selectOfflineOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult);
 
+    JsonResult selectOfflineRefundOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult);
+
     /**
      * 根据条件查询线下订单
      * @param uid 用户id

@@ -54,6 +54,9 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
     @Autowired
     private OrderRefundMapper refundMapper;
 
+    @Autowired
+    private MessageMapper messageMapper;
+
     @Transactional
     @Override
     public JsonResult insertOfflineOrder(StoreOfflineOrder storeOfflineOrder, String uid, JsonResult jsonResult) {
@@ -199,6 +202,55 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                 criteria.andStatusEqualTo(status);
             }
             criteria.andCreateTimeBetween(begin, end);
+            storeOfflineOrderExample.setOrderByClause("id desc");
+
+            PageHelper.startPage(page,per_page);
+            List<StoreOfflineOrder> storeOfflineOrders = storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);
+            PageInfo pageInfo = new PageInfo(storeOfflineOrders);
+
+            if (!ValidCheck.validList(storeOfflineOrders)) {
+                for (StoreOfflineOrder storeOfflineOrder : storeOfflineOrders) {
+                    StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeOfflineOrder.getSiId());
+                    if (ValidCheck.validPojo(storeInfo)) {
+                        storeOfflineOrder.setName("已删除");
+                    } else {
+                        storeOfflineOrder.setName(storeInfo.getName());
+                    }
+
+                }
+            }
+
+            Map map = new HashMap();
+            map.put("data", storeOfflineOrders);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
+
+            CommonResult.success(jsonResult);
+            jsonResult.setItem(map);
+
+        } catch (Exception e) {
+
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult selectOfflineRefundOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult) {
+        try {
+            StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
+            StoreOfflineOrderExample.Criteria criteria = storeOfflineOrderExample.or();
+            if(!org.springframework.util.StringUtils.isEmpty(trxCode)){
+                criteria.andTrxCodeEqualTo(trxCode);
+            }
+            if(!org.springframework.util.StringUtils.isEmpty(status)){
+                criteria.andStatusEqualTo(status);
+            }
+            criteria.andCreateTimeBetween(begin, end);
+            criteria.andStatusEqualTo(DBConstants.OrderStatus.REFUND.getCode());
             storeOfflineOrderExample.setOrderByClause("id desc");
 
             PageHelper.startPage(page,per_page);
@@ -408,6 +460,15 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
         or.setTrxCode(st.getCode());
 
         this.refundMapper.refundOrder(or);
+
+        String title = storeInfo.getName() + "向您退回" + storeOfflineOrder.getIntegral() + "积分";
+        Message message = new Message();
+        message.setReadStatus(0);
+        message.setContent(title);
+        message.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        message.setUid(storeOfflineOrder.getUid());
+
+        messageMapper.insert(message);
     }
 
     @Override

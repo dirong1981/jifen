@@ -71,16 +71,6 @@ public class ModuleServiceImpl implements ModuleService {
                 return jsonResult;
             }
 
-            //查询已添加图片数量，最多5张
-            ModulePictureExample modulePictureExample = new ModulePictureExample();
-            ModulePictureExample.Criteria criteria = modulePictureExample.or();
-            criteria.andModuleIdEqualTo(modulePicture.getModuleId());
-            List<ModulePicture> modulePictures = modulePictureMapper.selectByExample(modulePictureExample);
-
-            if(modulePictures.size() >= 5){
-                CommonResult.greatThan5(jsonResult);
-                return jsonResult;
-            }
 
             //上传图片
 
