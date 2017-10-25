@@ -81,6 +81,12 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
             OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
+            //System.out.println(new Date(Long.parseLong(start_time)));
+
+            if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
+                criteria.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time)));
+            }
+
             onlineOrderExample.setOrderByClause("id desc");
 
 
@@ -145,6 +151,11 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
             StoreOfflineOrderExample.Criteria criteria1 = storeOfflineOrderExample.or();
             criteria1.andUidEqualTo(Integer.parseInt(uid));
+
+
+            if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
+                criteria1.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time)));
+            }
             storeOfflineOrderExample.setOrderByClause("id desc");
 
             List<StoreOfflineOrder> storeOfflineOrders = storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);
@@ -183,6 +194,10 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
             IntegralTransferOrderExample.Criteria criteria2 = integralTransferOrderExample.or();
             criteria2.andUidEqualTo(Integer.parseInt(uid));
+
+            if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
+                criteria2.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time)));
+            }
             integralTransferOrderExample.setOrderByClause("id desc");
 
             List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderMapper.selectByExample(integralTransferOrderExample);
@@ -265,6 +280,11 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
             OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
+
+            if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
+                criteria.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time)));
+            }
+
             onlineOrderExample.setOrderByClause("id desc");
 
             PageHelper.startPage(page,per_page);
@@ -334,6 +354,9 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
             criteria.andStatusEqualTo(DBConstants.OrderStatus.UNPAID.getCode());
             criteria.andUidEqualTo(Integer.parseInt(uid));
+            if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
+                criteria.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time)));
+            }
             onlineOrderExample.setOrderByClause("id desc");
 
             PageHelper.startPage(page,per_page);
@@ -521,7 +544,6 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     @Transactional
     public JsonResult updateOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult) {
 
-        System.out.println(trxCode);
         OnlineOrderExample onlineOrderExample = new OnlineOrderExample();
         OnlineOrderExample.Criteria criteria = onlineOrderExample.or();
         criteria.andTrxCodeEqualTo(trxCode);

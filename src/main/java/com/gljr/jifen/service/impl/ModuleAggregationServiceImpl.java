@@ -266,6 +266,9 @@ public class ModuleAggregationServiceImpl extends BaseService implements ModuleA
                 return jsonResult;
             }
 
+            moduleAggregation.setStatus(DBConstants.ModuleAggregationStatus.ACTIVED.getCode());
+            moduleAggregationMapper.updateByPrimaryKey(moduleAggregation);
+
             //查找聚合页下包含哪些商品和商户
             ModuleAggregationProductExample moduleAggregationProductExample = new ModuleAggregationProductExample();
             ModuleAggregationProductExample.Criteria criteria = moduleAggregationProductExample.or();
@@ -295,7 +298,7 @@ public class ModuleAggregationServiceImpl extends BaseService implements ModuleA
                         aggregationProduct.setName(product.getName());
                         aggregationProduct.setPrice(product.getPrice());
                         aggregationProduct.setType(DBConstants.CategoryType.PRODUCT.getCode());
-                        aggregationProduct.setLogoKey(product.getLogoKey());
+                        aggregationProduct.setLogoKey(product.getLogoKey() + "!popular");
                         aggregationProduct.setSales(product.getSales());
 
                         aggregationProducts.add(aggregationProduct);
@@ -304,7 +307,7 @@ public class ModuleAggregationServiceImpl extends BaseService implements ModuleA
                     //店铺
                     StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(moduleAggregationProduct.getStoreId());
                     if (!ValidCheck.validPojo(storeInfo)) {
-                        aggregationProduct.setLogoKey(storeInfo.getLogoKey());
+                        aggregationProduct.setLogoKey(storeInfo.getLogoKey() + "!popular");
                         aggregationProduct.setType(DBConstants.CategoryType.STORE.getCode());
                         aggregationProduct.setName(storeInfo.getName());
                         aggregationProduct.setId(storeInfo.getId());
@@ -453,7 +456,7 @@ public class ModuleAggregationServiceImpl extends BaseService implements ModuleA
                         aggregationProduct.setName(product.getName());
                         aggregationProduct.setPrice(product.getPrice());
                         aggregationProduct.setType(DBConstants.CategoryType.PRODUCT.getCode());
-                        aggregationProduct.setLogoKey(product.getLogoKey());
+                        aggregationProduct.setLogoKey(product.getLogoKey() + "!popular");
                         aggregationProduct.setSales(product.getSales());
 
                         aggregationProducts.add(aggregationProduct);
@@ -462,7 +465,7 @@ public class ModuleAggregationServiceImpl extends BaseService implements ModuleA
                     //店铺
                     StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(moduleAggregationProduct.getStoreId());
                     if (!ValidCheck.validPojo(storeInfo)) {
-                        aggregationProduct.setLogoKey(storeInfo.getLogoKey());
+                        aggregationProduct.setLogoKey(storeInfo.getLogoKey() + "!popular");
                         aggregationProduct.setType(DBConstants.CategoryType.STORE.getCode());
                         aggregationProduct.setName(storeInfo.getName());
                         aggregationProduct.setId(storeInfo.getId());

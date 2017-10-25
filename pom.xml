@@ -92,17 +92,6 @@
             <version>${spring.version}</version>
         </dependency>
 
-        <!--引入Spring Test-->
-
-        <!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-
         <!--引入Log4j-->
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
         <dependency>
@@ -186,17 +175,6 @@
             <artifactId>druid</artifactId>
             <version>${druid.version}</version>
         </dependency>
-
-
-        <!--Junit-->
-        <!-- https://mvnrepository.com/artifact/junit/junit -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
 
         <!--Gson-->
 

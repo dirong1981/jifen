@@ -56,14 +56,6 @@ public class OnlineOrderController {
             return jsonResult;
         }
 
-        if(StringUtils.isEmpty(start_time)){
-            start_time = "0";
-        }
-
-        if(StringUtils.isEmpty(end_time)){
-            end_time = "0";
-        }
-
         if(StringUtils.isEmpty(sort) || sort > 4 || sort < 0){
             sort = 0;
         }
@@ -100,14 +92,6 @@ public class OnlineOrderController {
             return jsonResult;
         }
 
-        if(StringUtils.isEmpty(start_time)){
-            start_time = "0";
-        }
-
-        if(StringUtils.isEmpty(end_time)){
-            end_time = "0";
-        }
-
         if(StringUtils.isEmpty(sort) || sort > 4 || sort < 0){
             sort = 0;
         }
@@ -142,14 +126,6 @@ public class OnlineOrderController {
         if (StringUtils.isEmpty(uid)) {
             CommonResult.userNotExit(jsonResult);
             return jsonResult;
-        }
-
-        if(StringUtils.isEmpty(start_time)){
-            start_time = "0";
-        }
-
-        if(StringUtils.isEmpty(end_time)){
-            end_time = "0";
         }
 
         if(StringUtils.isEmpty(sort) || sort > 4 || sort < 0){

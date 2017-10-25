@@ -328,5 +328,16 @@ public class StoreInfoManagerController extends BaseController {
         return jsonResult;
     }
 
-
+    /**
+     * 修改是否可以积分支付
+     * @param id
+     * @param allow
+     * @return
+     */
+    @GetMapping(value = "/allow")
+    @ResponseBody
+    public JsonResult allowCancelStoreCouponById(@RequestParam(value = "id") Integer id, @RequestParam(value = "allow") Integer allow){
+        JsonResult jsonResult = storeInfoService.allowCancelStoreCouponById(id, allow);
+        return jsonResult;
+    }
 }

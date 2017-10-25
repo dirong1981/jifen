@@ -109,4 +109,6 @@ public interface StoreInfoService
     List<StorePhoto> selectStorePhotoById(Integer id);
 
     StoreInfo selectStoreInfoById(Integer siid);
+
+    JsonResult allowCancelStoreCouponById(Integer id, Integer allow);
 }

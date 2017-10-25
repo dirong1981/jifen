@@ -114,7 +114,9 @@ public class OrderManagerController extends BaseController {
                                          @RequestParam(value = "trxCode", required = false) String trxCode,
                                          @RequestParam(value = "status", required = false) Integer status,
                                          @RequestParam(value = "beginTime", required = false) String beginTime,
-                                         @RequestParam(value = "endTime", required = false) String endTime){
+                                         @RequestParam(value = "endTime", required = false) String endTime,
+                                         @RequestParam(value = "phone", required = false) String phone,
+                                         @RequestParam(value = "storeName", required = false) String storeName){
         JsonResult jsonResult = new JsonResult();
 
         if(StringUtils.isEmpty(page)){
@@ -160,7 +162,7 @@ public class OrderManagerController extends BaseController {
             return jsonResult;
         }
 
-        jsonResult = storeOfflineOrderService.selectOfflineOrders(page, per_page, trxCode, status, begin, end, jsonResult);
+        jsonResult = storeOfflineOrderService.selectOfflineOrders(page, per_page, trxCode, status, begin, end, phone, storeName, jsonResult);
 
         return jsonResult;
     }

@@ -7,9 +7,9 @@ public class GlobalConstants {
 
 
     //设置返回的请求域名
-    public static final String WEBDOMAIN = "http://console.iep.dtchain.io";
-//    public static final String WEBDOMAIN = "http://localhost";
-    public static final String APPDOMAIN = "http://joer.pro";
+//    public static final String WEBDOMAIN = "http://console.iep.dtchain.io";
+        public static final String WEBDOMAIN = "http://localhost";
+    public static final String APPDOMAIN = "http://m.p.dtchain.io";
 
 
     //数据验证错误
@@ -75,7 +75,7 @@ public class GlobalConstants {
     public static final String OBJ_IS_USED = "该对象正在被使用！";
     public static final String USER_NO_EXIST = "获取用户数据失败！";
 
-//商家端api新增信息返回--------start--------
+    //商家端api新增信息返回--------start--------
     /**
      * token过期时间
      */
@@ -88,7 +88,7 @@ public class GlobalConstants {
     /**
      * 积分和人民币兑换比例
      */
-    public static final long INTEGRAL_RMB_EXCHANGE_RATIO = 10;
+    public static final double INTEGRAL_RMB_EXCHANGE_RATIO = 10;
     /**
      * 缓存积分校验结果key前缀
      */
@@ -110,12 +110,75 @@ public class GlobalConstants {
     public static final String[] ORDER_STATUS_EXCEPTION = {"486", "订单状态异常"};
     public static final String[] PASSWORD_NOT_CHECK = {"485", "密码未校验"};
     public static final String[] USER_NOT_EXIST = {"484", "用户信息不存在"};
+    public static final String[] COUPON_NOT_EXIST = {"483", "代金券不存在"};
+    public static final String[] COUPON_USED_OR_LOSS = {"482", "代金券已使用或者已过期"};
     public static final String[] CONFIGURATION_ERROR = {"998", "配置错误"};
     public static final String[] SYSTEM_EXCEPTION = {"999", "系统异常"};
     public static final String SESSION_STORE_USER = "session_store_user";
     //商家端api新增信息返回--------end--------
 
+    //是否超过免密额度 0：未超过 1：超过
+    public enum ExceedLimit {
+        NO(0, "未超过免密额度"), YES(1, "已超过免密额度");
+        private int code;
 
+        private String description;
+
+        ExceedLimit(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    //交易状态 0：待付款 1：已付款 2：取消
+    public enum OrderStatus {
+        UNPAID(0, "待付款"), PAID(1, "已付款"), CANCELED(2, "已取消");
+        private int code;
+
+        private String description;
+
+        OrderStatus(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    //是否校验过密码 0：没有 1：已校验（不超过免密额度默认为1）
+    public enum PwCheck {
+        NO(0, "未校验"), YES(1, "已校验");
+        private int code;
+
+        private String description;
+
+        PwCheck(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
 
     //线上商品商户管理员权限，商品添加，修改，删除，商户信息修改，线上线下订单查看
     public static final String ONLINE_STORE_ADMIN_PERMISSION = "#11#1110#111004#111005#12#1210#121001#1211#121101#";

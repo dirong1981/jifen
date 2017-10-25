@@ -73,6 +73,8 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
             }
             UserExtInfo userExtInfo = userExtInfos.get(0);
 
+            String gphone = userExtInfo.getCellphone();
+
             //判断积分是否足够
             UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid),
                     DBConstants.OwnerType.CUSTOMER.getCode());
@@ -168,7 +170,9 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
 
             messageMapper.insert(message);
 
-            title = "您向" + userExtInfo.getCellphone() + "转账" + integralTransferOrder.getIntegral() + "分";
+
+
+            title = "您向" + gphone + "转账" + integralTransferOrder.getIntegral() + "分";
             message = new Message();
             message.setReadStatus(0);
             message.setContent(title);
@@ -197,6 +201,10 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
             IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
             IntegralTransferOrderExample.Criteria criteria = integralTransferOrderExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
+            if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
+                criteria.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time)));
+            }
+
             integralTransferOrderExample.setOrderByClause("id desc");
 
             PageHelper.startPage(page,per_page);

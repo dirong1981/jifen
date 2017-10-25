@@ -487,6 +487,27 @@ public class DBConstants {
             return description;
         }
     }
+
+    public enum CouponValidityType {
+        DATE_RANGE(1, "起止日期"), DAYS_LATER(2, "领取后多少天");
+
+        private int code;
+
+        private String description;
+
+        CouponValidityType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
 }
 
 

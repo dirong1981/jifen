@@ -41,6 +41,11 @@ public class TokenIntecepter implements HandlerInterceptor {
         }
 
         String device = httpServletRequest.getHeader("device");
+        String requestUri = httpServletRequest.getRequestURI();
+
+        if(requestUri.contains("index/code")){
+            return true;
+        }
 
         if(device.equals(DBConstants.ClientType.WEB.getDescription())){
             //从pc端进入，只能是商户管理员和系统管理员
@@ -80,7 +85,6 @@ public class TokenIntecepter implements HandlerInterceptor {
             String token = httpServletRequest.getHeader("token");
 
 
-            String requestUri = httpServletRequest.getRequestURI();
             String params = httpServletRequest.getParameter("token");
             if(!StringUtils.isEmpty(params)){
                 return true;

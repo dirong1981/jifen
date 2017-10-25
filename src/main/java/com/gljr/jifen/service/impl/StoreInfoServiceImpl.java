@@ -54,6 +54,9 @@ public class StoreInfoServiceImpl implements StoreInfoService {
     @Autowired
     private StoreCouponMapper storeCouponMapper;
 
+    @Autowired
+    private UserCouponMapper userCouponMapper;
+
     @Override
     public JsonResult selectAllStoreInfo(Integer page, Integer per_page, JsonResult jsonResult) {
         try {
@@ -387,6 +390,17 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             criteria1.andStatusEqualTo(1);
             List<StoreCoupon> storeCoupons = storeCouponMapper.selectByExample(storeCouponExample);
 
+            for (StoreCoupon storeCoupon : storeCoupons){
+                UserCouponExample userCouponExample = new UserCouponExample();
+                UserCouponExample.Criteria criteria2 = userCouponExample.or();
+                criteria2.andStatusNotEqualTo(DBConstants.CouponStatus.REFUND.getCode());
+                criteria2.andScIdEqualTo(storeCoupon.getId());
+
+                Long num = userCouponMapper.countByExample(userCouponExample);
+
+                storeCoupon.setRemainingAmount(storeCoupon.getMaxGenerated() - Integer.parseInt(num + ""));
+            }
+
             map.put("coupons",storeCoupons);
 
 
@@ -540,6 +554,21 @@ public class StoreInfoServiceImpl implements StoreInfoService {
     @Override
     public StoreInfo selectStoreInfoById(Integer siid) {
         return storeInfoMapper.selectByPrimaryKey(siid);
+    }
+
+    @Override
+    public JsonResult allowCancelStoreCouponById(Integer id, Integer allow) {
+        JsonResult jsonResult = new JsonResult();
+        try{
+            StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(id);
+            storeInfo.setPayStatus(allow);
+            storeInfoMapper.updateByPrimaryKey(storeInfo);
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            System.out.println(e);
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
     }
 
     @Override

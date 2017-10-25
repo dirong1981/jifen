@@ -31,17 +31,17 @@ public interface StoreOfflineOrderService {
      * 查询所有线下订单
      * @return
      */
-    JsonResult selectOfflineOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult);
+    JsonResult selectOfflineOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, String phone, String storeName, JsonResult jsonResult);
 
     JsonResult selectOfflineRefundOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult);
 
     /**
      * 根据条件查询线下订单
-     * @param uid 用户id
-     * @param reqParam
+     * @param reqParam 查询参数
+     * @param storeId 商户ID
      * @return
      */
-    List<StoreOfflineOrder> selectAllOfflineOrderByExample(int uid, OfflineOrderReqParam reqParam);
+    List<StoreOfflineOrder> selectAllOfflineOrderByExample(OfflineOrderReqParam reqParam, int storeId);
 
     /**
      * 根据uid获取商户已经获得的积分和现金总额
@@ -94,4 +94,30 @@ public interface StoreOfflineOrderService {
      */
     List<StoreOfflineOrder> selectAllOfflineOrderByUid(int uid, int sort, String start_time, String end_time);
 
+    /**
+     * 代金券校验
+     *
+     * @param uid 用户id
+     * @param storeInfo 商户信息
+     * @param userCoupon 用户购买代金券信息
+     * @param storeCoupon 商户发放代金券信息
+     */
+    String verifyCoupon(int uid, StoreInfo storeInfo, UserCoupon userCoupon, StoreCoupon storeCoupon);
+
+    /**
+     * 根据代码获取用户购买的代金券
+     *
+     * @param couponCode 代金券代码
+     * @param storeId 商店ID
+     * @return UserCoupon
+     */
+    UserCoupon findUserCouponByCode(String couponCode, int storeId);
+
+    /**
+     * 根据商铺代金券id获取代金券具体信息
+     *
+     * @param storeCouponId 代金券Id
+     * @return UserCoupon
+     */
+    StoreCoupon findStoreCouponById(int storeCouponId);
 }

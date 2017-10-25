@@ -175,9 +175,9 @@ public class UserServiceImpl implements UserService {
             map.put("viewType", viewType);
             map.put("token", token);
             map.put("readMessage", readMessage);
-            map.put("uid", uid);
             map.put("unpaid", Integer.parseInt(count + ""));
-            map.put("url", "http://www.gouli.com");
+            map.put("uid", uid);
+            //map.put("url", "http://www.gouli.com");
 
             jsonResult.setItem(map);
 

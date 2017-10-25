@@ -300,10 +300,13 @@ public class ModuleServiceImpl implements ModuleService {
     }
 
     @Override
-    public List<Module> selectModules() {
+    public List<Module> selectModules(Integer ext_type) {
         ModuleExample moduleExample = new ModuleExample();
         ModuleExample.Criteria criteria = moduleExample.or();
         criteria.andStatusNotEqualTo(DBConstants.ModuleStatus.DELETED.getCode());
+        if(ext_type != 0){
+            criteria.andExtTypeEqualTo(ext_type);
+        }
         moduleExample.setOrderByClause("id desc");
         return moduleMapper.selectByExample(moduleExample);
     }

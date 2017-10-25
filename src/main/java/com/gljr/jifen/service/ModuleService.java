@@ -117,7 +117,7 @@ public interface ModuleService {
      * 查询所有模块
      * @return
      */
-    List<Module> selectModules();
+    List<Module> selectModules(Integer ext_type);
 
     /**
      * 按照状态查询

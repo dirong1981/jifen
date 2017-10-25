@@ -13,6 +13,7 @@ import com.gljr.jifen.service.VirtualProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +155,10 @@ public class VirtualProductServiceImpl implements VirtualProductService {
 
             virtualProduct.setType(Integer.parseInt(systemVirtualProduct.getCode()));
             virtualProduct.setIntegral(systemVirtualProduct.getIntegral());
+
+            if(virtualProduct.getValidFrom().after(new Date()) || virtualProduct.getValidTo().before(new Date())){
+                virtualProduct.setStatus(2);
+            }
 
             Map map = new HashMap();
             map.put("data", virtualProduct);

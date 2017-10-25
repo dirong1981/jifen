@@ -29,6 +29,8 @@ public class UserCoupon {
 
     private Date createTime;
 
+    private String storeAddress;
+
     public Integer getId() {
         return id;
     }
@@ -131,5 +133,13 @@ public class UserCoupon {
 
     public void setEqualMoney(Integer equalMoney) {
         this.equalMoney = equalMoney;
+    }
+
+    public String getStoreAddress() {
+        return storeAddress;
+    }
+
+    public void setStoreAddress(String storeAddress) {
+        this.storeAddress = storeAddress;
     }
 }

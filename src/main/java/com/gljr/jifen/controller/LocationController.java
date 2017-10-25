@@ -29,7 +29,7 @@ public class LocationController extends BaseController {
 
     @GetMapping
     @ResponseBody
-    public JsonResult selectLocation(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+    public JsonResult selectLocation(){
         JsonResult jsonResult = new JsonResult();
 
         try {
@@ -50,6 +50,7 @@ public class LocationController extends BaseController {
             jsonResult.setMessage(GlobalConstants.OPERATION_SUCCEED_MESSAGE);
             jsonResult.setItem(map);
         }catch (Exception e){
+            System.out.println(e);
             jsonResult.setMessage(GlobalConstants.OPERATION_FAILED);
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED_MESSAGE);
         }

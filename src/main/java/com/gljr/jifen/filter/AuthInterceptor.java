@@ -6,6 +6,8 @@ import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.StrUtil;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
+import com.gljr.jifen.dao.OptLogMapper;
+import com.gljr.jifen.pojo.OptLog;
 import com.gljr.jifen.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
@@ -16,6 +18,7 @@ import redis.clients.jedis.Jedis;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +27,9 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private OptLogMapper optLogMapper;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
@@ -43,11 +49,43 @@ public class AuthInterceptor implements HandlerInterceptor {
                 //获取路径
                 String requestUri = httpServletRequest.getRequestURI();
 
+                if(requestUri.contains("index/code")){
+                    return true;
+                }
+
+
+
                 if(device.equals(DBConstants.ClientType.WEB.getDescription())){
                     HandlerMethod method = (HandlerMethod) handler;
                     AuthPassport authPassport = method.getMethodAnnotation(AuthPassport.class);
 
                     String aid = httpServletRequest.getHeader("aid");
+
+                    OptLog optLog = new OptLog();
+                    optLog.setAid(Integer.parseInt(aid));
+                    optLog.setContent(requestUri);
+                    optLog.setOptTime(new Timestamp(System.currentTimeMillis()));
+                    if(httpServletRequest.getMethod().equals("GET")){
+                        optLog.setOptType(1);
+                    }
+                    if(httpServletRequest.getMethod().equals("POST")){
+                        optLog.setOptType(2);
+                    }
+                    if(httpServletRequest.getMethod().equals("DELETE")){
+                        optLog.setOptType(3);
+                    }
+                    if(httpServletRequest.getMethod().equals("PUT")){
+                        optLog.setOptType(4);
+                    }
+
+                    String[] a = requestUri.split("/");
+                    if(a.length >= 4) {
+                        optLog.setTableName(a[3]);
+                    }else {
+                        optLog.setTableName(a[2]);
+                    }
+                    optLogMapper.insert(optLog);
+
 
                     Map<String, String> tokenMap = this.redisService.getMap("admin_" + aid, String.class);
 
@@ -78,6 +116,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
 
             }catch (Exception e){
+                System.out.println(e);
                 StrUtil.dealErrorReturn(httpServletResponse, jsonResult, GlobalConstants.WEBDOMAIN);
                 return false;
             }

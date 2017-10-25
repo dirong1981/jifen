@@ -26,4 +26,6 @@ public interface StoreCouponService {
     JsonResult refundStoreCouponOrder(Integer couponId, String uid);
 
     JsonResult selectStoreCouponStatusById(Integer couponId);
+
+    JsonResult allowCancelStoreCouponById(Integer couponId, Integer allow);
 }

@@ -92,6 +92,7 @@ public class ModuleAggregationController {
 
             ModuleAggregation moduleAggregation = moduleAggregations.get(0);
 
+            //条件聚合
             if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.CONDITION.getCode()){
 
                 ModuleAggregationConditionExample moduleAggregationConditionExample = new ModuleAggregationConditionExample();
@@ -109,6 +110,7 @@ public class ModuleAggregationController {
                 ProductExample productExample = new ProductExample();
                 ProductExample.Criteria criteria2 = productExample.or();
                 criteria2.andIntegralBetween(Integer.parseInt(from), Integer.parseInt(to));
+                criteria2.andStatusEqualTo(DBConstants.ProductStatus.ON_SALE.getCode());
 
                 if(sort == 0){
                     productExample.setOrderByClause("id desc");
@@ -122,6 +124,9 @@ public class ModuleAggregationController {
 
                 PageHelper.startPage(page,per_page);
                 List<Product> products = productMapper.selectByExample(productExample);
+                for (Product product : products){
+                    product.setLogoKey(product.getLogoKey() + "!popular");
+                }
                 PageInfo pageInfo = new PageInfo(products);
 
                 map = new HashMap();
@@ -136,6 +141,21 @@ public class ModuleAggregationController {
                 CommonResult.success(jsonResult);
                 return jsonResult;
             }
+
+
+
+//            //商品聚合
+//            if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.PRODUCT.getCode()){
+//                ModuleAggregationProductExample moduleAggregationProductExample = new ModuleAggregationProductExample();
+//                ModuleAggregationProductExample.Criteria criteria1 = moduleAggregationProductExample.or();
+//                criteria1.andAggregationIdEqualTo(moduleAggregation.getId());
+//
+//            }
+//
+//            //商户聚合
+//            if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.STORE.getCode()){
+//
+//            }
 
 
             //获取缓存中对应的排序结果
@@ -155,6 +175,11 @@ public class ModuleAggregationController {
             }
 
             map.put("data", json);
+            map.put("pages", 1);
+
+            map.put("total", 1);
+            //当前页
+            map.put("pageNum", 1);
 
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);

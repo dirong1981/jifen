@@ -110,6 +110,7 @@ public class ModuleManagerController {
         modulePicture.setModuleId(moduleId);
         modulePicture.setSort(99);
         modulePicture.setTitle(title);
+        modulePicture.setBanner(0);
         if(!StringUtils.isEmpty(banner)) {
             modulePicture.setBanner(Integer.parseInt(banner));
         }
@@ -251,7 +252,8 @@ public class ModuleManagerController {
     @GetMapping
     @ResponseBody
     public JsonResult selectModuls(@RequestParam(value = "page", required = false) Integer page,
-                                   @RequestParam(value = "per_page", required = false) Integer per_page){
+                                   @RequestParam(value = "per_page", required = false) Integer per_page,
+                                   @RequestParam(value = "ext_type", required = false) Integer ext_type){
         JsonResult jsonResult = new JsonResult();
 
         if(StringUtils.isEmpty(page)){
@@ -263,8 +265,9 @@ public class ModuleManagerController {
         }
 
         try {
+
             PageHelper.startPage(page,per_page);
-            List<Module> modules = moduleService.selectModules();
+            List<Module> modules = moduleService.selectModules(ext_type);
             PageInfo pageInfo = new PageInfo(modules);
 
             Map map = new HashMap();
@@ -279,6 +282,7 @@ public class ModuleManagerController {
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
         }catch (Exception e){
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
 
@@ -383,13 +387,31 @@ public class ModuleManagerController {
      */
     @GetMapping(value = "/enabled")
     @ResponseBody
-    public JsonResult selectModulesByStatus(){
+    public JsonResult selectModulesByStatus(@RequestParam(value = "page", required = false) Integer page,
+                                            @RequestParam(value = "per_page", required = false) Integer per_page){
         JsonResult jsonResult = new JsonResult();
 
         try {
+            if(StringUtils.isEmpty(page)){
+                page = 1;
+            }
+
+            if(StringUtils.isEmpty(per_page)){
+                per_page = 10;
+            }
+
+
+            PageHelper.startPage(page,per_page);
             List<Module> modules = moduleService.selectModulesByEnabled();
+            PageInfo pageInfo = new PageInfo(modules);
+
             Map map = new HashMap();
             map.put("data", modules);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
 
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
@@ -411,7 +433,7 @@ public class ModuleManagerController {
      */
     @PostMapping(value = "/online/{moduleId}")
     @ResponseBody
-    public JsonResult onlineModuleToPlate(@PathVariable(value = "moduleId") Integer moduleId, @RequestParam(value = "sort") Integer sort,
+    public JsonResult onlineModuleToPlate(@PathVariable(value = "moduleId") Integer moduleId,
                                           HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
         JsonResult jsonResult = new JsonResult();
 
@@ -435,10 +457,7 @@ public class ModuleManagerController {
             plate.setCreateTime(new Timestamp(System.currentTimeMillis()));
             plate.setManagerId(Integer.parseInt(aid));
             plate.setModuleId(moduleId);
-            if (StringUtils.isEmpty(sort)) {
-                sort = 9999;
-            }
-            plate.setSort(sort);
+            plate.setSort(9999);
             moduleService.onlineModuleById(module, plate);
 
             CommonResult.success(jsonResult);

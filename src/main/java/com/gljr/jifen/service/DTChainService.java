@@ -138,7 +138,7 @@ public class DTChainService {
         return null;
     }
 
-    public GatewayResponse<Map<String, String>> userRecommend(Long userId) {
+    public GatewayResponse<String> userRecommend(Long userId) {
         TreeMap<String, Object> params = _buildParams();
         String userRecommendAPI = String.format(apiGLUserRecommend, userId);
         try {
@@ -147,14 +147,14 @@ public class DTChainService {
             return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + userRecommendAPI, params)
                             : HttpClientHelper.doGet(apiEndpoint + userRecommendAPI, params),
-                    new TypeToken<GatewayResponse<Map<String, String>>>(){}.getType());
+                    new TypeToken<GatewayResponse<String>>(){}.getType());
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
         return null;
     }
 
-    public GatewayResponse<Map<String, String>> userEarnPoints(Long userId) {
+    public GatewayResponse<String> userEarnPoints(Long userId) {
         TreeMap<String, Object> params = _buildParams();
         String userEarnPointsAPI = String.format(apiGLUserEarnPoints, userId);
         try {
@@ -163,7 +163,7 @@ public class DTChainService {
             return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + userEarnPointsAPI, params)
                             : HttpClientHelper.doGet(apiEndpoint + userEarnPointsAPI, params),
-                    new TypeToken<GatewayResponse<Map<String, String>>>(){}.getType());
+                    new TypeToken<GatewayResponse<String>>(){}.getType());
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }

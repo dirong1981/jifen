@@ -117,4 +117,11 @@ public class StoreCouponController {
         return jsonResult;
     }
 
+    @GetMapping(value = "/allow")
+    @ResponseBody
+    public JsonResult allowCancelStoreCouponById(@RequestParam(value = "id") Integer couponId, @RequestParam(value = "allow") Integer allow){
+        JsonResult jsonResult = storeCouponService.allowCancelStoreCouponById(couponId, allow);
+        return jsonResult;
+    }
+
 }

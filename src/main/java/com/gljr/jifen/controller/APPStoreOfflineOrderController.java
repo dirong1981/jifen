@@ -14,10 +14,13 @@ import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.*;
 import com.gljr.jifen.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +33,7 @@ import static com.gljr.jifen.constants.DBConstants.CACHE_USER_PAYMENT_CODE_KEY;
 @RequestMapping(value = "/v1/app")
 public class APPStoreOfflineOrderController extends BaseController {
 
+    private static Logger logger = LoggerFactory.getLogger(APPStoreOfflineOrderController.class);
 
     @Autowired
     private StoreOfflineOrderService storeOfflineOrderService;
@@ -46,13 +50,13 @@ public class APPStoreOfflineOrderController extends BaseController {
     @Autowired
     private DTChainService chainService;
 
-
     @Autowired
     private AdminService adminService;
 
+    @Resource
+    private StoreCouponService storeCouponService;
 
     private final String ORDER_DATE_FORMAT = "yyyy/MM/dd HH:mm";
-
 
     /**
      * 商户登录
@@ -134,6 +138,7 @@ public class APPStoreOfflineOrderController extends BaseController {
             storeInfoMap.put("logoUrl", storeInfo.getLogoKey());//logo图片地址
             storeInfoMap.put("serialCode", storeInfo.getSerialCode());//商家号
             storeInfoMap.put("name", storeInfo.getName());//商铺名称
+            storeInfoMap.put("integralToRmbRatio", GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO);//积分兑换人民币比例
 
             String principalIdNo = "";//证件号
             String principalPhone = "";//联系电话
@@ -192,9 +197,16 @@ public class APPStoreOfflineOrderController extends BaseController {
             pageSize = 10;
         }
 
+        List<StoreInfo> storeInfoList = storeInfoService.selectStoreInfoByAid(NumberUtils.getInt(uid));
+        if (ValidCheck.validList(storeInfoList)) {
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
+        StoreInfo storeInfo = storeInfoList.get(0);
 
         PageHelper.startPage(pageNum, pageSize);
-        List<StoreOfflineOrder> storeOfflineOrderList = storeOfflineOrderService.selectAllOfflineOrderByExample(NumberUtils.getInt(uid), offlineOrderReqParam);
+        List<StoreOfflineOrder> storeOfflineOrderList = storeOfflineOrderService.selectAllOfflineOrderByExample(offlineOrderReqParam, storeInfo.getId());
         PageInfo pageInfo = new PageInfo(storeOfflineOrderList);
         Map<Object, Object> resultMap = new HashMap<>(7);
         HashMap totalInfo = storeOfflineOrderService.getStoreTotalInfo(NumberUtils.getInt(uid));
@@ -255,7 +267,7 @@ public class APPStoreOfflineOrderController extends BaseController {
         resultMap.put("buyUser", response.getContent().getUserName());
         String oderType = "积分买单";
         if (storeOfflineOrder.getExtCash() > 0) {
-            oderType = "积分买+现金买单";
+            oderType = "积分+现金买单";
         }
         resultMap.put("oderType", oderType);
         resultMap.put("orderStat", storeOfflineOrder.getStatus());
@@ -333,7 +345,7 @@ public class APPStoreOfflineOrderController extends BaseController {
         JsonResult jsonResult = new JsonResult();
 
         List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(Integer.parseInt(uid));
-        if(ValidCheck.validList(storeInfos)){
+        if (ValidCheck.validList(storeInfos)) {
             CommonResult.noObject(jsonResult);
             return jsonResult;
         }
@@ -354,24 +366,27 @@ public class APPStoreOfflineOrderController extends BaseController {
         //判断用户积分状况
 
         Map<Object, Object> checkResult = new HashMap<>();
-        double cash = 0L;
-        int exceedLimit = 0;
-        int pwCheck = 1;
+        double cash = 0D;
+        int exceedLimit = GlobalConstants.ExceedLimit.NO.getCode();
+        int pwCheck = GlobalConstants.PwCheck.YES.getCode();
+        int actuallyPayIntegral = integral;
         if (userCredits.getIntegral() < integral) {
             cash = (integral - userCredits.getIntegral()) / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO;
+            actuallyPayIntegral = userCredits.getIntegral();
         }
         if (userCredits.getFreePaymentLimit() != null && userCredits.getFreePaymentLimit() < integral) {
-            exceedLimit = 1;
-            pwCheck = 0;
+            exceedLimit = GlobalConstants.ExceedLimit.YES.getCode();
+            pwCheck = GlobalConstants.PwCheck.NO.getCode();
         }
         checkResult.put("integral", integral);//消费积分
+        checkResult.put("actuallyPayIntegral", actuallyPayIntegral);//实际支付的积分
         checkResult.put("cash", cash);//需补充的现金
         checkResult.put("exceedLimit", exceedLimit);//是否超过免密额度 0：未超过 1：超过
-        checkResult.put("status", 0);//交易状态 0：待付款 1：已付款 2：取消
+        checkResult.put("status", GlobalConstants.OrderStatus.UNPAID.getCode());//交易状态 0：待付款 1：已付款 2：取消
         checkResult.put("pwCheck", pwCheck);//是否校验过密码 0：没有 1：已校验（不超过免密额度默认为1）
         checkResult.put("storeName", storeInfos.get(0).getName());
 
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + integral;
         String cacheKey1 = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId;
         this.redisService.put(cacheKey, JsonUtil.toJson(checkResult), GlobalConstants.CACHE_DATA_FAILURE_TIME, TimeUnit.SECONDS);
         this.redisService.put(cacheKey1, integral + "", 60, TimeUnit.SECONDS);
@@ -422,7 +437,7 @@ public class APPStoreOfflineOrderController extends BaseController {
     public JsonResult integralTradResult(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "integral") Integer integral) {
         JsonResult jsonResult = new JsonResult();
 
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + integral;
         String cacheResult = this.redisService.get(cacheKey);
         if (cacheResult == null) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
@@ -447,7 +462,7 @@ public class APPStoreOfflineOrderController extends BaseController {
     @ResponseBody
     public JsonResult pwCheck(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "password") String password, @RequestParam(value = "integral") Integer integral) {
         JsonResult jsonResult = new JsonResult();
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + integral;
         String cacheResult = this.redisService.get(cacheKey);
         if (cacheResult == null) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
@@ -462,7 +477,7 @@ public class APPStoreOfflineOrderController extends BaseController {
 
         JSONObject cacheJsonObj = JSON.parseObject(cacheResult);
         //修改缓存订单状态
-        cacheJsonObj.put("pwCheck", 1);
+        cacheJsonObj.put("pwCheck", GlobalConstants.PwCheck.YES.getCode());
         this.redisService.put(cacheKey, cacheJsonObj.toString(), GlobalConstants.CACHE_DATA_FAILURE_TIME, TimeUnit.SECONDS);
 
         jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
@@ -483,7 +498,7 @@ public class APPStoreOfflineOrderController extends BaseController {
         String uid = request.getHeader("uid");
         integral = Math.abs(integral);
         JsonResult jsonResult = new JsonResult();
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + integral;
         String cacheResult = this.redisService.get(cacheKey);
         if (cacheResult == null) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
@@ -518,7 +533,7 @@ public class APPStoreOfflineOrderController extends BaseController {
         }
 
         //修改缓存订单状态
-        cacheJsonObj.put("status", 1);
+        cacheJsonObj.put("status", GlobalConstants.OrderStatus.PAID.getCode());
         this.redisService.put(cacheKey, cacheJsonObj.toString(), GlobalConstants.CACHE_DATA_FAILURE_TIME, TimeUnit.SECONDS);
 
         jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
@@ -537,7 +552,7 @@ public class APPStoreOfflineOrderController extends BaseController {
     public JsonResult orderCancel(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "integral") Integer integral) {
         JsonResult jsonResult = new JsonResult();
 
-        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + ":" + integral;
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + integral;
         String cacheResult = this.redisService.get(cacheKey);
         if (cacheResult == null) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
@@ -546,9 +561,126 @@ public class APPStoreOfflineOrderController extends BaseController {
 
         //修改缓存订单状态
         JSONObject cacheJsonObj = JSON.parseObject(cacheResult);
-        cacheJsonObj.put("status", 2);
+        cacheJsonObj.put("status", GlobalConstants.OrderStatus.CANCELED.getCode());
         this.redisService.put(cacheKey, cacheJsonObj.toString(), GlobalConstants.CACHE_DATA_FAILURE_TIME, TimeUnit.SECONDS);
 
+        jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
+        return jsonResult;
+    }
+
+    /**
+     * 代金券消费
+     *
+     * @param couponCode 代金券消费
+     * @return
+     */
+    @RequestMapping(value = "/store/consumeCoupon")
+    @ResponseBody
+    public JsonResult consumeCoupon(@RequestParam(value = "couponCode") String couponCode) {
+        String uid = request.getHeader("uid");
+        List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(NumberUtils.getInt(uid));
+        JsonResult jsonResult = new JsonResult();
+
+        if (ValidCheck.validList(storeInfos)) {
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+        StoreInfo storeInfo = storeInfos.get(0);
+        UserCoupon userCoupon = storeOfflineOrderService.findUserCouponByCode(couponCode, storeInfo.getId());
+
+        if (userCoupon == null) {
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.COUPON_NOT_EXIST);
+            return jsonResult;
+        }
+
+        if(userCoupon.getStatus() != DBConstants.CouponStatus.VALID.getCode()){
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.COUPON_USED_OR_LOSS);
+            return jsonResult;
+        }
+
+        StoreCoupon storeCoupon = storeOfflineOrderService.findStoreCouponById(userCoupon.getScId());
+
+        if (storeCoupon == null) {
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.COUPON_NOT_EXIST);
+            return jsonResult;
+        }
+
+        Map<Object, Object> data = new HashMap<>(4);
+        try {
+            String trxCode = storeOfflineOrderService.verifyCoupon(NumberUtils.getInt(uid), storeInfos.get(0), userCoupon, storeCoupon);
+            data.put("trxCode", trxCode);
+            jsonResult.setItem(data);
+        } catch (ApiServerException e) {
+            e.printStackTrace();
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.SYSTEM_EXCEPTION);
+            data.put("errorMsg", e.getMessage());
+            jsonResult.setItem(data);
+            return jsonResult;
+        }
+
+        jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
+        return jsonResult;
+    }
+
+    /**
+     * 代金券校验
+     *
+     * @param couponCode 代金券代码
+     * @return
+     */
+    @RequestMapping(value = "/store/verifyCoupon")
+    @ResponseBody
+    public JsonResult verifyCoupon(@RequestParam(value = "couponCode") String couponCode) {
+        String uid = request.getHeader("uid");
+        List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(NumberUtils.getInt(uid));
+        JsonResult jsonResult = new JsonResult();
+
+        if (ValidCheck.validList(storeInfos)) {
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+        StoreInfo storeInfo = storeInfos.get(0);
+        UserCoupon userCoupon = storeOfflineOrderService.findUserCouponByCode(couponCode, storeInfo.getId());
+
+        if (userCoupon == null) {
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.COUPON_NOT_EXIST);
+            return jsonResult;
+        }
+
+        if(userCoupon.getStatus() != DBConstants.CouponStatus.VALID.getCode()){
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.COUPON_USED_OR_LOSS);
+            return jsonResult;
+        }
+
+        StoreCoupon storeCoupon = storeOfflineOrderService.findStoreCouponById(userCoupon.getScId());
+
+        if (storeCoupon == null) {
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.COUPON_NOT_EXIST);
+            return jsonResult;
+        }
+
+        Map<Object, Object> info = new HashMap<>(11);
+        final String dateFormat = "yyyy/MM/dd";
+
+        info.put("address", storeInfo.getAddress());//商铺地址
+        info.put("logoUrl", storeInfo.getLogoKey());//logo图片地址
+        info.put("name", storeInfo.getName());//商铺名称
+        info.put("couponMoney", storeCoupon.getEqualMoney());//卡券等值现金
+        info.put("couponCode", userCoupon.getCouponCode());//卡券代码
+        info.put("couponIntegral", storeCoupon.getIntegral());//卡券积分
+
+        String startDate;//有效期起始时间
+        String endDate;//有效期结束时间
+        if (storeCoupon.getValidityType() == DBConstants.CouponValidityType.DAYS_LATER.getCode()) {
+            startDate = DateUtils.formatToString(userCoupon.getCreateTime(), dateFormat);
+            endDate = DateUtils.formatToString(DateUtils.getRallDate(userCoupon.getCreateTime(), storeCoupon.getValidDays()), dateFormat);
+        } else {
+            startDate = DateUtils.formatToString(storeCoupon.getValidFrom(), dateFormat);
+            endDate = DateUtils.formatToString(storeCoupon.getValidTo(), dateFormat);
+        }
+        info.put("couponDateRange", startDate + " 至 " + endDate);
+
+        jsonResult.setItem(info);
         jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
         return jsonResult;
     }
@@ -564,7 +696,7 @@ public class APPStoreOfflineOrderController extends BaseController {
             offilineOrderDTO.setOrderDate(DateUtils.formatToString(soo.getCreateTime(), ORDER_DATE_FORMAT));
             String oderType = "积分买单";
             if (soo.getExtCash() > 0) {
-                oderType = "积分买+现金买单";
+                oderType = "积分+现金买单";
             }
             offilineOrderDTO.setOrderType(oderType);
             offilineOrderDTO.setRemark("");
@@ -572,5 +704,4 @@ public class APPStoreOfflineOrderController extends BaseController {
         }
         return offilineOrderDTOList;
     }
-
 }

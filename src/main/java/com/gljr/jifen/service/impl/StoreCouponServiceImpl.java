@@ -17,9 +17,11 @@ import com.gljr.jifen.service.StoreCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -52,6 +54,9 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
     @Autowired
     private DTChainService chainService;
 
+    @Autowired
+    private LocationMapper locationMapper;
+
     private final static int INVALID_INTEGRAL_AMOUNT = 402;
 
     private final static int STORE_COUPON_NOT_FOUND = 416;
@@ -83,6 +88,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             StoreCouponExample storeCouponExample = new StoreCouponExample();
             StoreCouponExample.Criteria criteria = storeCouponExample.or();
             criteria.andStatusNotEqualTo(DBConstants.ProductStatus.DELETED.getCode());
+            storeCouponExample.setOrderByClause("id desc");
 
             PageHelper.startPage(page,per_page);
             List<StoreCoupon> storeCoupons = storeCouponMapper.selectByExample(storeCouponExample);
@@ -94,6 +100,13 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
 
                     if(!ValidCheck.validPojo(storeInfo)){
                         storeCoupon.setStoreName(storeInfo.getName());
+                    }
+
+                    if(storeCoupon.getValidityType() == 1){
+                        long df = storeCoupon.getValidFrom().getTime();
+                        long dt = storeCoupon.getValidTo().getTime();
+                        long mi = dt - df;
+                        storeCoupon.setValidDays(Integer.parseInt(TimeUnit.MILLISECONDS.toDays(mi) + ""));
                     }
 
                     UserCouponExample userCouponExample = new UserCouponExample();
@@ -220,6 +233,14 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
 
             UserCoupon userCoupon = userCoupons.get(0);
 
+            if(userCoupon.getValidFrom().after(new Date())){
+                userCoupon.setStatus(0);
+            }
+
+            if(userCoupon.getValidTo().before(new Date())){
+                userCoupon.setStatus(DBConstants.CouponStatus.EXPIRED.getCode());
+            }
+
             StoreCoupon storeCoupon = storeCouponMapper.selectByPrimaryKey(userCoupon.getScId());
 
             StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeCoupon.getSiId());
@@ -229,6 +250,26 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             userCoupon.setIntegral(storeCoupon.getIntegral());
             userCoupon.setEqualMoney(storeCoupon.getEqualMoney());
 
+            LocationExample locationExample = new LocationExample();
+            LocationExample.Criteria criteria1 = locationExample.or();
+            criteria1.andCodeEqualTo(storeInfo.getLocationCode());
+
+            List<Location> locations = locationMapper.selectByExample(locationExample);
+
+            String address = locations.get(0).getName() + storeInfo.getAddress();
+
+            criteria1 = locationExample.or();
+            criteria1.andCodeEqualTo(locations.get(0).getParentCode());
+            locations = locationMapper.selectByExample(locationExample);
+
+            address = locations.get(0).getName() + address;
+//
+//            criteria1.andCodeEqualTo(locations.get(0).getParentCode());
+//            locations = locationMapper.selectByExample(locationExample);
+
+//            address = locations.get(0).getName() + address;
+            userCoupon.setStoreAddress(address);
+
 
             Map map = new HashMap();
             map.put("data", userCoupon);
@@ -237,6 +278,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             CommonResult.success(jsonResult);
         }catch (Exception e){
             System.out.println(e);
+            jsonResult.setItem(null);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -250,6 +292,10 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             UserCouponExample.Criteria criteria = userCouponExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
             criteria.andStatusEqualTo(DBConstants.CouponStatus.VALID.getCode());
+
+            if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
+                criteria.andCreateTimeBetween(new Timestamp(Integer.parseInt(start_time)), new Timestamp(Integer.parseInt(end_time)));
+            }
             userCouponExample.setOrderByClause("id desc");
 
             PageHelper.startPage(page,per_page);
@@ -257,6 +303,8 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             PageInfo pageInfo = new PageInfo(userCoupons);
 
             for (UserCoupon userCoupon : userCoupons){
+
+
                 StoreCoupon storeCoupon = storeCouponMapper.selectByPrimaryKey(userCoupon.getScId());
 
                 userCoupon.setEqualMoney(storeCoupon.getEqualMoney());
@@ -265,6 +313,14 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
 
                 StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeCoupon.getSiId());
                 userCoupon.setStoreName(storeInfo.getName());
+
+                if(userCoupon.getValidFrom().after(new Date())){
+                    userCoupon.setStatus(0);
+                }
+
+                if(userCoupon.getValidTo().before(new Date())){
+                    userCoupon.setStatus(DBConstants.CouponStatus.EXPIRED.getCode());
+                }
             }
 
             Map map = new HashMap();
@@ -278,6 +334,8 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
         }catch (Exception e){
+            System.out.println(e);
+            jsonResult.setItem(null);
             CommonResult.sqlFailed(jsonResult);
         }
 
@@ -493,6 +551,23 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             CommonResult.success(jsonResult);
         }catch (Exception e){
             CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult allowCancelStoreCouponById(Integer couponId, Integer allow) {
+        try{
+            StoreCoupon storeCoupon = storeCouponMapper.selectByPrimaryKey(couponId);
+
+            storeCoupon.setAllowCancel(allow);
+
+            storeCouponMapper.updateByPrimaryKey(storeCoupon);
+            CommonResult.success(jsonResult);
+            jsonResult.setItem(null);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+            jsonResult.setItem(null);
         }
         return jsonResult;
     }
