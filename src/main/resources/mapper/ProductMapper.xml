@@ -101,6 +101,35 @@
       order by ${orderByClause}
     </if>
   </select>
+
+  <select id="findProducts" resultMap="BaseResultMap">
+    SELECT * FROM (
+    SELECT p.id, p.`name`, p.`type`, p.`category_code`, p.`si_id`, p.`price`, p.`integral`,
+    p.`discounts`, p.`max_purchases`, p.`logo_key`, p.`invetory`, x0.sales_count as sales,
+    p.`unit`, p.`description`, p.`status`, p.`create_time`, x0.weight FROM (
+    SELECT
+    v.id, v.`name`, v.category_code, v.integral, v.sales_count,
+    <choose>
+      <when test="userIntegral != null">
+        v._weight + (1 - ABS(#{userIntegral} - v.integral) / #{userIntegral}) * 20
+      </when>
+      <otherwise>
+        v._weight
+      </otherwise>
+    </choose> AS weight,
+    v.create_time
+    FROM v_product v) x0 JOIN product p ON x0.id = p.id) x0
+    WHERE 1 = 1
+    <if test="categoryCode != null">
+      AND x0.category_code = ${categoryCode}
+    </if>
+    <if test="keyword != null">
+      <bind name="kw" value="'%' + keyword + '%'"/>
+      AND x0.`name` like #{kw}
+    </if>
+    order by ${orderBy}
+  </select>
+
   <select id="selectByExample" parameterType="com.gljr.jifen.pojo.ProductExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -116,7 +145,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -137,16 +166,16 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into product (name, category_code, si_id, 
-      price, integral, discounts, 
-      logo_key, invetory, sales, 
-      max_purchases, unit, status, 
-      create_time, description)
-    values (#{name,jdbcType=VARCHAR}, #{categoryCode,jdbcType=INTEGER}, #{siId,jdbcType=INTEGER}, 
-      #{price,jdbcType=INTEGER}, #{integral,jdbcType=INTEGER}, #{discounts,jdbcType=INTEGER}, 
-      #{logoKey,jdbcType=VARCHAR}, #{invetory,jdbcType=INTEGER}, #{sales,jdbcType=INTEGER}, 
-      #{maxPurchases,jdbcType=INTEGER}, #{unit,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
+    insert into product (name, category_code, si_id,
+    price, integral, discounts,
+    logo_key, invetory, sales,
+    max_purchases, unit, status,
+    create_time, description)
+    values (#{name,jdbcType=VARCHAR}, #{categoryCode,jdbcType=INTEGER}, #{siId,jdbcType=INTEGER},
+    #{price,jdbcType=INTEGER}, #{integral,jdbcType=INTEGER}, #{discounts,jdbcType=INTEGER},
+    #{logoKey,jdbcType=VARCHAR}, #{invetory,jdbcType=INTEGER}, #{sales,jdbcType=INTEGER},
+    #{maxPurchases,jdbcType=INTEGER}, #{unit,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+    #{createTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.Product">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
@@ -304,20 +333,20 @@
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update product
     set id = #{record.id,jdbcType=INTEGER},
-      name = #{record.name,jdbcType=VARCHAR},
-      category_code = #{record.categoryCode,jdbcType=INTEGER},
-      si_id = #{record.siId,jdbcType=INTEGER},
-      price = #{record.price,jdbcType=INTEGER},
-      integral = #{record.integral,jdbcType=INTEGER},
-      discounts = #{record.discounts,jdbcType=INTEGER},
-      logo_key = #{record.logoKey,jdbcType=VARCHAR},
-      invetory = #{record.invetory,jdbcType=INTEGER},
-      sales = #{record.sales,jdbcType=INTEGER},
-      max_purchases = #{record.maxPurchases,jdbcType=INTEGER},
-      unit = #{record.unit,jdbcType=VARCHAR},
-      status = #{record.status,jdbcType=INTEGER},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      description = #{record.description,jdbcType=LONGVARCHAR}
+    name = #{record.name,jdbcType=VARCHAR},
+    category_code = #{record.categoryCode,jdbcType=INTEGER},
+    si_id = #{record.siId,jdbcType=INTEGER},
+    price = #{record.price,jdbcType=INTEGER},
+    integral = #{record.integral,jdbcType=INTEGER},
+    discounts = #{record.discounts,jdbcType=INTEGER},
+    logo_key = #{record.logoKey,jdbcType=VARCHAR},
+    invetory = #{record.invetory,jdbcType=INTEGER},
+    sales = #{record.sales,jdbcType=INTEGER},
+    max_purchases = #{record.maxPurchases,jdbcType=INTEGER},
+    unit = #{record.unit,jdbcType=VARCHAR},
+    status = #{record.status,jdbcType=INTEGER},
+    create_time = #{record.createTime,jdbcType=TIMESTAMP},
+    description = #{record.description,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -325,19 +354,19 @@
   <update id="updateByExample" parameterType="map">
     update product
     set id = #{record.id,jdbcType=INTEGER},
-      name = #{record.name,jdbcType=VARCHAR},
-      category_code = #{record.categoryCode,jdbcType=INTEGER},
-      si_id = #{record.siId,jdbcType=INTEGER},
-      price = #{record.price,jdbcType=INTEGER},
-      integral = #{record.integral,jdbcType=INTEGER},
-      discounts = #{record.discounts,jdbcType=INTEGER},
-      logo_key = #{record.logoKey,jdbcType=VARCHAR},
-      invetory = #{record.invetory,jdbcType=INTEGER},
-      sales = #{record.sales,jdbcType=INTEGER},
-      max_purchases = #{record.maxPurchases,jdbcType=INTEGER},
-      unit = #{record.unit,jdbcType=VARCHAR},
-      status = #{record.status,jdbcType=INTEGER},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+    name = #{record.name,jdbcType=VARCHAR},
+    category_code = #{record.categoryCode,jdbcType=INTEGER},
+    si_id = #{record.siId,jdbcType=INTEGER},
+    price = #{record.price,jdbcType=INTEGER},
+    integral = #{record.integral,jdbcType=INTEGER},
+    discounts = #{record.discounts,jdbcType=INTEGER},
+    logo_key = #{record.logoKey,jdbcType=VARCHAR},
+    invetory = #{record.invetory,jdbcType=INTEGER},
+    sales = #{record.sales,jdbcType=INTEGER},
+    max_purchases = #{record.maxPurchases,jdbcType=INTEGER},
+    unit = #{record.unit,jdbcType=VARCHAR},
+    status = #{record.status,jdbcType=INTEGER},
+    create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>

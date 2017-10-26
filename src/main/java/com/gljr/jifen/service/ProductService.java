@@ -80,7 +80,7 @@ public interface ProductService {
      * @param jsonResult
      * @return
      */
-    JsonResult selectProductByKeyword(String keyword, Integer page, Integer per_page, Integer sort, JsonResult jsonResult);
+    JsonResult selectProductByKeyword(Long uid, String keyword, Integer page, Integer per_page, Integer sort, JsonResult jsonResult);
 
 
     /**
@@ -89,5 +89,5 @@ public interface ProductService {
      * @param jsonResult
      * @return
      */
-    JsonResult selectProductByCode(Integer code, Integer page, Integer per_page, Integer sort, JsonResult jsonResult);
+    JsonResult selectProductByCode(Long uid, Integer code, Integer page, Integer per_page, Integer sort, JsonResult jsonResult);
 }

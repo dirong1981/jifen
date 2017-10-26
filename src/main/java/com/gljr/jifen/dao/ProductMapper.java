@@ -20,6 +20,11 @@ public interface ProductMapper {
 
     List<Product> selectByExample(ProductExample example);
 
+    List<Product> findProducts(@Param("categoryCode") Integer categoryCode,
+                               @Param("keyword") String keyword,
+                               @Param("userIntegral") Long userIntegral,
+                               @Param("orderBy") String orderBy);
+
     Product selectByPrimaryKey(Integer id);
 
     int updateByExampleSelective(@Param("record") Product record, @Param("example") ProductExample example);

@@ -460,8 +460,21 @@ public class APPStoreOfflineOrderController extends BaseController {
      */
     @GetMapping(value = "/store/pwCheck")
     @ResponseBody
-    public JsonResult pwCheck(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "password") String password, @RequestParam(value = "integral") Integer integral) {
+    public JsonResult pwCheck(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "password") String password, @RequestParam(value = "integral") Integer integral,
+                              @RequestParam(value = "code") String code) {
         JsonResult jsonResult = new JsonResult();
+
+        if(!org.springframework.util.StringUtils.isEmpty(code)){
+            if(!code.equals(redisService.get("USER_CODE"+userId))){
+                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                jsonResult.setMessage("验证码错误！");
+                return jsonResult;
+            }
+
+            redisService.evict("USER_CODE"+ userId);
+        }
+
+
         String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + integral;
         String cacheResult = this.redisService.get(cacheKey);
         if (cacheResult == null) {

@@ -37,6 +37,9 @@ public class Product {
 
     private Integer userPurchases;
 
+    // 默认排序的权重值
+    private Double weight;
+
     public Integer getId() {
         return id;
     }
@@ -171,5 +174,13 @@ public class Product {
 
     public void setUserPurchases(Integer userPurchases) {
         this.userPurchases = userPurchases;
+    }
+
+    public Double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Double weight) {
+        this.weight = weight;
     }
 }

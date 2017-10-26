@@ -572,6 +572,82 @@ public class StoreInfoServiceImpl implements StoreInfoService {
     }
 
     @Override
+    public JsonResult insertStoreExtInfo(StoreExtInfo storeExtInfo, MultipartFile file, JsonResult jsonResult) {
+
+        try {
+
+
+
+            StoreExtInfoExample storeExtInfoExample = new StoreExtInfoExample();
+            StoreExtInfoExample.Criteria criteria = storeExtInfoExample.or();
+            criteria.andSiIdEqualTo(storeExtInfo.getSiId());
+
+            List<StoreExtInfo> storeExtInfos = storeExtInfoMapper.selectByExample(storeExtInfoExample);
+            if(ValidCheck.validList(storeExtInfos)){
+                storeExtInfo.setCreateTime(new Timestamp(System.currentTimeMillis()));
+
+                if (file != null && !file.isEmpty()) {
+                    String _key = storageService.uploadToPublicBucket("store", file);
+                    if (StringUtils.isEmpty(_key)) {
+                        CommonResult.uploadFailed(jsonResult);
+                        return jsonResult;
+                    }
+                    storeExtInfo.setLicenseFileKey(_key);
+                } else {
+                    jsonResult.setMessage("请上传营业执照");
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    return jsonResult;
+                }
+
+                storeExtInfoMapper.insert(storeExtInfo);
+            }else {
+                storeExtInfo.setId(storeExtInfos.get(0).getId());
+                storeExtInfo.setCreateTime(storeExtInfos.get(0).getCreateTime());
+
+                if (file != null && !file.isEmpty()) {
+                    String _key = storageService.uploadToPublicBucket("store", file);
+                    if (StringUtils.isEmpty(_key)) {
+                        CommonResult.uploadFailed(jsonResult);
+                        return jsonResult;
+                    }
+                    storeExtInfo.setLicenseFileKey(_key);
+                } else {
+                    storeExtInfo.setLicenseFileKey(storeExtInfos.get(0).getLicenseFileKey());
+                }
+
+                storeExtInfoMapper.updateByPrimaryKey(storeExtInfo);
+            }
+
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult selectStoreExtInfoById(Integer id, JsonResult jsonResult) {
+        try {
+            StoreExtInfoExample storeExtInfoExample = new StoreExtInfoExample();
+            StoreExtInfoExample.Criteria criteria = storeExtInfoExample.or();
+            criteria.andSiIdEqualTo(id);
+            List<StoreExtInfo> storeExtInfos = storeExtInfoMapper.selectByExample(storeExtInfoExample);
+            if(ValidCheck.validList(storeExtInfos)){
+                jsonResult.setItem(null);
+            }else {
+                Map map = new HashMap();
+                map.put("data", storeExtInfos.get(0));
+                jsonResult.setItem(map);
+            }
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
+    @Override
     public StoreExtInfo selectStoreExtInfoBySiId(Integer siId) {
         StoreExtInfoExample storeExtInfoExample = new StoreExtInfoExample();
         StoreExtInfoExample.Criteria criteria = storeExtInfoExample.or();

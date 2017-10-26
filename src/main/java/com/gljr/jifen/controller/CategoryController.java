@@ -29,7 +29,7 @@ import java.util.Map;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Controller
 @RequestMapping(value = "/v1/categories")
-public class CategoryController {
+public class CategoryController extends BaseController {
 
     @Autowired
     private CategoryService categoryService;
@@ -112,6 +112,8 @@ public class CategoryController {
                                       @RequestParam(value = "per_page", required = false) Integer per_page, @RequestParam(value = "sort", required = false) Integer sort){
         JsonResult jsonResult = new JsonResult();
 
+        String uid = request.getHeader("uid");
+
         //设置各个参数的默认值
         if(page == null){
             page = 1;
@@ -123,7 +125,9 @@ public class CategoryController {
             sort = 0;
         }
 
-        jsonResult = productService.selectProductByCode(code, page, per_page, sort, jsonResult);
+        Long _uid = org.apache.commons.lang3.math.NumberUtils.isNumber(uid) ? Long.parseLong(uid) : null;
+
+        jsonResult = productService.selectProductByCode(_uid, code, page, per_page, sort, jsonResult);
 
         return jsonResult;
     }

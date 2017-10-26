@@ -5,6 +5,7 @@ import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.constants.GlobalConstants;
 import com.gljr.jifen.controller.BaseController;
 import com.gljr.jifen.pojo.Admin;
+import com.gljr.jifen.pojo.StoreExtInfo;
 import com.gljr.jifen.pojo.StoreInfo;
 import com.gljr.jifen.pojo.StorePhoto;
 import com.gljr.jifen.service.AdminService;
@@ -338,6 +339,26 @@ public class StoreInfoManagerController extends BaseController {
     @ResponseBody
     public JsonResult allowCancelStoreCouponById(@RequestParam(value = "id") Integer id, @RequestParam(value = "allow") Integer allow){
         JsonResult jsonResult = storeInfoService.allowCancelStoreCouponById(id, allow);
+        return jsonResult;
+    }
+
+
+    @PostMapping(value = "/ext_info")
+    @ResponseBody
+    public JsonResult insertStoreExtInfoById(StoreExtInfo storeExtInfo, @RequestParam(value = "pic", required = false) MultipartFile file){
+        JsonResult jsonResult = new JsonResult();
+
+        jsonResult = storeInfoService.insertStoreExtInfo(storeExtInfo, file, jsonResult);
+
+        return jsonResult;
+    }
+
+    @GetMapping(value = "/ext_info")
+    @ResponseBody
+    public JsonResult selectStoreExtInfoById(@RequestParam(value = "id") Integer id){
+        JsonResult jsonResult = new JsonResult();
+        jsonResult= storeInfoService.selectStoreExtInfoById(id, jsonResult);
+
         return jsonResult;
     }
 }

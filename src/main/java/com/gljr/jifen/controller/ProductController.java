@@ -70,6 +70,7 @@ public class ProductController extends BaseController{
                                     @RequestParam(value = "per_page", required = false) Integer per_page, @RequestParam(value = "sort", required = false) Integer sort){
         JsonResult jsonResult = new JsonResult();
 
+        String uid = request.getHeader("uid");
         //设置各个参数的默认值
         if(page == null){
             page = 1;
@@ -81,7 +82,9 @@ public class ProductController extends BaseController{
             sort = 0;
         }
 
-        jsonResult = productService.selectProductByKeyword(keyword, page,per_page, sort, jsonResult);
+        Long _uid = org.apache.commons.lang3.math.NumberUtils.isNumber(uid) ? Long.parseLong(uid) : null;
+
+        jsonResult = productService.selectProductByKeyword(_uid, keyword, page,per_page, sort, jsonResult);
 
         return jsonResult;
     }

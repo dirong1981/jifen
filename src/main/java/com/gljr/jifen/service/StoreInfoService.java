@@ -111,4 +111,8 @@ public interface StoreInfoService
     StoreInfo selectStoreInfoById(Integer siid);
 
     JsonResult allowCancelStoreCouponById(Integer id, Integer allow);
+
+    JsonResult insertStoreExtInfo(StoreExtInfo storeExtInfo,  MultipartFile file, JsonResult jsonResult);
+
+    JsonResult selectStoreExtInfoById(Integer id, JsonResult jsonResult);
 }

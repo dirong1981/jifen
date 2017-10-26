@@ -645,6 +645,206 @@ public class StoreExtInfoExample {
             return (Criteria) this;
         }
 
+        public Criteria andBankNameIsNull() {
+            addCriterion("bank_name is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameIsNotNull() {
+            addCriterion("bank_name is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameEqualTo(String value) {
+            addCriterion("bank_name =", value, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameNotEqualTo(String value) {
+            addCriterion("bank_name <>", value, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameGreaterThan(String value) {
+            addCriterion("bank_name >", value, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameGreaterThanOrEqualTo(String value) {
+            addCriterion("bank_name >=", value, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameLessThan(String value) {
+            addCriterion("bank_name <", value, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameLessThanOrEqualTo(String value) {
+            addCriterion("bank_name <=", value, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameLike(String value) {
+            addCriterion("bank_name like", value, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameNotLike(String value) {
+            addCriterion("bank_name not like", value, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameIn(List<String> values) {
+            addCriterion("bank_name in", values, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameNotIn(List<String> values) {
+            addCriterion("bank_name not in", values, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameBetween(String value1, String value2) {
+            addCriterion("bank_name between", value1, value2, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankNameNotBetween(String value1, String value2) {
+            addCriterion("bank_name not between", value1, value2, "bankName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameIsNull() {
+            addCriterion("bank_account_name is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameIsNotNull() {
+            addCriterion("bank_account_name is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameEqualTo(String value) {
+            addCriterion("bank_account_name =", value, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameNotEqualTo(String value) {
+            addCriterion("bank_account_name <>", value, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameGreaterThan(String value) {
+            addCriterion("bank_account_name >", value, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameGreaterThanOrEqualTo(String value) {
+            addCriterion("bank_account_name >=", value, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameLessThan(String value) {
+            addCriterion("bank_account_name <", value, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameLessThanOrEqualTo(String value) {
+            addCriterion("bank_account_name <=", value, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameLike(String value) {
+            addCriterion("bank_account_name like", value, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameNotLike(String value) {
+            addCriterion("bank_account_name not like", value, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameIn(List<String> values) {
+            addCriterion("bank_account_name in", values, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameNotIn(List<String> values) {
+            addCriterion("bank_account_name not in", values, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameBetween(String value1, String value2) {
+            addCriterion("bank_account_name between", value1, value2, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankAccountNameNotBetween(String value1, String value2) {
+            addCriterion("bank_account_name not between", value1, value2, "bankAccountName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleIsNull() {
+            addCriterion("settle_cycle is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleIsNotNull() {
+            addCriterion("settle_cycle is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleEqualTo(Integer value) {
+            addCriterion("settle_cycle =", value, "settleCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleNotEqualTo(Integer value) {
+            addCriterion("settle_cycle <>", value, "settleCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleGreaterThan(Integer value) {
+            addCriterion("settle_cycle >", value, "settleCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleGreaterThanOrEqualTo(Integer value) {
+            addCriterion("settle_cycle >=", value, "settleCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleLessThan(Integer value) {
+            addCriterion("settle_cycle <", value, "settleCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleLessThanOrEqualTo(Integer value) {
+            addCriterion("settle_cycle <=", value, "settleCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleIn(List<Integer> values) {
+            addCriterion("settle_cycle in", values, "settleCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleNotIn(List<Integer> values) {
+            addCriterion("settle_cycle not in", values, "settleCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleBetween(Integer value1, Integer value2) {
+            addCriterion("settle_cycle between", value1, value2, "settleCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleCycleNotBetween(Integer value1, Integer value2) {
+            addCriterion("settle_cycle not between", value1, value2, "settleCycle");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

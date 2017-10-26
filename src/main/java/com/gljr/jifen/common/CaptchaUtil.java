@@ -1,26 +1,19 @@
 package com.gljr.jifen.common;
 
 
-        import java.awt.Color;
-        import java.awt.Font;
-        import java.awt.Graphics2D;
-        import java.awt.image.BufferedImage;
-        import java.io.ByteArrayOutputStream;
-        import java.io.FileOutputStream;
-        import java.io.IOException;
-        import java.util.Random;
-        import java.util.concurrent.TimeUnit;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Random;
 
-        import javax.imageio.ImageIO;
-        import javax.servlet.ServletException;
-        import javax.servlet.ServletOutputStream;
-        import javax.servlet.http.HttpServletRequest;
-        import javax.servlet.http.HttpServletResponse;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-        import com.gljr.jifen.service.RedisService;
-        import com.sun.image.codec.jpeg.JPEGCodec;
-        import com.sun.image.codec.jpeg.JPEGImageEncoder;
-        import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @ClassName: CaptchaUtil
@@ -113,9 +106,6 @@ public final class CaptchaUtil
 
         // 转成JPEG格式
         ServletOutputStream out = response.getOutputStream();
-//        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-//        encoder.encode(bi);
-//        ByteArrayOutputStream out = new ByteArrayOutputStream();
         ImageIO.write(bi, "jpeg", out);
         out.flush();
     }

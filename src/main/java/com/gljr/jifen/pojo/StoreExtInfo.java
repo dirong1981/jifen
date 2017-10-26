@@ -19,6 +19,12 @@ public class StoreExtInfo {
 
     private String bankAccount;
 
+    private String bankName;
+
+    private String bankAccountName;
+
+    private Integer settleCycle;
+
     private Date createTime;
 
     public Integer getId() {
@@ -83,6 +89,30 @@ public class StoreExtInfo {
 
     public void setBankAccount(String bankAccount) {
         this.bankAccount = bankAccount == null ? null : bankAccount.trim();
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName == null ? null : bankName.trim();
+    }
+
+    public String getBankAccountName() {
+        return bankAccountName;
+    }
+
+    public void setBankAccountName(String bankAccountName) {
+        this.bankAccountName = bankAccountName == null ? null : bankAccountName.trim();
+    }
+
+    public Integer getSettleCycle() {
+        return settleCycle;
+    }
+
+    public void setSettleCycle(Integer settleCycle) {
+        this.settleCycle = settleCycle;
     }
 
     public Date getCreateTime() {

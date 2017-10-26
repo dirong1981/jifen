@@ -205,45 +205,71 @@ public class UserController extends BaseController {
 
     @GetMapping("/recommend")
     @ResponseBody
-    public HttpServletResponse toUserRecommend() throws IOException {
+    public JsonResult toUserRecommend() throws IOException {
+
+        JsonResult jsonResult = new JsonResult();
 
         String uid = request.getHeader("uid");
         if (uid == null || uid.equals("")) {
-            super.response.setStatus(401);
-            return super.response;
+            jsonResult.setMessage("");
+
         }
+
+        Map map = new HashMap();
 
         GatewayResponse<String> response = this.chainService.userRecommend(Long.parseLong(uid));
         if (null == response || response.getCode() != 200 || StringUtils.isEmpty(response.getContent())) {
             super.response.setStatus(404);
-            return super.response;
+            map.put("recommend", "");
         }
 
-        super.response.sendRedirect(response.getContent());
-        return null;
+        if(response.getCode() == 200){
+            map.put("recommend", response.getContent());
+        }
+
+
+        response = this.chainService.userEarnPoints(Long.parseLong(uid));
+
+        if (null == response || response.getCode() != 200 || StringUtils.isEmpty(response.getContent())) {
+            super.response.setStatus(404);
+            map.put("points", "");
+        }
+
+        if(response.getCode() == 200){
+            map.put("points", response.getContent());
+        }
+
+        jsonResult.setItem(map);
+        jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+        return jsonResult;
 
     }
 
     @GetMapping("/points")
     @ResponseBody
-    public HttpServletResponse userEarnPoints() throws IOException {
+    public JsonResult userEarnPoints() throws IOException {
+
+        JsonResult jsonResult = new JsonResult();
 
         String uid = request.getHeader("uid");
         if (uid == null || uid.equals("")) {
             super.response.setStatus(401);
-            return super.response;
+            jsonResult.setMessage("");
         }
 
         GatewayResponse<String> response = this.chainService.userEarnPoints(Long.parseLong(uid));
 
         if (null == response || response.getCode() != 200 || StringUtils.isEmpty(response.getContent())) {
             super.response.setStatus(404);
-            return super.response;
+            jsonResult.setMessage("");
         }
 
-        super.response.sendRedirect(response.getContent());
+        if(response.getCode() == 200){
+            jsonResult.setMessage(response.getContent());
+        }
 
-        return null;
+        jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
+        return jsonResult;
     }
 
 
@@ -498,10 +524,10 @@ public class UserController extends BaseController {
             }
 
             if(!StringUtils.isEmpty(code)){
-                 if(!code.equals(redisService.get("USER_CODE"+uid))){
-                     jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                     jsonResult.setMessage("验证码错误！");
-                     return jsonResult;
+                if(!code.equals(redisService.get("USER_CODE"+uid))){
+                    jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+                    jsonResult.setMessage("验证码错误！");
+                    return jsonResult;
                 }
 
                 redisService.evict("USER_CODE"+ uid);

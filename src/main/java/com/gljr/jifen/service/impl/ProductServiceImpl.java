@@ -12,6 +12,7 @@ import com.gljr.jifen.dao.*;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.ProductService;
 import com.gljr.jifen.service.StorageService;
+import com.gljr.jifen.service.UserCreditsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class ProductServiceImpl implements ProductService{
+public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductMapper productMapper;
@@ -50,27 +51,30 @@ public class ProductServiceImpl implements ProductService{
     @Autowired
     private OnlineOrderMapper onlineOrderMapper;
 
+    @Autowired
+    private UserCreditsService userCreditsService;
+
 
     @Override
     public JsonResult selectAllProduct(Integer page, Integer per_page, JsonResult jsonResult) {
 
-        try{
+        try {
             ProductExample productExample = new ProductExample();
             ProductExample.Criteria criteria = productExample.or();
             criteria.andStatusNotEqualTo(DBConstants.ProductStatus.DELETED.getCode());
             productExample.setOrderByClause("id desc");
 
-            PageHelper.startPage(page,per_page);
+            PageHelper.startPage(page, per_page);
             List<Product> products = productMapper.selectByExample(productExample);
             PageInfo pageInfo = new PageInfo(products);
 
             //获取商户名称
-            if(!ValidCheck.validList(products)){
-                for (Product product : products){
+            if (!ValidCheck.validList(products)) {
+                for (Product product : products) {
                     StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(product.getSiId());
-                    if(ValidCheck.validPojo(storeInfo)){
+                    if (ValidCheck.validPojo(storeInfo)) {
                         product.setStoreName("已删除");
-                    }else {
+                    } else {
                         product.setStoreName(storeInfo.getName());
                     }
                 }
@@ -87,7 +91,7 @@ public class ProductServiceImpl implements ProductService{
 
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
-        }catch (Exception e){
+        } catch (Exception e) {
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -97,7 +101,7 @@ public class ProductServiceImpl implements ProductService{
     public JsonResult stopProductById(Integer productId, JsonResult jsonResult) {
         try {
             Product product = productMapper.selectByPrimaryKey(productId);
-            if(ValidCheck.validPojo(product)){
+            if (ValidCheck.validPojo(product)) {
                 CommonResult.noObject(jsonResult);
                 return jsonResult;
             }
@@ -140,7 +144,7 @@ public class ProductServiceImpl implements ProductService{
 
             CommonResult.success(jsonResult);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -150,7 +154,7 @@ public class ProductServiceImpl implements ProductService{
     public JsonResult startProductById(Integer productId, JsonResult jsonResult) {
         try {
             Product product = productMapper.selectByPrimaryKey(productId);
-            if(ValidCheck.validPojo(product)){
+            if (ValidCheck.validPojo(product)) {
                 CommonResult.noObject(jsonResult);
                 return jsonResult;
             }
@@ -160,7 +164,7 @@ public class ProductServiceImpl implements ProductService{
 
             CommonResult.success(jsonResult);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -170,7 +174,7 @@ public class ProductServiceImpl implements ProductService{
     public JsonResult deleteProductById(Integer productId, JsonResult jsonResult) {
         try {
             Product product = productMapper.selectByPrimaryKey(productId);
-            if(ValidCheck.validPojo(product)){
+            if (ValidCheck.validPojo(product)) {
                 CommonResult.noObject(jsonResult);
                 return jsonResult;
             }
@@ -202,7 +206,7 @@ public class ProductServiceImpl implements ProductService{
 
             CommonResult.success(jsonResult);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -239,15 +243,15 @@ public class ProductServiceImpl implements ProductService{
 
             List<ProductPhoto> productPhotos = productPhotoMapper.selectByExample(productPhotoExample);
 
-            if(!ValidCheck.validList(productPhotos)){
-                for (ProductPhoto productPhoto : productPhotos){
+            if (!ValidCheck.validList(productPhotos)) {
+                for (ProductPhoto productPhoto : productPhotos) {
                     productPhoto.setPid(product.getId());
                     productPhotoMapper.updateByPrimaryKey(productPhoto);
                 }
             }
 
             CommonResult.success(jsonResult);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
@@ -275,7 +279,7 @@ public class ProductServiceImpl implements ProductService{
 
 
             CommonResult.success(jsonResult);
-        }catch (Exception e){
+        } catch (Exception e) {
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -284,14 +288,14 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public JsonResult selectProductById(Integer productId, String uid, JsonResult jsonResult) {
 
-        try{
+        try {
             Product product = productMapper.selectByPrimaryKey(productId);
-            if(ValidCheck.validPojo(product)){
+            if (ValidCheck.validPojo(product)) {
                 CommonResult.noObject(jsonResult);
                 return jsonResult;
             }
 
-            if(product.getStatus() == DBConstants.ProductStatus.DELETED.getCode()){
+            if (product.getStatus() == DBConstants.ProductStatus.DELETED.getCode()) {
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 jsonResult.setMessage("商品已删除！");
                 return jsonResult;
@@ -308,15 +312,15 @@ public class ProductServiceImpl implements ProductService{
 
             int userPurchases = 0;
 
-            if(!ValidCheck.validList(onlineOrders)){
-                for (OnlineOrder onlineOrder : onlineOrders){
+            if (!ValidCheck.validList(onlineOrders)) {
+                for (OnlineOrder onlineOrder : onlineOrders) {
                     userPurchases += onlineOrder.getQuantity();
                 }
             }
 
             product.setUserPurchases(userPurchases);
 
-            Map  map = new HashMap();
+            Map map = new HashMap();
             map.put("data", product);
 
             //查找商品图片
@@ -330,89 +334,56 @@ public class ProductServiceImpl implements ProductService{
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
     }
 
     @Override
-    public JsonResult selectProductByKeyword(String keyword, Integer page, Integer per_page, Integer sort, JsonResult jsonResult) {
-
-        try{
-            ProductExample productExample = new ProductExample();
-            ProductExample.Criteria criteria = productExample.createCriteria();
-            criteria.andStatusEqualTo(DBConstants.ProductStatus.ON_SALE.getCode());
-            criteria.andNameLike("%" + keyword + "%");
-            //设置排序
-            if(sort == 0){
-                productExample.setOrderByClause("id desc");
-            }else if (sort == 1){
-                productExample.setOrderByClause("sales desc, id desc");
-            }else if (sort == 2){
-                productExample.setOrderByClause("sales asc, id desc");
-            }else if (sort == 3){
-                productExample.setOrderByClause("integral desc, id desc");
-            }else if (sort == 4){
-                productExample.setOrderByClause("integral asc, id desc");
-            }
-
-            PageHelper.startPage(page,per_page);
-            List<Product> list = productMapper.selectByExample(productExample);
-            for (Product product : list){
-                product.setLogoKey(product.getLogoKey() + "!popular");
-            }
-
-            PageInfo pageInfo = new PageInfo(list);
-            Map  map = new HashMap();
-            map.put("data", list);
-
-            map.put("pages", pageInfo.getPages());
-
-            map.put("total", pageInfo.getTotal());
-            //当前页
-            map.put("pageNum", pageInfo.getPageNum());
-
-            jsonResult.setItem(map);
-            CommonResult.success(jsonResult);
-
-        }catch (Exception e){
-            CommonResult.sqlFailed(jsonResult);
-        }
-        return jsonResult;
+    public JsonResult selectProductByKeyword(Long uid, String keyword, Integer page, Integer per_page, Integer sort, JsonResult jsonResult) {
+        return _executeProductSelection(uid, null, keyword, page, per_page, sort, jsonResult);
     }
 
-    @Override
-    public JsonResult selectProductByCode(Integer code, Integer page, Integer per_page, Integer sort, JsonResult jsonResult) {
-        try{
-            ProductExample productExample = new ProductExample();
-            ProductExample.Criteria criteria = productExample.createCriteria();
-            criteria.andStatusEqualTo(DBConstants.ProductStatus.ON_SALE.getCode());
-            criteria.andCategoryCodeEqualTo(code);
+    private JsonResult _executeProductSelection(Long uid, Integer code, String keyword, Integer page, Integer per_page, Integer sort, JsonResult jsonResult) {
+        try {
             //设置排序
-            if(sort == 0){
-                productExample.setOrderByClause("id desc");
-            }else if (sort == 1){
-                productExample.setOrderByClause("sales desc, id desc");
-            }else if (sort == 2){
-                productExample.setOrderByClause("sales asc, id desc");
-            }else if (sort == 3){
-                productExample.setOrderByClause("integral desc, id desc");
-            }else if (sort == 4){
-                productExample.setOrderByClause("integral asc, id desc");
+            String orderBy;
+
+            switch (sort) {
+                case 1:
+                    orderBy = " sales desc, id desc";
+                    break;
+                case 2:
+                    orderBy = " sales asc, id desc";
+                    break;
+                case 3:
+                    orderBy = " integral desc, id desc";
+                    break;
+                case 4:
+                    orderBy = " integral asc, id desc";
+                    break;
+                default:
+                    orderBy = " weight desc";
             }
 
+            UserCredits userCredits = null;
+            if (null != uid && uid > 0L) {
+                userCredits = this.userCreditsService.getUserCredits(Math.toIntExact(uid), DBConstants.OwnerType.CUSTOMER);
+            }
 
-            PageHelper.startPage(page,per_page);
+            PageHelper.startPage(page, per_page);
+
             //查询分类下的商品，按照sort排序
-            List<Product> list = productMapper.selectByExample(productExample);
-            for (Product product : list){
+            List<Product> list = productMapper.findProducts(code, keyword, null != userCredits ? userCredits.getIntegral() + 0L : null, orderBy);
+            for (Product product : list) {
                 product.setLogoKey(product.getLogoKey() + "!popular");
             }
 
             PageInfo pageInfo = new PageInfo(list);
-            Map  map = new HashMap();
+            Map map = new HashMap();
             map.put("data", list);
+
             //设置总页面
             map.put("pages", pageInfo.getPages());
 
@@ -425,10 +396,15 @@ public class ProductServiceImpl implements ProductService{
 
             CommonResult.success(jsonResult);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
+    }
+
+    @Override
+    public JsonResult selectProductByCode(Long uid, Integer code, Integer page, Integer per_page, Integer sort, JsonResult jsonResult) {
+        return _executeProductSelection(uid, code, null, page, per_page, sort, jsonResult);
     }
 
 //
