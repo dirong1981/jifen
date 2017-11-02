@@ -106,7 +106,11 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
                         long df = storeCoupon.getValidFrom().getTime();
                         long dt = storeCoupon.getValidTo().getTime();
                         long mi = dt - df;
-                        storeCoupon.setValidDays(Integer.parseInt(TimeUnit.MILLISECONDS.toDays(mi) + ""));
+                        if(mi == 0){
+                            storeCoupon.setValidDays(1);
+                        }else {
+                            storeCoupon.setValidDays(Integer.parseInt(TimeUnit.MILLISECONDS.toDays(mi) + ""));
+                        }
                     }
 
                     UserCouponExample userCouponExample = new UserCouponExample();
@@ -291,7 +295,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             UserCouponExample userCouponExample = new UserCouponExample();
             UserCouponExample.Criteria criteria = userCouponExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
-            criteria.andStatusEqualTo(DBConstants.CouponStatus.VALID.getCode());
+            criteria.andStatusNotEqualTo(DBConstants.CouponStatus.USED.getCode());
 
             if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
                 criteria.andCreateTimeBetween(new Timestamp(Integer.parseInt(start_time)), new Timestamp(Integer.parseInt(end_time)));
@@ -530,6 +534,13 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
 
             storeOfflineOrder.setStatus(DBConstants.OrderStatus.REFUND.getCode());
             storeOfflineOrderMapper.updateByPrimaryKey(storeOfflineOrder);
+
+            String title = "代金券退还" + storeOfflineOrder.getIntegral() + "积分";
+            Message message = new Message();
+            message.setReadStatus(0);
+            message.setContent(title);
+            message.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            message.setUid(storeOfflineOrder.getUid());
 
             CommonResult.success(jsonResult);
 

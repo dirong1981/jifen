@@ -177,6 +177,7 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
 
             map.put("parents", categories);
 
+            categoryExample = new CategoryExample();
             criteria = categoryExample.or();
             criteria.andParentCodeNotEqualTo(0);
             criteria.andTypeEqualTo(DBConstants.CategoryType.STORE.getCode());

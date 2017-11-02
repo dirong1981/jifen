@@ -355,40 +355,44 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                 break;
             case 5:
                 //开始时间,格式为yyyyMMdd 20170102
-                if (StringUtils.isBlank(reqParam.getStartTime())) {
+                if (StringUtils.isNotBlank(reqParam.getStartTime())) {
                     Date startDate = DateUtils.formatToDate(reqParam.getStartTime());
                     criteria.andCreateTimeGreaterThanOrEqualTo(DateUtils.getOneDayStart(startDate));
                 }
 
                 //结束时间,格式为yyyyMMdd 20170102
-                if (StringUtils.isBlank(reqParam.getEndTime())) {
+                if (StringUtils.isNotBlank(reqParam.getEndTime())) {
                     Date endDate = DateUtils.formatToDate(reqParam.getEndTime());
                     criteria.andCreateTimeLessThanOrEqualTo(DateUtils.getOneDayStart(endDate));
                 }
 
                 //按照类型塞选交易记录
-                switch (reqParam.getUseType()) {
-                    case 1:
-                        criteria.andIntegralGreaterThan(0);
-                        criteria.andExtCashEqualTo(0);
-                        break;
-                    case 2:
-                        criteria.andExtCashGreaterThan(0);
-                        break;
-                    default:
-                        break;
+                if (reqParam.getUseType() != null) {
+                    switch (reqParam.getUseType()) {
+                        case 1:
+                            criteria.andIntegralGreaterThan(0);
+                            criteria.andExtCashEqualTo(0);
+                            break;
+                        case 2:
+                            criteria.andExtCashGreaterThan(0);
+                            break;
+                        default:
+                            break;
+                    }
                 }
 
                 //按照交易状态塞选
-                switch (reqParam.getTransationStat()) {
-                    case 1:
-                        criteria.andStatusEqualTo(DBConstants.OrderStatus.PAID.getCode());
-                        break;
-                    case 2:
-                        criteria.andStatusEqualTo(DBConstants.OrderStatus.SETTLED.getCode());
-                        break;
-                    default:
-                        break;
+                if (reqParam.getTransationStat() != null) {
+                    switch (reqParam.getTransationStat()) {
+                        case 1:
+                            criteria.andStatusEqualTo(DBConstants.OrderStatus.PAID.getCode());
+                            break;
+                        case 2:
+                            criteria.andStatusEqualTo(DBConstants.OrderStatus.SETTLED.getCode());
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 break;
             case 6:

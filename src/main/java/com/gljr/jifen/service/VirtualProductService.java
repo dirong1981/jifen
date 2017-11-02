@@ -20,5 +20,7 @@ public interface VirtualProductService {
 
     JsonResult selectVirtualProductById(Integer virtualId, JsonResult jsonResult);
 
+    JsonResult deleteVirtualProductById(Integer id, JsonResult jsonResult);
+
 
 }

@@ -106,6 +106,9 @@ public final class CaptchaUtil
 
         // 转成JPEG格式
         ServletOutputStream out = response.getOutputStream();
+//        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+//        encoder.encode(bi);
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
         ImageIO.write(bi, "jpeg", out);
         out.flush();
     }

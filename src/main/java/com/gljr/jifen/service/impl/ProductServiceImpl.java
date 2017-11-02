@@ -352,16 +352,16 @@ public class ProductServiceImpl implements ProductService {
 
             switch (sort) {
                 case 1:
-                    orderBy = " sales desc, id desc";
+                    orderBy = " sales desc";
                     break;
                 case 2:
-                    orderBy = " sales asc, id desc";
+                    orderBy = " sales asc";
                     break;
                 case 3:
-                    orderBy = " integral desc, id desc";
+                    orderBy = " integral desc";
                     break;
                 case 4:
-                    orderBy = " integral asc, id desc";
+                    orderBy = " integral asc";
                     break;
                 default:
                     orderBy = " weight desc";

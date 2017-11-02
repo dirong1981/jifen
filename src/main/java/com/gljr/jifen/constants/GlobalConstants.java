@@ -7,9 +7,9 @@ public class GlobalConstants {
 
 
     //设置返回的请求域名
-    public static final String WEBDOMAIN = "http://console.iep.dtchain.io";
-//        public static final String WEBDOMAIN = "http://localhost";
-    public static final String APPDOMAIN = "http://m.p.dtchain.io";
+//    public static final String WEBDOMAIN = "https://console.iep.dtchain.io";
+        public static final String WEBDOMAIN = "http://localhost";
+    public static final String APPDOMAIN = "https://m.p.dtchain.io";
 
 
     //数据验证错误

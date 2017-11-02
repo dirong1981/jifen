@@ -124,4 +124,14 @@ public class VirtualProductManagerController extends BaseController{
         return jsonResult;
     }
 
+    @DeleteMapping
+    @ResponseBody
+    public JsonResult deleteVirtualProductById(@RequestParam(value = "id") Integer id){
+        JsonResult jsonResult = new JsonResult();
+
+        jsonResult = virtualProductService.deleteVirtualProductById(id,jsonResult);
+
+        return jsonResult;
+    }
+
 }

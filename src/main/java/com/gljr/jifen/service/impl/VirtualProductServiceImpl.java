@@ -3,6 +3,7 @@ package com.gljr.jifen.service.impl;
 import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
+import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.dao.SystemVirtualProductMapper;
 import com.gljr.jifen.dao.VirtualProductMapper;
 import com.gljr.jifen.pojo.SystemVirtualProduct;
@@ -55,7 +56,6 @@ public class VirtualProductServiceImpl implements VirtualProductService {
             virtualProductMapper.insert(virtualProduct);
             CommonResult.success(jsonResult);
         }catch (Exception e){
-            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -65,6 +65,8 @@ public class VirtualProductServiceImpl implements VirtualProductService {
     public JsonResult selectVirtualProduct(JsonResult jsonResult) {
         try {
             VirtualProductExample virtualProductExample = new VirtualProductExample();
+            VirtualProductExample.Criteria criteria = virtualProductExample.or();
+            criteria.andStatusNotEqualTo(-1);
             virtualProductExample.setOrderByClause("id desc");
             List<VirtualProduct> virtualProducts = virtualProductMapper.selectByExample(virtualProductExample);
 
@@ -79,7 +81,6 @@ public class VirtualProductServiceImpl implements VirtualProductService {
             jsonResult.setItem(map);
             CommonResult.success(jsonResult);
         }catch (Exception e){
-            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -120,7 +121,6 @@ public class VirtualProductServiceImpl implements VirtualProductService {
             virtualProductMapper.updateByPrimaryKey(virtualProduct);
             CommonResult.success(jsonResult);
         }catch (Exception e){
-            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
@@ -164,6 +164,19 @@ public class VirtualProductServiceImpl implements VirtualProductService {
             map.put("data", virtualProduct);
 
             jsonResult.setItem(map);
+            CommonResult.success(jsonResult);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult deleteVirtualProductById(Integer id, JsonResult jsonResult) {
+        try {
+            VirtualProduct virtualProduct = virtualProductMapper.selectByPrimaryKey(id);
+            virtualProduct.setStatus(-1);
+            virtualProductMapper.updateByPrimaryKey(virtualProduct);
             CommonResult.success(jsonResult);
         }catch (Exception e){
             CommonResult.sqlFailed(jsonResult);

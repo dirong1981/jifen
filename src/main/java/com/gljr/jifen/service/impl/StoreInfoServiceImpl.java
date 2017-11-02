@@ -234,7 +234,6 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             AdminExample.Criteria criteria = adminExample.or();
             criteria.andUsernameEqualTo(username);
 
-            System.out.println(storeInfo.getStoreType());
 
             List<Admin> admins = adminMapper.selectByExample(adminExample);
             if(!ValidCheck.validList(admins)){
@@ -273,6 +272,8 @@ public class StoreInfoServiceImpl implements StoreInfoService {
 
             String[] types = type.split(",");
 
+            int siid = 0;
+
             for(String _type : types){
                 if(_type.equals("1")){
                     storeInfo.setCategoryCode(-1);
@@ -282,6 +283,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
                 if(_type.equals("2")){
                     storeInfo.setStoreType(DBConstants.MerchantType.OFFLINE.getCode());
                     storeInfoMapper.insert(storeInfo);
+                    siid = storeInfo.getId();
                 }
             }
 
@@ -300,7 +302,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             List<StorePhoto> storePhotos = storePhotoMapper.selectByExample(storePhotoExample);
             if(!ValidCheck.validList(storePhotos)){
                 for (StorePhoto storePhoto : storePhotos) {
-                    storePhoto.setSiId(storeInfo.getId());
+                    storePhoto.setSiId(siid);
                     storePhotoMapper.updateByPrimaryKey(storePhoto);
                 }
             }
