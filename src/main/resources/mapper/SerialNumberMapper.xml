@@ -12,6 +12,10 @@
         select count(0) > 0 from store_info where serial_code = #{serialCode}
     </select>
 
+    <select id="isSettleNoExist" resultType="Boolean">
+        select count(0) > 0 from merchant_settlement where settlement_no = #{settleNo}
+    </select>
+
     <select id="isValidLocation" resultType="Boolean">
         SELECT count(0) > 0 FROM `location` WHERE code = #{locationCode}
     </select>

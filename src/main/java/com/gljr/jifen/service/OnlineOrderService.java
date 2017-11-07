@@ -92,4 +92,6 @@ public interface OnlineOrderService {
     JsonResult updateVirtualProductOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult);
     JsonResult cancelVirtualProductOnlineOrderByTrxCode(String trxCode, String uid, JsonResult jsonResult);
 
+    JsonResult selectOnlineOrderById(Integer id);
+
 }

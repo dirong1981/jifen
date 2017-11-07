@@ -1,17 +1,15 @@
 package com.gljr.jifen.pojo;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class OrderRefund implements Serializable{
+public class OrderRefund {
+    private Integer id;
 
-    private Long id;
-
-    private Long orderId;
+    private Integer orderId;
 
     private Integer orderType;
 
-    private Long trxId;
+    private Integer trxId;
 
     private String trxCode;
 
@@ -19,31 +17,27 @@ public class OrderRefund implements Serializable{
 
     private String extOrderId;
 
-    private Long storeId;
+    private Integer storeId;
 
-    private Long toUid;
+    private Integer toUid;
 
-    private Long integral;
+    private Integer integral;
 
     private Date created;
 
-    public OrderRefund() {
-
-    }
-
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 
@@ -55,11 +49,11 @@ public class OrderRefund implements Serializable{
         this.orderType = orderType;
     }
 
-    public Long getTrxId() {
+    public Integer getTrxId() {
         return trxId;
     }
 
-    public void setTrxId(Long trxId) {
+    public void setTrxId(Integer trxId) {
         this.trxId = trxId;
     }
 
@@ -68,7 +62,7 @@ public class OrderRefund implements Serializable{
     }
 
     public void setTrxCode(String trxCode) {
-        this.trxCode = trxCode;
+        this.trxCode = trxCode == null ? null : trxCode.trim();
     }
 
     public String getDtchainBlockId() {
@@ -76,7 +70,7 @@ public class OrderRefund implements Serializable{
     }
 
     public void setDtchainBlockId(String dtchainBlockId) {
-        this.dtchainBlockId = dtchainBlockId;
+        this.dtchainBlockId = dtchainBlockId == null ? null : dtchainBlockId.trim();
     }
 
     public String getExtOrderId() {
@@ -84,30 +78,30 @@ public class OrderRefund implements Serializable{
     }
 
     public void setExtOrderId(String extOrderId) {
-        this.extOrderId = extOrderId;
+        this.extOrderId = extOrderId == null ? null : extOrderId.trim();
     }
 
-    public Long getStoreId() {
+    public Integer getStoreId() {
         return storeId;
     }
 
-    public void setStoreId(Long storeId) {
+    public void setStoreId(Integer storeId) {
         this.storeId = storeId;
     }
 
-    public Long getToUid() {
+    public Integer getToUid() {
         return toUid;
     }
 
-    public void setToUid(Long toUid) {
+    public void setToUid(Integer toUid) {
         this.toUid = toUid;
     }
 
-    public Long getIntegral() {
+    public Integer getIntegral() {
         return integral;
     }
 
-    public void setIntegral(Long integral) {
+    public void setIntegral(Integer integral) {
         this.integral = integral;
     }
 

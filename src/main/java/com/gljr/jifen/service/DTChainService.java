@@ -7,13 +7,13 @@ import com.gljr.jifen.common.dtchain.security.SignatureUtil;
 import com.gljr.jifen.common.dtchain.vo.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 @Service
@@ -75,11 +75,23 @@ public class DTChainService {
     @Value("${dtchain.api.settle.integral.issued.history}")
     private String apiSettleIntegralIssuedHistory;
 
+    @Value("${dtchain.api.settle.integral.recycled.history}")
+    private String apiSettleIntegralRecycledHistory;
+
     @Value("${dtchain.api.store.coupons}")
     private String apiStoreCoupons;
 
     @Value("${dtchain.api.orders.coupon.refund}")
     private String apiCouponRefund;
+
+    @Value("${dtchain.api.settle.unsettles}")
+    private String apiIntegralUnsettles;
+
+    @Value("${dtchain.api.settle.unsettles.calc}")
+    private String apiIntegralSettleToCalc;
+
+    @Value("${dtchain.api.settle.remit}")
+    private String apiSettleRemit;
 
     private TreeMap<String, Object> _buildParams() {
         TreeMap<String, Object> params = new TreeMap<>();
@@ -310,6 +322,57 @@ public class DTChainService {
         return null;
     }
 
+    public GatewayResponse<List<IntegralIssuedHistory>> getIntegralRecycledHistory() {
+        TreeMap<String, Object> params = _buildParams();
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_GET, apiSettleIntegralRecycledHistory), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doGetSSL(apiEndpoint + apiSettleIntegralRecycledHistory, params)
+                            : HttpClientHelper.doGet(apiEndpoint + apiSettleIntegralRecycledHistory, params),
+                    new TypeToken<GatewayResponse<List<IntegralIssuedHistory>>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse<List<MerchantSettleInfo>> getUnsettledIntegral() {
+        TreeMap<String, Object> params = _buildParams();
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_GET, apiIntegralUnsettles), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doGetSSL(apiEndpoint + apiIntegralUnsettles, params)
+                            : HttpClientHelper.doGet(apiEndpoint + apiIntegralUnsettles, params),
+                    new TypeToken<GatewayResponse<List<MerchantSettleInfo>>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse<SettlePeriodStat> getUnsettledPeriodStat(Long storeId, String settleTo, String blockId) {
+        TreeMap<String, Object> params = _buildParams();
+        String api = String.format(apiIntegralSettleToCalc, storeId);
+        if (StringUtils.isEmpty(blockId)) {
+            params.put("settle_to", settleTo);
+        } else {
+            params.put("block_id", blockId);
+        }
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_GET, api), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doGetSSL(apiEndpoint + api, params)
+                            : HttpClientHelper.doGet(apiEndpoint + api, params),
+                    new TypeToken<GatewayResponse<SettlePeriodStat>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
     public GatewayResponse<CommonOrderResponse> verifyCoupon(Long storeId, String couponCode) {
         TreeMap<String, Object> params = _buildParams();
         params.put("store_id", storeId);
@@ -322,6 +385,22 @@ public class DTChainService {
                             HttpClientHelper.doPostSSL(apiEndpoint + apiStoreCoupons, params)
                             : HttpClientHelper.doPost(apiEndpoint + apiStoreCoupons, params),
                     new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public GatewayResponse settleRemit(String blockId) {
+        TreeMap<String, Object> params = _buildParams();
+        String api = String.format(apiSettleRemit, blockId);
+
+        try {
+            params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
+                    METHOD_POST, api), secretKey));
+            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                            HttpClientHelper.doPostSSL(apiEndpoint + api, params)
+                            : HttpClientHelper.doPost(apiEndpoint + api, params), GatewayResponse.class);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }

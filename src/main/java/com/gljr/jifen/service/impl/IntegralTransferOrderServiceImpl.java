@@ -18,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderService {
@@ -198,40 +195,112 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
     public JsonResult selectIntegralOrderByuid(String uid, Integer page, Integer per_page, Integer sort, String start_time, String end_time, JsonResult jsonResult) {
 
         try {
-            IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
-            IntegralTransferOrderExample.Criteria criteria = integralTransferOrderExample.or();
-            criteria.andUidEqualTo(Integer.parseInt(uid));
+
+            TransactionExample transactionExample = new TransactionExample();
+            TransactionExample.Criteria criteria = transactionExample.or();
+            criteria.andOwnerTypeEqualTo(DBConstants.OwnerType.CUSTOMER.getCode());
+            criteria.andOwnerIdEqualTo(Integer.parseInt(uid));
+            criteria.andTypeEqualTo(DBConstants.TrxType.TRANSFER.getCode());
             if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
                 criteria.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time)));
             }
-
-            integralTransferOrderExample.setOrderByClause("id desc");
+            transactionExample.setOrderByClause("id desc");
 
             PageHelper.startPage(page,per_page);
-            List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderMapper.selectByExample(integralTransferOrderExample);
-            PageInfo pageInfo = new PageInfo(integralTransferOrders);
+            List<Transaction> transactions = transactionMapper.selectByExample(transactionExample);
+            PageInfo pageInfo = new PageInfo(transactions);
 
-            if(!ValidCheck.validList(integralTransferOrders)) {
-                for (IntegralTransferOrder integralTransferOrder : integralTransferOrders) {
-                    UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
-                    UserExtInfoExample.Criteria criteria1 = userExtInfoExample.or();
-                    criteria1.andUidEqualTo(integralTransferOrder.getgUid());
+            List<UserOrder> userOrders = new ArrayList<>();
+            if(!ValidCheck.validList(transactions)) {
+                for (Transaction transaction : transactions) {
+                    IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
+                    IntegralTransferOrderExample.Criteria criteria1 = integralTransferOrderExample.or();
+                    criteria1.andTrxCodeEqualTo(transaction.getCode());
+                    List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderMapper.selectByExample(integralTransferOrderExample);
+                    if (!ValidCheck.validList(integralTransferOrders)) {
+                        IntegralTransferOrder integralTransferOrder = integralTransferOrders.get(0);
 
-                    List<UserExtInfo> userExtInfos = userExtInfoMapper.selectByExample(userExtInfoExample);
-                    if(ValidCheck.validList(userExtInfos)){
-                        integralTransferOrder.setName("用户不存在");
-                    }else {
-                        integralTransferOrder.setName(userExtInfos.get(0).getCellphone());
-                        integralTransferOrder.setDescription("转账" + integralTransferOrder.getIntegral() + "分");
+                        UserOrder userOrder = new UserOrder();
+
+                        userOrder.setTrxType(DBConstants.TrxType.TRANSFER.getCode());
+                        userOrder.setTrxCode(integralTransferOrder.getTrxCode());
+                        userOrder.setStatus(integralTransferOrder.getStatus());
+                        userOrder.setQuantity(0);
+                        userOrder.setIntegral(transaction.getIntegral());
+                        userOrder.setId(integralTransferOrder.getId());
+                        userOrder.setCreateTime(integralTransferOrder.getCreateTime());
+
+                        UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
+                        UserExtInfoExample.Criteria criteria3 = userExtInfoExample.or();
+                        if (transaction.getIntegral() > 0) {
+                            criteria3.andUidEqualTo(integralTransferOrder.getUid());
+                        } else {
+                            criteria3.andUidEqualTo(integralTransferOrder.getgUid());
+                        }
+
+                        List<UserExtInfo> userExtInfos = userExtInfoMapper.selectByExample(userExtInfoExample);
+                        if (ValidCheck.validList(userExtInfos)) {
+                            userOrder.setName("用户不存在");
+                        } else {
+                            userOrder.setName(userExtInfos.get(0).getCellphone());
+                            if (transaction.getIntegral() > 0) {
+                                userOrder.setDescription("积分获赠" + integralTransferOrder.getIntegral() + "分");
+                            } else {
+                                userOrder.setDescription("积分转出" + integralTransferOrder.getIntegral() + "分");
+                            }
+                        }
+                        userOrders.add(userOrder);
                     }
-
-                    integralTransferOrder.setTrxType(3);
 
                 }
             }
 
+
+//            IntegralTransferOrderExample integralTransferOrderExample = new IntegralTransferOrderExample();
+//            IntegralTransferOrderExample.Criteria criteria = integralTransferOrderExample.or();
+//            criteria.andUidEqualTo(Integer.parseInt(uid));
+//            criteria.andGUidEqualTo(Integer.parseInt(uid));
+//            if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
+//                criteria.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time) + 86400000));
+//            }
+//
+//            integralTransferOrderExample.setOrderByClause("id desc");
+//
+//            PageHelper.startPage(page,per_page);
+//            List<IntegralTransferOrder> integralTransferOrders = integralTransferOrderMapper.selectByExample(integralTransferOrderExample);
+//            PageInfo pageInfo = new PageInfo(integralTransferOrders);
+//
+//            if(!ValidCheck.validList(integralTransferOrders)) {
+//                for (IntegralTransferOrder integralTransferOrder : integralTransferOrders) {
+//                    System.out.println("aa");
+//                    UserExtInfoExample userExtInfoExample = new UserExtInfoExample();
+//                    UserExtInfoExample.Criteria criteria1 = userExtInfoExample.or();
+//                    if(uid.equals(integralTransferOrder.getUid()+"")) {
+//                        criteria1.andUidEqualTo(integralTransferOrder.getgUid());
+//                    }else {
+//                        criteria1.andUidEqualTo(integralTransferOrder.getUid());
+//                    }
+//
+//                    List<UserExtInfo> userExtInfos = userExtInfoMapper.selectByExample(userExtInfoExample);
+//                    if(ValidCheck.validList(userExtInfos)){
+//                        integralTransferOrder.setName("用户不存在");
+//                    }else {
+//                        integralTransferOrder.setName(userExtInfos.get(0).getCellphone());
+//                        if(uid.equals(integralTransferOrder.getUid()+"")) {
+//                            integralTransferOrder.setDescription("转账" + integralTransferOrder.getIntegral() + "分");
+//                        }else {
+//                            integralTransferOrder.setDescription("接受转账" + integralTransferOrder.getIntegral() + "分");
+//                        }
+//
+//                    }
+//
+//                    integralTransferOrder.setTrxType(3);
+//
+//                }
+//            }
+
             Map map = new HashMap();
-            map.put("data", integralTransferOrders);
+            map.put("data", userOrders);
             map.put("pages", pageInfo.getPages());
 
             map.put("total", pageInfo.getTotal());

@@ -14,4 +14,6 @@ public interface SerialNumberMapper {
 
     boolean isTrxCodeExist(@Param("trxCode") String trxCode);
 
+    boolean isSettleNoExist(@Param("settleNo") String settleNo);
+
 }

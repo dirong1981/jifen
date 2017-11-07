@@ -269,146 +269,147 @@ public class ModuleAggregationServiceImpl extends BaseService implements ModuleA
             moduleAggregation.setStatus(DBConstants.ModuleAggregationStatus.ACTIVED.getCode());
             moduleAggregationMapper.updateByPrimaryKey(moduleAggregation);
 
-            //查找聚合页下包含哪些商品和商户
-            ModuleAggregationProductExample moduleAggregationProductExample = new ModuleAggregationProductExample();
-            ModuleAggregationProductExample.Criteria criteria = moduleAggregationProductExample.or();
-            criteria.andAggregationIdEqualTo(moduleAggregation.getId());
-            List<ModuleAggregationProduct> moduleAggregationProducts = moduleAggregationProductMapper.selectByExample(moduleAggregationProductExample);
-
-
-            //如果聚合页下没有添加商品或者商户，不能启用聚合页
-//            if(ValidCheck.validList(moduleAggregationProducts)) {
-//                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-//                jsonResult.setMessage("请为聚合页选择商品或者商户！");
-//                return jsonResult;
+//            //查找聚合页下包含哪些商品和商户
+//            ModuleAggregationProductExample moduleAggregationProductExample = new ModuleAggregationProductExample();
+//            ModuleAggregationProductExample.Criteria criteria = moduleAggregationProductExample.or();
+//            criteria.andAggregationIdEqualTo(moduleAggregation.getId());
+//            List<ModuleAggregationProduct> moduleAggregationProducts = moduleAggregationProductMapper.selectByExample(moduleAggregationProductExample);
 //
+//
+//            //如果聚合页下没有添加商品或者商户，不能启用聚合页
+////            if(ValidCheck.validList(moduleAggregationProducts)) {
+////                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+////                jsonResult.setMessage("请为聚合页选择商品或者商户！");
+////                return jsonResult;
+////
+////            }
+//
+//            //循环获取商户或商品信息
+//            List<AggregationProduct> aggregationProducts = new ArrayList<>();
+//            for (ModuleAggregationProduct moduleAggregationProduct : moduleAggregationProducts) {
+//                AggregationProduct aggregationProduct = new AggregationProduct();
+//                if (moduleAggregationProduct.getType() == 1) {
+//                    //线上商品
+//                    Product product = productMapper.selectByPrimaryKey(moduleAggregationProduct.getProductId());
+//                    if (!ValidCheck.validPojo(product)) {
+//
+//                        aggregationProduct.setId(product.getId());
+//                        aggregationProduct.setIntegral(product.getIntegral());
+//                        aggregationProduct.setName(product.getName());
+//                        aggregationProduct.setPrice(product.getPrice());
+//                        aggregationProduct.setType(DBConstants.CategoryType.PRODUCT.getCode());
+//                        aggregationProduct.setLogoKey(product.getLogoKey() + "!popular");
+//                        aggregationProduct.setSales(product.getSales());
+//
+//                        aggregationProducts.add(aggregationProduct);
+//                    }
+//                } else {
+//                    //店铺
+//                    StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(moduleAggregationProduct.getStoreId());
+//                    if (!ValidCheck.validPojo(storeInfo)) {
+//                        aggregationProduct.setLogoKey(storeInfo.getLogoKey() + "!popular");
+//                        aggregationProduct.setType(DBConstants.CategoryType.STORE.getCode());
+//                        aggregationProduct.setName(storeInfo.getName());
+//                        aggregationProduct.setId(storeInfo.getId());
+//                        aggregationProduct.setAddress(storeInfo.getAddress());
+//
+//                        aggregationProducts.add(aggregationProduct);
+//                    }
+//                }
 //            }
-
-            //循环获取商户或商品信息
-            List<AggregationProduct> aggregationProducts = new ArrayList<>();
-            for (ModuleAggregationProduct moduleAggregationProduct : moduleAggregationProducts) {
-                AggregationProduct aggregationProduct = new AggregationProduct();
-                if (moduleAggregationProduct.getType() == 1) {
-                    //线上商品
-                    Product product = productMapper.selectByPrimaryKey(moduleAggregationProduct.getProductId());
-                    if (!ValidCheck.validPojo(product)) {
-
-                        aggregationProduct.setId(product.getId());
-                        aggregationProduct.setIntegral(product.getIntegral());
-                        aggregationProduct.setName(product.getName());
-                        aggregationProduct.setPrice(product.getPrice());
-                        aggregationProduct.setType(DBConstants.CategoryType.PRODUCT.getCode());
-                        aggregationProduct.setLogoKey(product.getLogoKey() + "!popular");
-                        aggregationProduct.setSales(product.getSales());
-
-                        aggregationProducts.add(aggregationProduct);
-                    }
-                } else {
-                    //店铺
-                    StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(moduleAggregationProduct.getStoreId());
-                    if (!ValidCheck.validPojo(storeInfo)) {
-                        aggregationProduct.setLogoKey(storeInfo.getLogoKey() + "!popular");
-                        aggregationProduct.setType(DBConstants.CategoryType.STORE.getCode());
-                        aggregationProduct.setName(storeInfo.getName());
-                        aggregationProduct.setId(storeInfo.getId());
-                        aggregationProduct.setAddress(storeInfo.getAddress());
-
-                        aggregationProducts.add(aggregationProduct);
-                    }
-                }
-            }
-
-
-            //生成5种排序规则
-
-
-            if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.PRODUCT.getCode()) {
-                //默认排序
-                this.redisService.put(moduleAggregation.getLinkCode(), JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
-
-
-                //积分低到高
-                Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
-
-                    @Override
-                    public int compare(AggregationProduct o1, AggregationProduct o2) {
-                        //按照学生的年龄进行升序排列
-                        if (o1.getIntegral() > o2.getIntegral()) {
-                            return 1;
-                        }
-                        if (o1.getIntegral() == o2.getIntegral()) {
-                            return 0;
-                        }
-                        return -1;
-                    }
-
-                });
-                this.redisService.put(moduleAggregation.getLinkCode() + "4", JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
-
-
-                //积分高到低
-                Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
-
-                    @Override
-                    public int compare(AggregationProduct o1, AggregationProduct o2) {
-                        //按照学生的年龄进行升序排列
-                        if (o1.getIntegral() > o2.getIntegral()) {
-                            return -1;
-                        }
-                        if (o1.getIntegral() == o2.getIntegral()) {
-                            return 0;
-                        }
-                        return 1;
-                    }
-
-                });
-                this.redisService.put(moduleAggregation.getLinkCode() + "3", JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
-
-
-                //销量低到高
-                Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
-
-                    @Override
-                    public int compare(AggregationProduct o1, AggregationProduct o2) {
-                        //按照学生的年龄进行升序排列
-                        if (o1.getSales() > o2.getSales()) {
-                            return 1;
-                        }
-                        if (o1.getSales() == o2.getSales()) {
-                            return 0;
-                        }
-                        return -1;
-                    }
-
-                });
-                this.redisService.put(moduleAggregation.getLinkCode() + "2", JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
-
-
-                //销量高到低
-                Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
-
-                    @Override
-                    public int compare(AggregationProduct o1, AggregationProduct o2) {
-                        //按照学生的年龄进行升序排列
-                        if (o1.getSales() > o2.getSales()) {
-                            return -1;
-                        }
-                        if (o1.getSales() == o2.getSales()) {
-                            return 0;
-                        }
-                        return 1;
-                    }
-
-                });
-                this.redisService.put(moduleAggregation.getLinkCode() + "1", JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
-            }
-
-
-            //更新聚合页状态
-            if(moduleAggregation.getStatus() != DBConstants.ModuleAggregationStatus.ACTIVED.getCode()) {
-                moduleAggregation.setStatus(DBConstants.ModuleAggregationStatus.ACTIVED.getCode());
-                moduleAggregationMapper.updateByPrimaryKey(moduleAggregation);
-            }
+//
+//
+//            //生成5种排序规则
+//
+//
+//            if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.PRODUCT.getCode()) {
+//                //默认排序
+//                this.redisService.put(moduleAggregation.getLinkCode(), JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
+//
+//
+//                //积分低到高
+//                Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
+//
+//                    @Override
+//                    public int compare(AggregationProduct o1, AggregationProduct o2) {
+//                        //按照学生的年龄进行升序排列
+//                        if (o1.getIntegral() > o2.getIntegral()) {
+//                            return 1;
+//                        }
+//                        if (o1.getIntegral() == o2.getIntegral()) {
+//                            return 0;
+//                        }
+//                        return -1;
+//                    }
+//
+//                });
+//                this.redisService.put(moduleAggregation.getLinkCode() + "4", JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
+//                System.out.println(this.redisService.get(moduleAggregation.getLinkCode() + "4"));
+//
+//
+//                //积分高到低
+//                Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
+//
+//                    @Override
+//                    public int compare(AggregationProduct o1, AggregationProduct o2) {
+//                        //按照学生的年龄进行升序排列
+//                        if (o1.getIntegral() > o2.getIntegral()) {
+//                            return -1;
+//                        }
+//                        if (o1.getIntegral() == o2.getIntegral()) {
+//                            return 0;
+//                        }
+//                        return 1;
+//                    }
+//
+//                });
+//                this.redisService.put(moduleAggregation.getLinkCode() + "3", JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
+//
+//
+//                //销量低到高
+//                Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
+//
+//                    @Override
+//                    public int compare(AggregationProduct o1, AggregationProduct o2) {
+//                        //按照学生的年龄进行升序排列
+//                        if (o1.getSales() > o2.getSales()) {
+//                            return 1;
+//                        }
+//                        if (o1.getSales() == o2.getSales()) {
+//                            return 0;
+//                        }
+//                        return -1;
+//                    }
+//
+//                });
+//                this.redisService.put(moduleAggregation.getLinkCode() + "2", JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
+//
+//
+//                //销量高到低
+//                Collections.sort(aggregationProducts, new Comparator<AggregationProduct>() {
+//
+//                    @Override
+//                    public int compare(AggregationProduct o1, AggregationProduct o2) {
+//                        //按照学生的年龄进行升序排列
+//                        if (o1.getSales() > o2.getSales()) {
+//                            return -1;
+//                        }
+//                        if (o1.getSales() == o2.getSales()) {
+//                            return 0;
+//                        }
+//                        return 1;
+//                    }
+//
+//                });
+//                this.redisService.put(moduleAggregation.getLinkCode() + "1", JsonUtil.toJson(aggregationProducts), 60*60*24*30, TimeUnit.SECONDS);
+//            }
+//
+//
+//            //更新聚合页状态
+//            if(moduleAggregation.getStatus() != DBConstants.ModuleAggregationStatus.ACTIVED.getCode()) {
+//                moduleAggregation.setStatus(DBConstants.ModuleAggregationStatus.ACTIVED.getCode());
+//                moduleAggregationMapper.updateByPrimaryKey(moduleAggregation);
+//            }
 
             CommonResult.success(jsonResult);
 

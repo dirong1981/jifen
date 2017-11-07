@@ -162,6 +162,9 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
             StoreOfflineOrderExample.Criteria criteria = storeOfflineOrderExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
+            if(!org.springframework.util.StringUtils.isEmpty(start_time) && !org.springframework.util.StringUtils.isEmpty(end_time)){
+                criteria.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time)));
+            }
             storeOfflineOrderExample.setOrderByClause("id desc");
 
             PageHelper.startPage(page, per_page);
@@ -171,6 +174,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             if (!ValidCheck.validList(storeOfflineOrders)) {
 
                 for (StoreOfflineOrder storeOfflineOrder : storeOfflineOrders) {
+                    storeOfflineOrder.setIntegral(-1*storeOfflineOrder.getIntegral());
                     StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeOfflineOrder.getSiId());
                     storeOfflineOrder.setName(storeInfo.getName());
                     if (storeOfflineOrder.getExtCash() == 0) {
@@ -487,12 +491,12 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
         or.setCreated(new Date());
         or.setDtchainBlockId(response.getContent().getBlockId());
         or.setExtOrderId(response.getContent().getExtOrderId());
-        or.setIntegral(storeOfflineOrder.getIntegral() + 0L);
-        or.setOrderId(storeOfflineOrder.getId() + 0L);
+        or.setIntegral(storeOfflineOrder.getIntegral());
+        or.setOrderId(storeOfflineOrder.getId());
         or.setOrderType(storeInfo.getStoreType());
-        or.setStoreId(storeInfo.getId() + 0L);
-        or.setToUid(storeOfflineOrder.getUid() + 0L);
-        or.setTrxId(st.getId() + 0L);
+        or.setStoreId(storeInfo.getId());
+        or.setToUid(storeOfflineOrder.getUid());
+        or.setTrxId(st.getId());
         or.setTrxCode(st.getCode());
 
         this.refundMapper.refundOrder(or);

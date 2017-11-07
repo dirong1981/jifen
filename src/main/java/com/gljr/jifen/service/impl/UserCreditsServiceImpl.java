@@ -23,4 +23,8 @@ public class UserCreditsServiceImpl implements UserCreditsService {
         return this.userCreditsMapper.getUserCredits(ownerId, ownerType.getCode());
     }
 
+    @Override
+    public UserCredits getStoreCreditsByManagerId(Integer managerId) {
+        return this.userCreditsMapper.getStoreCreditsByManagerId(managerId);
+    }
 }

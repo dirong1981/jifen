@@ -50,10 +50,13 @@ public class StorageService {
     }
 
     public String uploadToPublicBucket(String prefix, MultipartFile file) {
-        String _token = auth.uploadToken(publicBucketName);
+        return _upload(auth.uploadToken(publicBucketName), prefix, file);
+    }
+
+    private String _upload(String token, String prefix, MultipartFile file) {
         try {
             String _key = prefix + "/" + StrUtil.randomKey(8) + "." + FilenameUtils.getExtension(file.getOriginalFilename());
-            Response _resp = uploadManager.put(IOUtils.toByteArray(file.getInputStream()), _key, _token);
+            Response _resp = uploadManager.put(IOUtils.toByteArray(file.getInputStream()), _key, token);
             if (null != _resp && _resp.isOK()) {
                 return _key;
             }
@@ -61,8 +64,11 @@ public class StorageService {
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
-
         return null;
+    }
+
+    public String uploadToPrivateBucket(String prefix, MultipartFile file) {
+        return _upload(auth.uploadToken(privateBucketName), prefix, file);
     }
 
     public String accessUrl(boolean isPrivateResource, String key, String styleName) {

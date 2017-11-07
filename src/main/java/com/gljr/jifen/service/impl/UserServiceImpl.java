@@ -68,18 +68,18 @@ public class UserServiceImpl implements UserService {
             if(!StringUtils.isEmpty(gltoken)){
                 //去沟里验证token
 
-                GatewayResponse<GouliUserId> gouliUserId = chainService.getUserId(gltoken);
+//                GatewayResponse<GouliUserId> gouliUserId = chainService.getUserId(gltoken);
+//
+//                if (null == gouliUserId || gouliUserId.getCode() != 200) {
+//                    CommonResult.userNotExit(jsonResult);
+//                    return jsonResult;
+//                } else {
+//                    CommonResult.success(jsonResult);
+//                }
+//
+//                uid = Integer.parseInt(gouliUserId.getContent().getId() + "");
 
-                if (null == gouliUserId || gouliUserId.getCode() != 200) {
-                    CommonResult.userNotExit(jsonResult);
-                    return jsonResult;
-                } else {
-                    CommonResult.success(jsonResult);
-                }
-
-                uid = Integer.parseInt(gouliUserId.getContent().getId() + "");
-
-//                uid  = 15470;
+                uid  = 15411;
                 UserOnlineExample userOnlineExample = new UserOnlineExample();
                 UserOnlineExample.Criteria criteria = userOnlineExample.or();
                 criteria.andUidEqualTo(uid);

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +57,15 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
 
     @Autowired
     private LocationMapper locationMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
+
+    @Autowired
+    private OrderRefundMapper orderRefundMapper;
+
+    @Autowired
+    private StoreCouponOrderMapper storeCouponOrderMapper;
 
     private final static int INVALID_INTEGRAL_AMOUNT = 402;
 
@@ -117,6 +127,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
                     UserCouponExample.Criteria criteria1 = userCouponExample.or();
                     criteria1.andScIdEqualTo(storeCoupon.getId());
                     criteria1.andSiIdEqualTo(storeCoupon.getSiId());
+                    criteria1.andStatusNotEqualTo(DBConstants.CouponStatus.REFUND.getCode());
 
                     long count = userCouponMapper.countByExample(userCouponExample);
 
@@ -254,6 +265,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             userCoupon.setIntegral(storeCoupon.getIntegral());
             userCoupon.setEqualMoney(storeCoupon.getEqualMoney());
 
+
             LocationExample locationExample = new LocationExample();
             LocationExample.Criteria criteria1 = locationExample.or();
             criteria1.andCodeEqualTo(storeInfo.getLocationCode());
@@ -296,9 +308,10 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             UserCouponExample.Criteria criteria = userCouponExample.or();
             criteria.andUidEqualTo(Integer.parseInt(uid));
             criteria.andStatusNotEqualTo(DBConstants.CouponStatus.USED.getCode());
+            criteria.andStatusNotEqualTo(DBConstants.CouponStatus.REFUND.getCode());
 
             if(!StringUtils.isEmpty(start_time) && !StringUtils.isEmpty(end_time)){
-                criteria.andCreateTimeBetween(new Timestamp(Integer.parseInt(start_time)), new Timestamp(Integer.parseInt(end_time)));
+                criteria.andCreateTimeBetween(new Date(Long.parseLong(start_time)), new Date(Long.parseLong(end_time)+86400000));
             }
             userCouponExample.setOrderByClause("id desc");
 
@@ -322,7 +335,12 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
                     userCoupon.setStatus(0);
                 }
 
-                if(userCoupon.getValidTo().before(new Date())){
+                Calendar calendar = new GregorianCalendar();
+                calendar.setTime(new Date());
+                calendar.add(calendar.DATE, -1);
+                Date end = calendar.getTime();
+
+                if(userCoupon.getValidTo().before(end)){
                     userCoupon.setStatus(DBConstants.CouponStatus.EXPIRED.getCode());
                 }
             }
@@ -362,6 +380,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             UserCouponExample.Criteria criteria = userCouponExample.or();
             criteria.andSiIdEqualTo(storeCoupon.getSiId());
             criteria.andScIdEqualTo(storeCoupon.getId());
+            criteria.andStatusNotEqualTo(DBConstants.CouponStatus.REFUND.getCode());
 
             long count = userCouponMapper.countByExample(userCouponExample);
             int remain = storeCoupon.getMaxGenerated() - Integer.parseInt(count + "");
@@ -406,7 +425,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             }
 
             if (INVALID_STORE_COUPON_STATUS == response.getCode()) {
-                jsonResult.setMessage("该商户代金券暂无法兑换！");
+                jsonResult.setMessage("该商品已下架！");
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 return jsonResult;
             }
@@ -424,7 +443,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             }
 
             if(response.getCode() != 200) {
-                jsonResult.setMessage(response.getMessage());
+                jsonResult.setMessage("代金券购买失败，请联系客服！");
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 return jsonResult;
             }
@@ -451,35 +470,46 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             userCoupon.setStatus(DBConstants.CouponStatus.VALID.getCode());
             userCouponMapper.insert(userCoupon);
 
-            StoreOfflineOrder storeOfflineOrder = new StoreOfflineOrder();
-            storeOfflineOrder.setSiId(storeCoupon.getSiId());
-            storeOfflineOrder.setUcId(userCoupon.getId());
-            storeOfflineOrder.setUid(Integer.parseInt(uid));
-            storeOfflineOrder.setDtchainBlockId(cor.getBlockId());
-            storeOfflineOrder.setExtOrderId(cor.getExtOrderId());
-            storeOfflineOrder.setIntegral(storeCoupon.getIntegral());
-            storeOfflineOrder.setExtCash(0);
-            storeOfflineOrder.setTotalMoney(0);
-            storeOfflineOrder.setStatus(DBConstants.OrderStatus.PAID.getCode());
-            storeOfflineOrder.setCreateTime(new Timestamp(System.currentTimeMillis()));
-            storeOfflineOrder.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+//            StoreOfflineOrder storeOfflineOrder = new StoreOfflineOrder();
+//            storeOfflineOrder.setSiId(storeCoupon.getSiId());
+//            storeOfflineOrder.setUcId(userCoupon.getId());
+//            storeOfflineOrder.setUid(Integer.parseInt(uid));
+//            storeOfflineOrder.setDtchainBlockId(cor.getBlockId());
+//            storeOfflineOrder.setExtOrderId(cor.getExtOrderId());
+//            storeOfflineOrder.setIntegral(storeCoupon.getIntegral());
+//            storeOfflineOrder.setExtCash(0);
+//            storeOfflineOrder.setTotalMoney(0);
+//            storeOfflineOrder.setStatus(DBConstants.OrderStatus.PAID.getCode());
+//            storeOfflineOrder.setCreateTime(new Timestamp(System.currentTimeMillis()));
+//            storeOfflineOrder.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 
             //添加一条通用交易信息
             Transaction transaction = new Transaction();
             transaction.setType(DBConstants.TrxType.OFFLINE.getCode());
             transaction.setOwnerType(DBConstants.OwnerType.CUSTOMER.getCode());
             transaction.setOwnerId(Integer.parseInt(uid));
-            transaction.setIntegral(-1 * storeOfflineOrder.getIntegral());
+            transaction.setIntegral(-1 * storeCoupon.getIntegral());
             transaction.setCreateTime(new Timestamp(System.currentTimeMillis()));
             transaction.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
             transaction.setCode(serialNumberService.getNextTrxCode(DBConstants.TrxType.OFFLINE.getCode()));
 
             transactionMapper.insert(transaction);
 
-            storeOfflineOrder.setTrxId(transaction.getId());
-            storeOfflineOrder.setTrxCode(transaction.getCode());
+            StoreCouponOrder storeCouponOrder = new StoreCouponOrder();
+            storeCouponOrder.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            storeCouponOrder.setIntegral(storeCoupon.getIntegral());
+            storeCouponOrder.setSiId(storeCoupon.getSiId());
+            storeCouponOrder.setTrxCode(transaction.getCode());
+            storeCouponOrder.setTrxId(transaction.getId());
+            storeCouponOrder.setUcId(userCoupon.getId());
+            storeCouponOrder.setDtchainBlockId(response.getContent().getBlockId());
 
-            storeOfflineOrderMapper.insert(storeOfflineOrder);
+            storeCouponOrderMapper.insert(storeCouponOrder);
+
+//            storeOfflineOrder.setTrxId(transaction.getId());
+//            storeOfflineOrder.setTrxCode(transaction.getCode());
+//
+//            storeOfflineOrderMapper.insert(storeOfflineOrder);
 
             jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
             jsonResult.setMessage(transaction.getCode());
@@ -495,52 +525,86 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
     @Transactional
     public JsonResult refundStoreCouponOrder(Integer couponId, String uid) {
         try {
-            StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
-            StoreOfflineOrderExample.Criteria criteria = storeOfflineOrderExample.or();
-            criteria.andUcIdEqualTo(couponId);
+//            StoreOfflineOrderExample storeOfflineOrderExample = new StoreOfflineOrderExample();
+//            StoreOfflineOrderExample.Criteria criteria = storeOfflineOrderExample.or();
+//            criteria.andUcIdEqualTo(couponId);
+//            criteria.andUidEqualTo(Integer.parseInt(uid));
+//            List<StoreOfflineOrder> storeOfflineOrders = storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);
+//            if(ValidCheck.validList(storeOfflineOrders)){
+//                CommonResult.noObject(jsonResult);
+//                return jsonResult;
+//            }
+//            StoreOfflineOrder storeOfflineOrder = storeOfflineOrders.get(0);
+//            if(storeOfflineOrder.getStatus() == DBConstants.OrderStatus.REFUND.getCode()){
+//                return jsonResult;
+//            }
+
+            UserCouponExample userCouponExample = new UserCouponExample();
+            UserCouponExample.Criteria criteria = userCouponExample.or();
+            criteria.andStatusNotEqualTo(DBConstants.CouponStatus.USED.getCode());
+            criteria.andIdEqualTo(couponId);
             criteria.andUidEqualTo(Integer.parseInt(uid));
-            List<StoreOfflineOrder> storeOfflineOrders = storeOfflineOrderMapper.selectByExample(storeOfflineOrderExample);
-            if(ValidCheck.validList(storeOfflineOrders)){
+
+            List<UserCoupon> userCoupons = userCouponMapper.selectByExample(userCouponExample);
+            if(ValidCheck.validList(userCoupons)){
                 CommonResult.noObject(jsonResult);
                 return jsonResult;
             }
-            StoreOfflineOrder storeOfflineOrder = storeOfflineOrders.get(0);
-            if(storeOfflineOrder.getStatus() == DBConstants.OrderStatus.REFUND.getCode()){
-                return jsonResult;
-            }
 
-            UserCoupon userCoupon = userCouponMapper.selectByPrimaryKey(couponId);
+            UserCoupon userCoupon = userCoupons.get(0);
 
             GatewayResponse<CommonOrderResponse> response = this.chainService.couponRefund(userCoupon.getSiId() + 0L, userCoupon.getCouponCode());
 
             if(response.getCode() != 200) {
-                jsonResult.setMessage(response.getMessage());
+                jsonResult.setMessage("该代金券暂不支持退款，请联系管理员！");
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 return jsonResult;
             }
 
+            StoreCoupon storeCoupon = storeCouponMapper.selectByPrimaryKey(userCoupon.getScId());
+
+            if(storeCoupon.getStatus() == DBConstants.StoreCouponStatus.SOLD_OUT.getCode()){
+                storeCoupon.setStatus(DBConstants.StoreCouponStatus.ACTIVED.getCode());
+                storeCouponMapper.updateByPrimaryKey(storeCoupon);
+            }
 
             //添加一条通用交易信息
             Transaction transaction = new Transaction();
-            transaction.setType(DBConstants.TrxType.OFFLINE.getCode());
+            transaction.setType(DBConstants.TrxType.REFUND.getCode());
             transaction.setOwnerType(DBConstants.OwnerType.CUSTOMER.getCode());
             transaction.setOwnerId(Integer.parseInt(uid));
-            transaction.setIntegral(storeOfflineOrder.getIntegral());
+            transaction.setIntegral(storeCoupon.getIntegral());
             transaction.setCreateTime(new Timestamp(System.currentTimeMillis()));
             transaction.setStatus(DBConstants.TrxStatus.REFUND.getCode());
-            transaction.setCode(serialNumberService.getNextTrxCode(DBConstants.TrxType.OFFLINE.getCode()));
+            transaction.setCode(serialNumberService.getNextTrxCode(DBConstants.TrxType.REFUND.getCode()));
 
             transactionMapper.insert(transaction);
 
-            storeOfflineOrder.setStatus(DBConstants.OrderStatus.REFUND.getCode());
-            storeOfflineOrderMapper.updateByPrimaryKey(storeOfflineOrder);
+            OrderRefund orderRefund = new OrderRefund();
+            orderRefund.setCreated(new Date());
+            orderRefund.setDtchainBlockId(response.getContent().getBlockId());
+            orderRefund.setExtOrderId(response.getContent().getExtOrderId());
+            orderRefund.setIntegral(transaction.getIntegral());
+            orderRefund.setOrderId(userCoupon.getId());
+            orderRefund.setOrderType(1);
+            orderRefund.setStoreId(storeCoupon.getSiId());
+            orderRefund.setToUid(Integer.parseInt(uid));
+            orderRefund.setTrxId(transaction.getId());
+            orderRefund.setTrxCode(transaction.getCode());
 
-            String title = "代金券退还" + storeOfflineOrder.getIntegral() + "积分";
+            orderRefundMapper.refundOrder(orderRefund);
+
+//            storeOfflineOrder.setStatus(DBConstants.OrderStatus.REFUND.getCode());
+//            storeOfflineOrderMapper.updateByPrimaryKey(storeOfflineOrder);
+
+            String title = "代金券退还" + storeCoupon.getIntegral() + "积分";
             Message message = new Message();
             message.setReadStatus(0);
             message.setContent(title);
             message.setCreateTime(new Timestamp(System.currentTimeMillis()));
-            message.setUid(storeOfflineOrder.getUid());
+            message.setUid(Integer.parseInt(uid));
+
+            messageMapper.insert(message);
 
             CommonResult.success(jsonResult);
 
@@ -579,6 +643,75 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
         }catch (Exception e){
             CommonResult.sqlFailed(jsonResult);
             jsonResult.setItem(null);
+        }
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult selectCouponOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult) {
+        try{
+            StoreCouponOrderExample storeCouponOrderExample = new StoreCouponOrderExample();
+            StoreCouponOrderExample.Criteria criteria = storeCouponOrderExample.or();
+
+            if(!StringUtils.isEmpty(trxCode)){
+                criteria.andTrxCodeEqualTo(trxCode);
+            }
+//            if(!StringUtils.isEmpty(status)){
+//                criteria.andStatusEqualTo(status);
+//            }
+            criteria.andCreateTimeBetween(begin, end);
+            storeCouponOrderExample.setOrderByClause("id desc");
+
+            PageHelper.startPage(page,per_page);
+            List<StoreCouponOrder> storeCouponOrders = storeCouponOrderMapper.selectByExample(storeCouponOrderExample);
+            PageInfo pageInfo = new PageInfo(storeCouponOrders);
+
+            List<UserCoupon> userCoupons = new ArrayList<>();
+            List<UserCoupon> del = new ArrayList<>();
+
+            if(!ValidCheck.validList(storeCouponOrders)){
+                for (StoreCouponOrder storeCouponOrder : storeCouponOrders) {
+                    UserCoupon userCoupon = new UserCoupon();
+
+                    StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeCouponOrder.getSiId());
+                    userCoupon.setStoreName(storeInfo.getName());
+
+                    UserCoupon userCoupon1 = userCouponMapper.selectByPrimaryKey(storeCouponOrder.getUcId());
+
+                    userCoupon.setStatus(userCoupon1.getStatus());
+
+                    if(!StringUtils.isEmpty(status)){
+                        if(userCoupon1.getStatus() != status){
+                            del.add(userCoupon);
+                        }
+                    }
+
+                    StoreCoupon storeCoupon = storeCouponMapper.selectByPrimaryKey(userCoupon1.getScId());
+                    userCoupon.setEqualMoney(storeCoupon.getEqualMoney());
+                    userCoupon.setIntegral(storeCoupon.getIntegral());
+
+                    userCoupon.setStoreAddress(storeCouponOrder.getTrxCode());
+
+                    userCoupon.setCreateTime(storeCouponOrder.getCreateTime());
+
+                    userCoupons.add(userCoupon);
+                }
+            }
+
+            userCoupons.removeAll(del);
+
+            Map map = new HashMap();
+            map.put("data", userCoupons);
+            map.put("pages", pageInfo.getPages());
+
+            map.put("total", pageInfo.getTotal());
+            //当前页
+            map.put("pageNum", pageInfo.getPageNum());
+
+            CommonResult.success(jsonResult);
+            jsonResult.setItem(map);
+        }catch (Exception e){
+            CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
     }

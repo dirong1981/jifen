@@ -8,9 +8,7 @@ import com.gljr.jifen.common.CommonResult;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.common.ValidCheck;
 import com.gljr.jifen.constants.DBConstants;
-import com.gljr.jifen.dao.ModuleAggregationConditionMapper;
-import com.gljr.jifen.dao.ModuleAggregationMapper;
-import com.gljr.jifen.dao.ProductMapper;
+import com.gljr.jifen.dao.*;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.ModuleAggregationService;
 import com.gljr.jifen.service.RedisService;
@@ -23,6 +21,7 @@ import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,12 @@ public class ModuleAggregationController {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private ModuleAggregationProductMapper moduleAggregationProductMapper;
+
+    @Autowired
+    private StoreInfoMapper storeInfoMapper;
 
     /**
      * 通过路径获取一个聚合页
@@ -115,11 +120,11 @@ public class ModuleAggregationController {
                 if(sort == 0){
                     productExample.setOrderByClause("id desc");
                 }else if (sort == 1 || sort == 2){
-                    productExample.setOrderByClause("sales desc, id desc");
+                    productExample.setOrderByClause("sales desc");
                 }else if (sort == 3){
-                    productExample.setOrderByClause("integral desc, id desc");
+                    productExample.setOrderByClause("integral desc");
                 }else if (sort == 4){
-                    productExample.setOrderByClause("integral asc, id desc");
+                    productExample.setOrderByClause("integral asc");
                 }
 
                 PageHelper.startPage(page,per_page);
@@ -144,45 +149,106 @@ public class ModuleAggregationController {
 
 
 
-//            //商品聚合
-//            if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.PRODUCT.getCode()){
-//                ModuleAggregationProductExample moduleAggregationProductExample = new ModuleAggregationProductExample();
-//                ModuleAggregationProductExample.Criteria criteria1 = moduleAggregationProductExample.or();
-//                criteria1.andAggregationIdEqualTo(moduleAggregation.getId());
-//
-//            }
-//
-//            //商户聚合
-//            if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.STORE.getCode()){
-//
-//            }
+            //商品聚合
+            if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.PRODUCT.getCode()){
+                ModuleAggregationProductExample moduleAggregationProductExample = new ModuleAggregationProductExample();
+                ModuleAggregationProductExample.Criteria criteria1 = moduleAggregationProductExample.or();
+                criteria1.andAggregationIdEqualTo(moduleAggregation.getId());
+                criteria1.andTypeEqualTo(DBConstants.ModuleAggregationType.PRODUCT.getCode());
+                moduleAggregationProductExample.setOrderByClause("id desc");
 
+                List<ModuleAggregationProduct> moduleAggregationProducts = moduleAggregationProductMapper.selectByExample(moduleAggregationProductExample);
 
-            //获取缓存中对应的排序结果
-            String json = this.redisService.get(link+_sort);
+                List<AggregationProduct> aggregationProducts = new ArrayList<>();
+                for (ModuleAggregationProduct moduleAggregationProduct : moduleAggregationProducts){
+                    Product product = productMapper.selectByPrimaryKey(moduleAggregationProduct.getProductId());
 
-            //为空，提示没有找到数据
-            if(StringUtils.isEmpty(json)){
-                jsonResult = moduleAggregationService.restartmoduleAggregationByLink(link, jsonResult);
-            }
+                    AggregationProduct aggregationProduct = new AggregationProduct();
+                    aggregationProduct.setId(product.getId());
+                    aggregationProduct.setIntegral(product.getIntegral());
+                    aggregationProduct.setName(product.getName());
+                    aggregationProduct.setPrice(product.getPrice());
+                    aggregationProduct.setType(DBConstants.CategoryType.PRODUCT.getCode());
+                    aggregationProduct.setLogoKey(product.getLogoKey() + "!popular");
+                    aggregationProduct.setSales(product.getSales());
 
-            json = this.redisService.get(link+_sort);
+                    aggregationProducts.add(aggregationProduct);
+                }
 
-            //还为空
-            if(StringUtils.isEmpty(json)){
-                CommonResult.noObject(jsonResult);
+                map = new HashMap();
+                map.put("data", aggregationProducts);
+                map.put("pages", 1);
+
+                map.put("total", aggregationProducts.size());
+                //当前页
+                map.put("pageNum", 1);
+                jsonResult.setItem(map);
+                CommonResult.success(jsonResult);
                 return jsonResult;
             }
 
-            map.put("data", json);
-            map.put("pages", 1);
+            //商户聚合
+            if(moduleAggregation.getType() == DBConstants.ModuleAggregationType.STORE.getCode()){
+                ModuleAggregationProductExample moduleAggregationProductExample = new ModuleAggregationProductExample();
+                ModuleAggregationProductExample.Criteria criteria1 = moduleAggregationProductExample.or();
+                criteria1.andAggregationIdEqualTo(moduleAggregation.getId());
+                criteria1.andTypeEqualTo(DBConstants.ModuleAggregationType.STORE.getCode());
+                moduleAggregationProductExample.setOrderByClause("id desc");
 
-            map.put("total", 1);
-            //当前页
-            map.put("pageNum", 1);
+                List<ModuleAggregationProduct> moduleAggregationProducts = moduleAggregationProductMapper.selectByExample(moduleAggregationProductExample);
 
-            jsonResult.setItem(map);
-            CommonResult.success(jsonResult);
+                List<AggregationProduct> aggregationProducts = new ArrayList<>();
+                for (ModuleAggregationProduct moduleAggregationProduct : moduleAggregationProducts){
+
+                    StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(moduleAggregationProduct.getStoreId());
+                        AggregationProduct aggregationProduct = new AggregationProduct();
+
+                        aggregationProduct.setLogoKey(storeInfo.getLogoKey() + "!popular");
+                        aggregationProduct.setType(DBConstants.CategoryType.STORE.getCode());
+                        aggregationProduct.setName(storeInfo.getName());
+                        aggregationProduct.setId(storeInfo.getId());
+                        aggregationProduct.setAddress(storeInfo.getAddress());
+
+                        aggregationProducts.add(aggregationProduct);
+                }
+                map = new HashMap();
+                map.put("data", aggregationProducts);
+                map.put("pages", 1);
+
+                map.put("total", aggregationProducts.size());
+                //当前页
+                map.put("pageNum", 1);
+                jsonResult.setItem(map);
+                CommonResult.success(jsonResult);
+                return jsonResult;
+            }
+
+
+//            //获取缓存中对应的排序结果
+//            String json = this.redisService.get(link+_sort);
+//
+//            //为空，提示没有找到数据
+//            if(StringUtils.isEmpty(json)){
+//                jsonResult = moduleAggregationService.restartmoduleAggregationByLink(link, jsonResult);
+//            }
+//
+//            json = this.redisService.get(link+_sort);
+//
+//            //还为空
+//            if(StringUtils.isEmpty(json)){
+//                CommonResult.noObject(jsonResult);
+//                return jsonResult;
+//            }
+//
+//            map.put("data", json);
+//            map.put("pages", 1);
+//
+//            map.put("total", 1);
+//            //当前页
+//            map.put("pageNum", 1);
+//
+//            jsonResult.setItem(map);
+//            CommonResult.success(jsonResult);
         }catch (Exception e){
             System.out.println(e);
             CommonResult.failed(jsonResult);

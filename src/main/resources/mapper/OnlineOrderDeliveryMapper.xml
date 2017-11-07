@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gljr.jifen.dao.OnlineOrderDeliveryMapper">
+  <resultMap id="BaseResultMap" type="com.gljr.jifen.pojo.OnlineOrderDelivery">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="oo_id" jdbcType="BIGINT" property="ooId" />
+    <result column="se_id" jdbcType="BIGINT" property="seId" />
+    <result column="express_no" jdbcType="VARCHAR" property="expressNo" />
+    <result column="delivery_date" jdbcType="DATE" property="deliveryDate" />
+    <result column="express_status" jdbcType="INTEGER" property="expressStatus" />
+    <result column="contact_name" jdbcType="VARCHAR" property="contactName" />
+    <result column="contact_phone" jdbcType="VARCHAR" property="contactPhone" />
+    <result column="delivery_address" jdbcType="VARCHAR" property="deliveryAddress" />
+    <result column="manager_id" jdbcType="BIGINT" property="managerId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, oo_id, se_id, express_no, delivery_date, express_status, contact_name, contact_phone, 
+    delivery_address, manager_id, create_time
+  </sql>
+  <select id="selectByExample" parameterType="com.gljr.jifen.pojo.OnlineOrderDeliveryExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from online_order_delivery
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from online_order_delivery
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from online_order_delivery
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.gljr.jifen.pojo.OnlineOrderDeliveryExample">
+    delete from online_order_delivery
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.gljr.jifen.pojo.OnlineOrderDelivery">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into online_order_delivery (oo_id, se_id, express_no, 
+      delivery_date, express_status, contact_name, 
+      contact_phone, delivery_address, manager_id, 
+      create_time)
+    values (#{ooId,jdbcType=BIGINT}, #{seId,jdbcType=BIGINT}, #{expressNo,jdbcType=VARCHAR}, 
+      #{deliveryDate,jdbcType=DATE}, #{expressStatus,jdbcType=INTEGER}, #{contactName,jdbcType=VARCHAR}, 
+      #{contactPhone,jdbcType=VARCHAR}, #{deliveryAddress,jdbcType=VARCHAR}, #{managerId,jdbcType=BIGINT}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.gljr.jifen.pojo.OnlineOrderDelivery">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into online_order_delivery
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="ooId != null">
+        oo_id,
+      </if>
+      <if test="seId != null">
+        se_id,
+      </if>
+      <if test="expressNo != null">
+        express_no,
+      </if>
+      <if test="deliveryDate != null">
+        delivery_date,
+      </if>
+      <if test="expressStatus != null">
+        express_status,
+      </if>
+      <if test="contactName != null">
+        contact_name,
+      </if>
+      <if test="contactPhone != null">
+        contact_phone,
+      </if>
+      <if test="deliveryAddress != null">
+        delivery_address,
+      </if>
+      <if test="managerId != null">
+        manager_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="ooId != null">
+        #{ooId,jdbcType=BIGINT},
+      </if>
+      <if test="seId != null">
+        #{seId,jdbcType=BIGINT},
+      </if>
+      <if test="expressNo != null">
+        #{expressNo,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryDate != null">
+        #{deliveryDate,jdbcType=DATE},
+      </if>
+      <if test="expressStatus != null">
+        #{expressStatus,jdbcType=INTEGER},
+      </if>
+      <if test="contactName != null">
+        #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null">
+        #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryAddress != null">
+        #{deliveryAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="managerId != null">
+        #{managerId,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.gljr.jifen.pojo.OnlineOrderDeliveryExample" resultType="java.lang.Long">
+    select count(*) from online_order_delivery
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update online_order_delivery
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.ooId != null">
+        oo_id = #{record.ooId,jdbcType=BIGINT},
+      </if>
+      <if test="record.seId != null">
+        se_id = #{record.seId,jdbcType=BIGINT},
+      </if>
+      <if test="record.expressNo != null">
+        express_no = #{record.expressNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.deliveryDate != null">
+        delivery_date = #{record.deliveryDate,jdbcType=DATE},
+      </if>
+      <if test="record.expressStatus != null">
+        express_status = #{record.expressStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.contactName != null">
+        contact_name = #{record.contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contactPhone != null">
+        contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.deliveryAddress != null">
+        delivery_address = #{record.deliveryAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.managerId != null">
+        manager_id = #{record.managerId,jdbcType=BIGINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update online_order_delivery
+    set id = #{record.id,jdbcType=BIGINT},
+      oo_id = #{record.ooId,jdbcType=BIGINT},
+      se_id = #{record.seId,jdbcType=BIGINT},
+      express_no = #{record.expressNo,jdbcType=VARCHAR},
+      delivery_date = #{record.deliveryDate,jdbcType=DATE},
+      express_status = #{record.expressStatus,jdbcType=INTEGER},
+      contact_name = #{record.contactName,jdbcType=VARCHAR},
+      contact_phone = #{record.contactPhone,jdbcType=VARCHAR},
+      delivery_address = #{record.deliveryAddress,jdbcType=VARCHAR},
+      manager_id = #{record.managerId,jdbcType=BIGINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gljr.jifen.pojo.OnlineOrderDelivery">
+    update online_order_delivery
+    <set>
+      <if test="ooId != null">
+        oo_id = #{ooId,jdbcType=BIGINT},
+      </if>
+      <if test="seId != null">
+        se_id = #{seId,jdbcType=BIGINT},
+      </if>
+      <if test="expressNo != null">
+        express_no = #{expressNo,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryDate != null">
+        delivery_date = #{deliveryDate,jdbcType=DATE},
+      </if>
+      <if test="expressStatus != null">
+        express_status = #{expressStatus,jdbcType=INTEGER},
+      </if>
+      <if test="contactName != null">
+        contact_name = #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null">
+        contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryAddress != null">
+        delivery_address = #{deliveryAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="managerId != null">
+        manager_id = #{managerId,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gljr.jifen.pojo.OnlineOrderDelivery">
+    update online_order_delivery
+    set oo_id = #{ooId,jdbcType=BIGINT},
+      se_id = #{seId,jdbcType=BIGINT},
+      express_no = #{expressNo,jdbcType=VARCHAR},
+      delivery_date = #{deliveryDate,jdbcType=DATE},
+      express_status = #{expressStatus,jdbcType=INTEGER},
+      contact_name = #{contactName,jdbcType=VARCHAR},
+      contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      delivery_address = #{deliveryAddress,jdbcType=VARCHAR},
+      manager_id = #{managerId,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

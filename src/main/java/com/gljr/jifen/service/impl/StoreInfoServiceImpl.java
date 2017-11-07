@@ -19,9 +19,7 @@ import redis.clients.jedis.Jedis;
 
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class StoreInfoServiceImpl implements StoreInfoService {
@@ -389,9 +387,12 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             StoreCouponExample storeCouponExample = new StoreCouponExample();
             StoreCouponExample.Criteria criteria1 = storeCouponExample.or();
             criteria1.andSiIdEqualTo(storeId);
-            criteria1.andStatusEqualTo(1);
+            criteria1.andStatusEqualTo(DBConstants.StoreCouponStatus.ACTIVED.getCode());
+            storeCouponExample.setOrderByClause("id desc");
             List<StoreCoupon> storeCoupons = storeCouponMapper.selectByExample(storeCouponExample);
 
+
+            List<StoreCoupon> del = new ArrayList<>();
             for (StoreCoupon storeCoupon : storeCoupons){
                 UserCouponExample userCouponExample = new UserCouponExample();
                 UserCouponExample.Criteria criteria2 = userCouponExample.or();
@@ -400,8 +401,33 @@ public class StoreInfoServiceImpl implements StoreInfoService {
 
                 Long num = userCouponMapper.countByExample(userCouponExample);
 
-                storeCoupon.setRemainingAmount(storeCoupon.getMaxGenerated() - Integer.parseInt(num + ""));
+                int remain = storeCoupon.getMaxGenerated() - Integer.parseInt(num + "");
+
+                storeCoupon.setRemainingAmount(remain);
+
+                boolean remove = false;
+                if(remain <= 0){
+                    storeCoupon.setStatus(DBConstants.StoreCouponStatus.SOLD_OUT.getCode());
+                    storeCouponMapper.updateByPrimaryKey(storeCoupon);
+                    remove = true;
+                }
+
+                if(storeCoupon.getValidityType() == 1){
+                    Calendar calendar = new GregorianCalendar();
+                    calendar.setTime(new Date());
+                    calendar.add(calendar.DATE, -1);
+                    Date end = calendar.getTime();
+                    if(storeCoupon.getValidTo().before(end)){
+                        remove = true;
+                    }
+                }
+
+                if(remove){
+                    del.add(storeCoupon);
+                }
+
             }
+            storeCoupons.removeAll(del);
 
             map.put("coupons",storeCoupons);
 
@@ -411,6 +437,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
             CommonResult.success(jsonResult);
 
         } catch (Exception e) {
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;

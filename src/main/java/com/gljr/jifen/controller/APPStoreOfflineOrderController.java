@@ -151,7 +151,7 @@ public class APPStoreOfflineOrderController extends BaseController {
             }
 
             String blockNo = "";//钱包地址
-            UserCredits userCredits = this.userCreditsService.getUserCredits(NumberUtils.getInt(uid), DBConstants.OwnerType.MERCHANT);
+            UserCredits userCredits = this.userCreditsService.getStoreCreditsByManagerId(storeInfo.getAid());
             if (null != userCredits && !StringUtils.isEmpty(userCredits.getWalletAddress())) {
                 blockNo = userCredits.getWalletAddress();
             }
@@ -344,7 +344,7 @@ public class APPStoreOfflineOrderController extends BaseController {
         String uid = request.getHeader("uid");
         JsonResult jsonResult = new JsonResult();
 
-        List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(Integer.parseInt(uid));
+        List<StoreInfo> storeInfos = storeInfoService.selectStoreInfoByAid(NumberUtils.getInt(uid));
         if (ValidCheck.validList(storeInfos)) {
             CommonResult.noObject(jsonResult);
             return jsonResult;
@@ -367,23 +367,24 @@ public class APPStoreOfflineOrderController extends BaseController {
 
         Map<Object, Object> checkResult = new HashMap<>();
         double cash = 0D;
-        int exceedLimit = GlobalConstants.ExceedLimit.NO.getCode();
         int pwCheck = GlobalConstants.PwCheck.YES.getCode();
         int actuallyPayIntegral = integral;
+        int canTrad = 1;
         if (userCredits.getIntegral() < integral) {
             cash = (integral - userCredits.getIntegral()) / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO;
             actuallyPayIntegral = userCredits.getIntegral();
+            canTrad = GlobalConstants.CanTrad.NO.getCode();
         }
         if (userCredits.getFreePaymentLimit() != null && userCredits.getFreePaymentLimit() < integral) {
-            exceedLimit = GlobalConstants.ExceedLimit.YES.getCode();
             pwCheck = GlobalConstants.PwCheck.NO.getCode();
+            canTrad = GlobalConstants.CanTrad.NO.getCode();
         }
         checkResult.put("integral", integral);//消费积分
         checkResult.put("actuallyPayIntegral", actuallyPayIntegral);//实际支付的积分
         checkResult.put("cash", cash);//需补充的现金
-        checkResult.put("exceedLimit", exceedLimit);//是否超过免密额度 0：未超过 1：超过
         checkResult.put("status", GlobalConstants.OrderStatus.UNPAID.getCode());//交易状态 0：待付款 1：已付款 2：取消
         checkResult.put("pwCheck", pwCheck);//是否校验过密码 0：没有 1：已校验（不超过免密额度默认为1）
+        checkResult.put("canTrad", canTrad);//商家端是否可扣款 0：不可 1：可以
         checkResult.put("storeName", storeInfos.get(0).getName());
 
         String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + integral;
@@ -395,7 +396,6 @@ public class APPStoreOfflineOrderController extends BaseController {
         jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
         return jsonResult;
     }
-
 
     /**
      * 获取用户积分
@@ -452,6 +452,42 @@ public class APPStoreOfflineOrderController extends BaseController {
     }
 
     /**
+     * 用户确认或者取消现金支付
+     *
+     * @param userId   校验用户积分的用户id
+     * @param integral 本次消费积分
+     * @return
+     */
+    @GetMapping(value = "/store/cashPay")
+    @ResponseBody
+    public JsonResult cashPay(@RequestParam(value = "userId") Integer userId,
+                                         @RequestParam(value = "integral") Integer integral,
+                                         @RequestParam(value = "cashPay") int cashPay) {
+        JsonResult jsonResult = new JsonResult();
+
+        String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + integral;
+        String cacheResult = this.redisService.get(cacheKey);
+        if (cacheResult == null) {
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.NO_RESULT);
+            return jsonResult;
+        }
+        JSONObject cacheJsonObj = JSON.parseObject(cacheResult);
+
+        //确认现金支付
+        if (cashPay == 1 && NumberUtils.getInt(cacheJsonObj.get("pwCheck") + "") == GlobalConstants.PwCheck.YES.getCode()) {
+            cacheJsonObj.put("canTrad", GlobalConstants.CanTrad.YES.getCode());
+        } else {
+            //订单直接取消
+            cacheJsonObj.put("status", GlobalConstants.OrderStatus.CANCELED.getCode());
+            cacheJsonObj.put("canTrad", GlobalConstants.CanTrad.NO.getCode());
+        }
+
+        this.redisService.put(cacheKey, cacheJsonObj.toString(), GlobalConstants.CACHE_DATA_FAILURE_TIME, TimeUnit.SECONDS);
+        jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
+        return jsonResult;
+    }
+
+    /**
      * 积分交易密码校验
      *
      * @param userId   校验用户积分的用户id
@@ -491,6 +527,8 @@ public class APPStoreOfflineOrderController extends BaseController {
         JSONObject cacheJsonObj = JSON.parseObject(cacheResult);
         //修改缓存订单状态
         cacheJsonObj.put("pwCheck", GlobalConstants.PwCheck.YES.getCode());
+        cacheJsonObj.put("canTrad", GlobalConstants.CanTrad.YES.getCode());
+
         this.redisService.put(cacheKey, cacheJsonObj.toString(), GlobalConstants.CACHE_DATA_FAILURE_TIME, TimeUnit.SECONDS);
 
         jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
@@ -526,20 +564,20 @@ public class APPStoreOfflineOrderController extends BaseController {
 
         JSONObject cacheJsonObj = JSON.parseObject(cacheResult);
         int orderStatus = NumberUtils.getInt(String.valueOf(cacheJsonObj.get("status")));
-        if (orderStatus != 0) {
+        if (orderStatus != GlobalConstants.OrderStatus.UNPAID.getCode()) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.ORDER_STATUS_EXCEPTION);
             return jsonResult;
         }
-        int pwCheck = NumberUtils.getInt(String.valueOf(cacheJsonObj.get("pwCheck")));
-        if (pwCheck == 0) {
-            jsonResult.setErrorCodeAndMessage(GlobalConstants.PASSWORD_NOT_CHECK);
+
+        int canTrad = NumberUtils.getInt(String.valueOf(cacheJsonObj.get("canTrad")));
+        if (canTrad != GlobalConstants.CanTrad.YES.getCode()) {
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.ORDER_CAN_NOT_TRAD);
             return jsonResult;
         }
 
         try {
             jsonResult = storeOfflineOrderService.integralTrad(userCredits, userId, NumberUtils.getInt(uid), integral, jsonResult);
         } catch (ApiServerException e) {
-            System.out.println(e);
             jsonResult.setErrorCodeAndMessage(GlobalConstants.SYSTEM_EXCEPTION);
             e.printStackTrace();
             return jsonResult;

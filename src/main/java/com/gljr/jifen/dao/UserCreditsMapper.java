@@ -23,4 +23,17 @@ public interface UserCreditsMapper {
     })
     UserCredits getUserCredits(@Param("ownerId") Integer ownerId, @Param("ownerType") Integer ownerType);
 
+    @Select("SELECT x0.* FROM user_credits x0,store_info x1 WHERE x0.owner_type=2 AND x0.owner_id=x1.id AND x1.aid=#{managerId}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "owner_type", property = "ownerType"),
+            @Result(column = "owner_id", property = "ownerId"),
+            @Result(column = "wallet_address", property = "walletAddress"),
+            @Result(column = "integral", property = "integral"),
+            @Result(column = "free_payment_limit", property = "freePaymentLimit"),
+            @Result(column = "frozen_integral", property = "frozenIntegral"),
+            @Result(column = "create_time", property = "createTime")
+    })
+    UserCredits getStoreCreditsByManagerId(@Param("managerId") Integer managerId);
+
 }

@@ -158,4 +158,19 @@ public class DateUtils {
         String str = format.format(date);
         return str;
     }
+
+    public static Date yesterday() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        return calendar.getTime();
+    }
+
+    public static boolean validate(String date, String format) {
+        return formatToDate(date, format) != null;
+    }
+
+    public static long diffSeconds(Date past, Date future) {
+        return (future.getTime() - past.getTime()) / 1000L;
+    }
 }

@@ -508,6 +508,48 @@ public class DBConstants {
             return description;
         }
     }
+
+    public enum SettleType {
+        BANK_TRANSFER(1, "银行汇款");
+
+        private int code;
+
+        private String description;
+
+        SettleType(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public enum SettleStatus {
+        IN_PROGRESS(0, "结算中"), SETTLED(1, "结算中");
+
+        private int code;
+
+        private String description;
+
+        SettleStatus(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
 }
 
 

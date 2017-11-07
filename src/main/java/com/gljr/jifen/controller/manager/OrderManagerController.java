@@ -10,6 +10,7 @@ import com.gljr.jifen.dao.UserCreditsMapper;
 import com.gljr.jifen.dao.UserExtInfoMapper;
 import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.*;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -35,6 +36,69 @@ public class OrderManagerController extends BaseController {
     @Autowired
     private IntegralTransferOrderService integralTransferOrderService;
 
+    @Autowired
+    private StoreCouponService storeCouponService;
+
+
+    @GetMapping(value = "/coupons")
+    @ResponseBody
+    public JsonResult selectCouponOrder(@RequestParam(value = "page", required = false) Integer page,
+                                        @RequestParam(value = "per_page", required = false) Integer per_page,
+                                        @RequestParam(value = "trxCode", required = false) String trxCode,
+                                        @RequestParam(value = "status", required = false) Integer status,
+                                        @RequestParam(value = "beginTime", required = false) String beginTime,
+                                        @RequestParam(value = "endTime", required = false) String endTime){
+        JsonResult jsonResult = new JsonResult();
+
+        if(StringUtils.isEmpty(page)){
+            page = 1;
+        }
+
+        if(StringUtils.isEmpty(per_page)){
+            per_page = 10;
+        }
+
+        //时间转换
+        Date begin;
+        Date end;
+        try {
+            if(!StringUtils.isEmpty(beginTime)){
+                String pattern="yyyy-MM-dd";
+                SimpleDateFormat dateFormat=new SimpleDateFormat(pattern);
+                begin = dateFormat.parse(beginTime);
+            }else {
+                Calendar calendar = new GregorianCalendar(1970,01,01);
+                begin = calendar.getTime();
+            }
+
+
+            if(StringUtils.isEmpty(endTime)){
+                Calendar calendar = Calendar.getInstance();
+                end = calendar.getTime();
+            }else {
+                String pattern="yyyy-MM-dd";
+                SimpleDateFormat dateFormat=new SimpleDateFormat(pattern);
+                end = dateFormat.parse(endTime);
+
+                //加一天
+                Calendar calendar = new GregorianCalendar();
+                calendar.setTime(end);
+                calendar.add(calendar.DATE, 1);
+                end = calendar.getTime();
+            }
+
+        }catch (Exception e){
+            jsonResult.setMessage("时间设置错误");
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            return jsonResult;
+        }
+
+
+
+        jsonResult = storeCouponService.selectCouponOrders(page, per_page, trxCode, status, begin, end, jsonResult);
+
+        return  jsonResult;
+    }
 
 
     /**
@@ -290,6 +354,13 @@ public class OrderManagerController extends BaseController {
 
         jsonResult = integralTransferOrderService.selectIntegralOrders(page, per_page, trxCode, status, begin, end, jsonResult);
 
+        return jsonResult;
+    }
+
+    @GetMapping(value = "/online/{id}")
+    @ResponseBody
+    public JsonResult selectOnlineOrderById(@PathVariable(value = "id") Integer id){
+        JsonResult jsonResult = onlineOrderService.selectOnlineOrderById(id);
         return jsonResult;
     }
 

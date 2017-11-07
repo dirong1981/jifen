@@ -3,6 +3,8 @@ package com.gljr.jifen.service;
 import com.gljr.jifen.common.JsonResult;
 import com.gljr.jifen.pojo.StoreCoupon;
 
+import java.util.Date;
+
 public interface StoreCouponService {
 
     JsonResult insertStoreCoupon(StoreCoupon storeCoupon);
@@ -28,4 +30,6 @@ public interface StoreCouponService {
     JsonResult selectStoreCouponStatusById(Integer couponId);
 
     JsonResult allowCancelStoreCouponById(Integer couponId, Integer allow);
+
+    JsonResult selectCouponOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult);
 }

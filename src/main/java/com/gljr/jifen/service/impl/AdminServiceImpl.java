@@ -614,6 +614,7 @@ public class AdminServiceImpl extends BaseService implements AdminService {
                 jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_PASSWORD_ERROR);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
             jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
         }

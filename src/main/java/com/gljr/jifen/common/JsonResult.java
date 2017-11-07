@@ -1,5 +1,7 @@
 package com.gljr.jifen.common;
 
+import com.gljr.jifen.constants.GlobalConstants;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +17,7 @@ public class JsonResult implements Serializable{
     private Map<Object, Object> item = new HashMap<Object, Object>();
 
     public JsonResult(){
-
+        this.errorCode = GlobalConstants.OPERATION_SUCCEED;
     }
 
     public String getErrorCode() {

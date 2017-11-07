@@ -1,21 +1,16 @@
 package com.gljr.jifen.service;
 
-import com.gljr.jifen.common.Md5Util;
 import com.gljr.jifen.common.RandomUtil;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.dao.CouponMapper;
 import com.gljr.jifen.dao.SerialNumberMapper;
 import com.gljr.jifen.pojo.Category;
-import com.gljr.jifen.pojo.StoreCoupon;
-import com.gljr.jifen.pojo.User;
 import com.gljr.jifen.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -87,6 +82,15 @@ public class SerialNumberService {
         }
 
         return _trxCode;
+    }
+
+    public String getNextSettlementNo() {
+        String _settleNo = "" + DateUtils.getShortTimeStamp() + RandomUtil.nextLong(7);
+        while(this.serialNumberMapper.isSettleNoExist(_settleNo)) {
+            _settleNo = "" + DateUtils.getShortTimeStamp() + RandomUtil.nextLong(7);
+        }
+
+        return _settleNo;
     }
 
 }

@@ -10,4 +10,6 @@ public interface UserCreditsService {
 
     UserCredits getUserCredits(Integer ownerId, DBConstants.OwnerType ownerType);
 
+    UserCredits getStoreCreditsByManagerId(Integer managerId);
+
 }
