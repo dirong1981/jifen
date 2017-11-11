@@ -19,8 +19,13 @@ public class UserCreditsServiceImpl implements UserCreditsService {
     private UserCreditsMapper userCreditsMapper;
 
     @Override
-    public UserCredits getUserCredits(Integer ownerId, DBConstants.OwnerType ownerType) {
-        return this.userCreditsMapper.getUserCredits(ownerId, ownerType.getCode());
+    public UserCredits getUserCredits(Integer ownerId) {
+        return this.userCreditsMapper.getUserCredits(ownerId);
+    }
+
+    @Override
+    public UserCredits getMerchantCredits(Integer ownerId) {
+        return this.userCreditsMapper.getMerchantCredits(ownerId);
     }
 
     @Override

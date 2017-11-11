@@ -185,6 +185,11 @@ public class StoreOfflineOrderExample {
             return (Criteria) this;
         }
 
+        public Criteria andUcIdIsNull() {
+            addCriterion("uc_id is null");
+            return (Criteria) this;
+        }
+
         public Criteria andSiIdNotEqualTo(Integer value) {
             addCriterion("si_id <>", value, "siId");
             return (Criteria) this;

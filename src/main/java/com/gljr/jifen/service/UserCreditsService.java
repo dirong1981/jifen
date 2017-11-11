@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface UserCreditsService {
 
-    UserCredits getUserCredits(Integer ownerId, DBConstants.OwnerType ownerType);
+    UserCredits getUserCredits(Integer ownerId);
+
+    UserCredits getMerchantCredits(Integer ownerId);
 
     UserCredits getStoreCreditsByManagerId(Integer managerId);
 

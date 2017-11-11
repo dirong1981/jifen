@@ -111,7 +111,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             UserCreditsExample.Criteria criteria = userCreditsExample.or();
             criteria.andOwnerIdEqualTo(Integer.parseInt(uid));
 
-            UserCredits userCredits = this.userCreditsService.getUserCredits(Integer.parseInt(uid), DBConstants.OwnerType.CUSTOMER);
+            UserCredits userCredits = this.userCreditsService.getUserCredits(Integer.parseInt(uid));
             if (null == userCredits) {
                 CommonResult.noObject(jsonResult);
                 return jsonResult;
@@ -402,6 +402,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             case 6:
                 criteria.andCreateTimeGreaterThan(DateUtils.getRallDate(new Date(), -1));
                 criteria.andStatusEqualTo(DBConstants.OrderStatus.PAID.getCode());
+                criteria.andUcIdIsNull();
                 break;
             default:
                 break;
@@ -526,7 +527,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             throw new ApiServerException("没有找到商户积分信息");
         }
 
-        UserCredits storeCredits = this.userCreditsService.getUserCredits(storeInfo.getId(), DBConstants.OwnerType.MERCHANT);
+        UserCredits storeCredits = this.userCreditsService.getMerchantCredits(storeInfo.getId());
         if (null == storeCredits) {
             throw new ApiServerException("没有找到商户积分信息");
         }
@@ -640,17 +641,25 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
 
         transactionService.insertTransaction(transaction);
 
-        //表store_coupon_order中新建一条记录
-        StoreCouponOrder storeCouponOrder = new StoreCouponOrder();
-        storeCouponOrder.setCreateTime(new Date());
-        storeCouponOrder.setDtchainBlockId(verifyCouponResp.getContent().getBlockId());
-        storeCouponOrder.setIntegral(storeCoupon.getIntegral());
-        storeCouponOrder.setSiId(storeInfo.getId());
-        storeCouponOrder.setTrxCode(trxCode);
-        storeCouponOrder.setTrxId(transaction.getId());
-        storeCouponOrder.setUcId(userCoupon.getId());
+        //代金券消费时store_offline_order新增一记录
+        CommonOrderResponse cor = verifyCouponResp.getContent();
+        StoreOfflineOrder storeOfflineOrder = new StoreOfflineOrder();
+        storeOfflineOrder.setSiId(storeInfo.getId());
+        storeOfflineOrder.setUcId(userCoupon.getId());
+        storeOfflineOrder.setUid(uid);
+        storeOfflineOrder.setTrxId(transaction.getId());
+        storeOfflineOrder.setTrxCode(trxCode);
+        storeOfflineOrder.setDtchainBlockId(cor.getBlockId());
+        storeOfflineOrder.setExtOrderId(cor.getExtOrderId());
+        storeOfflineOrder.setTotalMoney(storeCoupon.getIntegral());
+        storeOfflineOrder.setIntegral(storeCoupon.getIntegral());
+        storeOfflineOrder.setExtCash(0);
+        storeOfflineOrder.setStatus(DBConstants.OrderStatus.PAID.getCode());
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        storeOfflineOrder.setCreateTime(now);
+        storeOfflineOrder.setUpdateTime(now);
 
-        storeCouponOrderMapper.insert(storeCouponOrder);
+        storeOfflineOrderMapper.insert(storeOfflineOrder);
 
         return trxCode;
     }

@@ -113,6 +113,7 @@ public class GlobalConstants {
     public static final String[] COUPON_NOT_EXIST = {"483", "代金券不存在"};
     public static final String[] COUPON_USED_OR_LOSS = {"482", "代金券已使用或者已过期"};
     public static final String[] ORDER_CAN_NOT_TRAD = {"481", "条件不足，订单无法扣款"};
+    public static final String[] COUPON_CAN_NOT_REFUND = {"480", "代金券不可退款"};
     public static final String[] CONFIGURATION_ERROR = {"998", "配置错误"};
     public static final String[] SYSTEM_EXCEPTION = {"999", "系统异常"};
     public static final String SESSION_STORE_USER = "session_store_user";
@@ -126,6 +127,27 @@ public class GlobalConstants {
         private String description;
 
         OrderStatus(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    //交易状态 0：不使用现金 1：额外支付现金
+    public enum CashPay {
+        NO(0, "不使用现金"), YES(1, "额外支付现金");
+        private int code;
+
+        private String description;
+
+        CashPay(int code, String description) {
             this.code = code;
             this.description = description;
         }

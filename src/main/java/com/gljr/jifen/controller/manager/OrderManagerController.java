@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -38,6 +40,9 @@ public class OrderManagerController extends BaseController {
 
     @Autowired
     private StoreCouponService storeCouponService;
+
+    @Autowired
+    private OnlineOrderDeliveryService onlineOrderDeliveryService;
 
 
     @GetMapping(value = "/coupons")
@@ -361,6 +366,27 @@ public class OrderManagerController extends BaseController {
     @ResponseBody
     public JsonResult selectOnlineOrderById(@PathVariable(value = "id") Integer id){
         JsonResult jsonResult = onlineOrderService.selectOnlineOrderById(id);
+        return jsonResult;
+    }
+
+    @PostMapping(value = "/online")
+    @ResponseBody
+    public JsonResult insertOnlineExpressById(OnlineOrderDelivery onlineOrderDelivery, HttpServletRequest httpServletRequest, @RequestParam(value = "date") String date) throws ParseException {
+        JsonResult jsonResult = new JsonResult();
+
+        String aid = httpServletRequest.getHeader("aid");
+        onlineOrderDelivery.setManagerId(Integer.parseInt(aid) + 0L);
+        onlineOrderDelivery.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        onlineOrderDelivery.setExpressStatus(1);
+
+        String pattern="yyyy-MM-dd";
+        SimpleDateFormat dateFormat=new SimpleDateFormat(pattern);
+        Date end = dateFormat.parse(date);
+
+        onlineOrderDelivery.setDeliveryDate(end);
+
+        jsonResult = onlineOrderDeliveryService.insertOnlineExpressById(onlineOrderDelivery);
+
         return jsonResult;
     }
 

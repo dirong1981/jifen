@@ -93,6 +93,9 @@ public class DTChainService {
     @Value("${dtchain.api.settle.remit}")
     private String apiSettleRemit;
 
+    @Value("${dtchain.api.log.enable}")
+    private String apiLogEnabled;
+
     private TreeMap<String, Object> _buildParams() {
         TreeMap<String, Object> params = new TreeMap<>();
         params.put(SignatureUtil.HEADER_INVOKE_ACCESS_KEY, accessKey);
@@ -102,6 +105,10 @@ public class DTChainService {
         return params;
     }
 
+    private boolean isLogEnabled() {
+        return !StringUtils.isEmpty(apiLogEnabled) && "1".equals(apiLogEnabled);
+    }
+
     public GatewayResponse login(String cellphone, String password) {
         TreeMap<String, Object> params = _buildParams();
         params.put("identify", cellphone);
@@ -109,9 +116,20 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, apiGLUserLogin), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("login | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                     HttpClientHelper.doPostSSL(apiEndpoint + apiGLUserLogin, params)
                     : HttpClientHelper.doPost(apiEndpoint + apiGLUserLogin, params), GatewayResponse.class);
+
+            if (isLogEnabled()) {
+                System.out.println("login | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -125,9 +143,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, apiGLUserPwCheck), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("checkPassword | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                     HttpClientHelper.doPostSSL(apiEndpoint + apiGLUserPwCheck, params)
                     : HttpClientHelper.doPost(apiEndpoint + apiGLUserPwCheck, params), GatewayResponse.class);
+
+            if (isLogEnabled()) {
+                System.out.println("checkPassword | response | " + gson.toJson(response));
+            }
+
+            return response;
+
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -140,10 +170,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, userInfoAPI), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("getUserInfo | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<GouliUserInfo> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + userInfoAPI, params)
                             : HttpClientHelper.doGet(apiEndpoint + userInfoAPI, params),
                     new TypeToken<GatewayResponse<GouliUserInfo>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("getUserInfo | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -156,10 +197,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, userRecommendAPI), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("userRecommend | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<String> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + userRecommendAPI, params)
                             : HttpClientHelper.doGet(apiEndpoint + userRecommendAPI, params),
                     new TypeToken<GatewayResponse<String>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("userRecommend | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -172,10 +224,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, userEarnPointsAPI), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("userEarnPoints | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<String> response = gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + userEarnPointsAPI, params)
                             : HttpClientHelper.doGet(apiEndpoint + userEarnPointsAPI, params),
                     new TypeToken<GatewayResponse<String>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("userEarnPoints | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -188,10 +251,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, userIdAPI), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("getUserId | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<GouliUserId> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + userIdAPI, params)
                             : HttpClientHelper.doGet(apiEndpoint + userIdAPI, params),
                     new TypeToken<GatewayResponse<GouliUserId>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("getUserId | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -207,10 +281,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, apiIntegralTransfer), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("transferIntegral | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<CommonOrderResponse> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doPostSSL(apiEndpoint + apiIntegralTransfer, params)
                             : HttpClientHelper.doPost(apiEndpoint + apiIntegralTransfer, params),
                     new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("transferIntegral | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -224,9 +309,20 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, apiStoreAccount), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("initStoreAccount | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                     HttpClientHelper.doPostSSL(apiEndpoint + apiStoreAccount, params)
                     : HttpClientHelper.doPost(apiEndpoint + apiStoreAccount, params), GatewayResponse.class);
+
+            if (isLogEnabled()) {
+                System.out.println("initStoreAccount | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -244,10 +340,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, apiOrders), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("postOrders | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<CommonOrderResponse> response = gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doPostSSL(apiEndpoint + apiOrders, params)
                             : HttpClientHelper.doPost(apiEndpoint + apiOrders, params),
                     new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("postOrders | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -263,10 +370,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, apiOfflineOrders), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("postOfflineOrders | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<CommonOrderResponse> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doPostSSL(apiEndpoint + apiOfflineOrders, params)
                             : HttpClientHelper.doPost(apiEndpoint + apiOfflineOrders, params),
                     new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("postOfflineOrders | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -282,10 +400,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, apiRefundOrders), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("refundOrders | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<CommonOrderResponse> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doPostSSL(apiEndpoint + apiRefundOrders, params)
                             : HttpClientHelper.doPost(apiEndpoint + apiRefundOrders, params),
                     new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("refundOrders | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -297,10 +426,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, apiSettleIntegralStat), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("getIntegralStatInfo | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<IntegralStatInfo> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + apiSettleIntegralStat, params)
                             : HttpClientHelper.doGet(apiEndpoint + apiSettleIntegralStat, params),
                     new TypeToken<GatewayResponse<IntegralStatInfo>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("getIntegralStatInfo | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -312,10 +452,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, apiSettleIntegralIssuedHistory), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("getIntegralIssuedHistory | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<List<IntegralIssuedHistory>> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + apiSettleIntegralIssuedHistory, params)
                             : HttpClientHelper.doGet(apiEndpoint + apiSettleIntegralIssuedHistory, params),
                     new TypeToken<GatewayResponse<List<IntegralIssuedHistory>>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("getIntegralIssuedHistory | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -327,10 +478,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, apiSettleIntegralRecycledHistory), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("getIntegralRecycledHistory | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<List<IntegralIssuedHistory>> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + apiSettleIntegralRecycledHistory, params)
                             : HttpClientHelper.doGet(apiEndpoint + apiSettleIntegralRecycledHistory, params),
                     new TypeToken<GatewayResponse<List<IntegralIssuedHistory>>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("getIntegralRecycledHistory | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -342,10 +504,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, apiIntegralUnsettles), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("getUnsettledIntegral | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<List<MerchantSettleInfo>> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + apiIntegralUnsettles, params)
                             : HttpClientHelper.doGet(apiEndpoint + apiIntegralUnsettles, params),
                     new TypeToken<GatewayResponse<List<MerchantSettleInfo>>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("getUnsettledIntegral | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -363,10 +536,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_GET, api), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("getUnsettledPeriodStat | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<SettlePeriodStat> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doGetSSL(apiEndpoint + api, params)
                             : HttpClientHelper.doGet(apiEndpoint + api, params),
                     new TypeToken<GatewayResponse<SettlePeriodStat>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("getUnsettledPeriodStat | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -381,10 +565,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, apiStoreCoupons), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("verifyCoupon | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<CommonOrderResponse> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doPostSSL(apiEndpoint + apiStoreCoupons, params)
                             : HttpClientHelper.doPost(apiEndpoint + apiStoreCoupons, params),
                     new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("verifyCoupon | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -398,9 +593,20 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, api), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
-                            HttpClientHelper.doPostSSL(apiEndpoint + api, params)
-                            : HttpClientHelper.doPost(apiEndpoint + api, params), GatewayResponse.class);
+
+            if (isLogEnabled()) {
+                System.out.println("settleRemit | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse response = gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+                    HttpClientHelper.doPostSSL(apiEndpoint + api, params)
+                    : HttpClientHelper.doPost(apiEndpoint + api, params), GatewayResponse.class);
+
+            if (isLogEnabled()) {
+                System.out.println("settleRemit | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }
@@ -415,10 +621,21 @@ public class DTChainService {
         try {
             params.put(SignatureUtil.HEADER_INVOKE_SIGNATURE, SignatureUtil.sign(SignatureUtil.makeSignPlainText(params,
                     METHOD_POST, apiCouponRefund), secretKey));
-            return gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
+
+            if (isLogEnabled()) {
+                System.out.println("couponRefund | params | " + gson.toJson(params));
+            }
+
+            GatewayResponse<CommonOrderResponse> response =  gson.fromJson(HttpClientHelper.isHttpsRequst(apiEndpoint) ?
                             HttpClientHelper.doPostSSL(apiEndpoint + apiCouponRefund, params)
                             : HttpClientHelper.doPost(apiEndpoint + apiCouponRefund, params),
                     new TypeToken<GatewayResponse<CommonOrderResponse>>(){}.getType());
+
+            if (isLogEnabled()) {
+                System.out.println("couponRefund | response | " + gson.toJson(response));
+            }
+
+            return response;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
         }

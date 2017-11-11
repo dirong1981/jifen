@@ -383,7 +383,7 @@ public class UserController extends BaseController {
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 return jsonResult;
             } else {
-                UserCredits userCredits = this.userCreditsService.getUserCredits(Integer.parseInt(uid), DBConstants.OwnerType.CUSTOMER);
+                UserCredits userCredits = this.userCreditsService.getUserCredits(Integer.parseInt(uid));
                 if (userCredits == null) {
                     jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
                     jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);

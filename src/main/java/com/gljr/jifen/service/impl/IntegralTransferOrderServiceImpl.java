@@ -73,8 +73,7 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
             String gphone = userExtInfo.getCellphone();
 
             //判断积分是否足够
-            UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid),
-                    DBConstants.OwnerType.CUSTOMER.getCode());
+            UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid));
 
             if (null == userCredits) {
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);

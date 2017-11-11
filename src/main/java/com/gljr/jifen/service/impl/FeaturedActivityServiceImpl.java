@@ -8,10 +8,8 @@ import com.gljr.jifen.common.ValidCheck;
 import com.gljr.jifen.constants.DBConstants;
 import com.gljr.jifen.dao.AdminMapper;
 import com.gljr.jifen.dao.FeaturedActivityMapper;
-import com.gljr.jifen.pojo.Admin;
-import com.gljr.jifen.pojo.Category;
-import com.gljr.jifen.pojo.FeaturedActivity;
-import com.gljr.jifen.pojo.FeaturedActivityExample;
+import com.gljr.jifen.dao.ModuleAggregationMapper;
+import com.gljr.jifen.pojo.*;
 import com.gljr.jifen.service.FeaturedActivityService;
 import com.gljr.jifen.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +35,9 @@ public class FeaturedActivityServiceImpl implements FeaturedActivityService {
 
     @Autowired
     private StorageService storageService;
+
+    @Autowired
+    private ModuleAggregationMapper moduleAggregationMapper;
 
 
     @Override
@@ -91,6 +92,20 @@ public class FeaturedActivityServiceImpl implements FeaturedActivityService {
 
             for(FeaturedActivity featuredActivity : featuredActivities){
                 featuredActivity.setPictureKey(featuredActivity.getPictureKey() + "!featured");
+
+                if(featuredActivity.getLinkType() == 1){
+                    String[] links = featuredActivity.getLinkUrl().split("/");
+                    ModuleAggregationExample moduleAggregationExample = new ModuleAggregationExample();
+                    ModuleAggregationExample.Criteria criteria1 = moduleAggregationExample.or();
+                    criteria1.andLinkCodeEqualTo(links[2]);
+                    List<ModuleAggregation> moduleAggregations = moduleAggregationMapper.selectByExample(moduleAggregationExample);
+
+                    if(!ValidCheck.validList(moduleAggregations)){
+                        if(moduleAggregations.get(0).getType() == 2){
+                            featuredActivity.setLinkType(3);
+                        }
+                    }
+                }
             }
 
             PageInfo pageInfo = new PageInfo(featuredActivities);

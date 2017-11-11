@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 
+import java.beans.Expression;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -78,6 +79,9 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
     @Autowired
     private OrderRefundMapper orderRefundMapper;
 
+    @Autowired
+    private SystemExpressMapper systemExpressMapper;
+
 
     private final static int PRODUCT_NOT_FOUND = 403;
 
@@ -137,7 +141,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                             userOrder.setId(onlineOrder.getId());
                             userOrder.setIntegral(transaction.getIntegral());
                             userOrder.setQuantity(onlineOrder.getQuantity());
-                            userOrder.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
+                            userOrder.setStatus(onlineOrder.getStatus());
                             userOrder.setTrxCode(onlineOrder.getTrxCode());
                             userOrder.setUpdateTime(onlineOrder.getUpdateTime());
                             userOrder.setUserName(userExtInfos.get(0).getCellphone());
@@ -184,9 +188,9 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                             userOrder.setUpdateTime(storeOfflineOrder.getUpdateTime());
                             userOrder.setTrxType(DBConstants.TrxType.OFFLINE.getCode());
                             userOrder.setTrxCode(storeOfflineOrder.getTrxCode());
-                            userOrder.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
+                            userOrder.setStatus(transaction.getStatus());
                             userOrder.setQuantity(0);
-                            userOrder.setIntegral(transaction.getIntegral());
+                            userOrder.setIntegral(DBConstants.TrxStatus.COMPLETED.getCode());
                             userOrder.setId(storeOfflineOrder.getId());
                             userOrder.setCreateTime(transaction.getCreateTime());
 
@@ -211,7 +215,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                                 userOrder.setUpdateTime(storeCouponOrder.getCreateTime());
                                 userOrder.setTrxCode(storeCouponOrder.getTrxCode());
                                 userOrder.setTrxType(DBConstants.TrxType.OFFLINE.getCode());
-                                userOrder.setStatus(transaction.getStatus());
+                                userOrder.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
                                 userOrder.setQuantity(1);
                                 userOrder.setIntegral(transaction.getIntegral());
                                 userOrder.setId(storeCouponOrder.getId());
@@ -278,7 +282,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
                             userOrder.setTrxType(DBConstants.TrxType.TRANSFER.getCode());
                             userOrder.setTrxCode(integralTransferOrder.getTrxCode());
-                            userOrder.setStatus(integralTransferOrder.getStatus());
+                            userOrder.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
                             userOrder.setQuantity(0);
                             userOrder.setIntegral(transaction.getIntegral());
                             userOrder.setId(integralTransferOrder.getId());
@@ -549,7 +553,6 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                         return jsonResult;
                     }
                     onlineOrder.setUserName(userExtInfos.get(0).getCellphone());
-                    onlineOrder.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
                     onlineOrder.setIntegral(-1*onlineOrder.getIntegral());
 
                     if(onlineOrder.getSiId() != 0) {
@@ -740,8 +743,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             onlineOrder.setIntegral(product.getIntegral()*onlineOrder.getQuantity());
 
             //验证用户积分
-            UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid),
-                    DBConstants.OwnerType.CUSTOMER.getCode());
+            UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid));
 
             if (null == userCredits) {
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
@@ -1085,8 +1087,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
             onlineOrder.setIntegral(product.getIntegral()*onlineOrder.getQuantity());
 
             //验证用户积分
-            UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid),
-                    DBConstants.OwnerType.CUSTOMER.getCode());
+            UserCredits userCredits = this.userCreditsMapper.getUserCredits(Integer.parseInt(uid));
 
             if (null == userCredits) {
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
@@ -1332,7 +1333,11 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                 OnlineOrderDelivery onlineOrderDelivery = onlineOrderDeliveries.get(0);
                 map.put("date",onlineOrderDelivery.getDeliveryDate());
                 map.put("expressNo", onlineOrderDelivery.getExpressNo());
+                map.put("seId", onlineOrderDelivery.getSeId());
             }
+
+            List<SystemExpress> systemExpresses = systemExpressMapper.selectByExample(null);
+            map.put("express", systemExpresses);
 
 
 

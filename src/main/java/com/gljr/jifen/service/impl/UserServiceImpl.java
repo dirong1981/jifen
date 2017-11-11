@@ -68,18 +68,18 @@ public class UserServiceImpl implements UserService {
             if(!StringUtils.isEmpty(gltoken)){
                 //去沟里验证token
 
-//                GatewayResponse<GouliUserId> gouliUserId = chainService.getUserId(gltoken);
-//
-//                if (null == gouliUserId || gouliUserId.getCode() != 200) {
-//                    CommonResult.userNotExit(jsonResult);
-//                    return jsonResult;
-//                } else {
-//                    CommonResult.success(jsonResult);
-//                }
-//
-//                uid = Integer.parseInt(gouliUserId.getContent().getId() + "");
+                GatewayResponse<GouliUserId> gouliUserId = chainService.getUserId(gltoken);
 
-                uid  = 15411;
+                if (null == gouliUserId || gouliUserId.getCode() != 200) {
+                    CommonResult.userNotExit(jsonResult);
+                    return jsonResult;
+                } else {
+                    CommonResult.success(jsonResult);
+                }
+
+                uid = Integer.parseInt(gouliUserId.getContent().getId() + "");
+
+//                uid  = 15411;
                 UserOnlineExample userOnlineExample = new UserOnlineExample();
                 UserOnlineExample.Criteria criteria = userOnlineExample.or();
                 criteria.andUidEqualTo(uid);
@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService {
             criteria.andOwnerIdEqualTo(uid);
             criteria.andOwnerTypeEqualTo(DBConstants.OwnerType.CUSTOMER.getCode());
 
-            UserCredits userCredits = this.userCreditsMapper.getUserCredits(uid, DBConstants.OwnerType.CUSTOMER.getCode());
+            UserCredits userCredits = this.userCreditsMapper.getUserCredits(uid);
             if(null == userCredits){
                 CommonResult.userNotExit(jsonResult);
                 return jsonResult;

@@ -390,7 +390,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
                 return jsonResult;
             }
 
-            UserCredits userCredits = userCreditsMapper.getUserCredits(Integer.parseInt(uid), DBConstants.OwnerType.CUSTOMER.getCode());
+            UserCredits userCredits = userCreditsMapper.getUserCredits(Integer.parseInt(uid));
 
             if(userCredits.getIntegral() < storeCoupon.getIntegral()){
                 jsonResult.setMessage("用户积分不足！");
@@ -650,67 +650,109 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
     @Override
     public JsonResult selectCouponOrders(Integer page, Integer per_page, String trxCode, Integer status, Date begin, Date end, JsonResult jsonResult) {
         try{
-            StoreCouponOrderExample storeCouponOrderExample = new StoreCouponOrderExample();
-            StoreCouponOrderExample.Criteria criteria = storeCouponOrderExample.or();
+            Map map = new HashMap();
+            System.out.println(status);
+            if(status == 0) {
+                System.out.println("a");
+                StoreCouponOrderExample storeCouponOrderExample = new StoreCouponOrderExample();
+                StoreCouponOrderExample.Criteria criteria = storeCouponOrderExample.or();
 
-            if(!StringUtils.isEmpty(trxCode)){
-                criteria.andTrxCodeEqualTo(trxCode);
-            }
+                if (!StringUtils.isEmpty(trxCode)) {
+                    criteria.andTrxCodeEqualTo(trxCode);
+                }
 //            if(!StringUtils.isEmpty(status)){
 //                criteria.andStatusEqualTo(status);
 //            }
-            criteria.andCreateTimeBetween(begin, end);
-            storeCouponOrderExample.setOrderByClause("id desc");
+                criteria.andCreateTimeBetween(begin, end);
+                storeCouponOrderExample.setOrderByClause("id desc");
 
-            PageHelper.startPage(page,per_page);
-            List<StoreCouponOrder> storeCouponOrders = storeCouponOrderMapper.selectByExample(storeCouponOrderExample);
-            PageInfo pageInfo = new PageInfo(storeCouponOrders);
+                PageHelper.startPage(page, per_page);
+                List<StoreCouponOrder> storeCouponOrders = storeCouponOrderMapper.selectByExample(storeCouponOrderExample);
+                PageInfo pageInfo = new PageInfo(storeCouponOrders);
 
-            List<UserCoupon> userCoupons = new ArrayList<>();
-            List<UserCoupon> del = new ArrayList<>();
+                List<UserCoupon> userCoupons = new ArrayList<>();
 
-            if(!ValidCheck.validList(storeCouponOrders)){
-                for (StoreCouponOrder storeCouponOrder : storeCouponOrders) {
-                    UserCoupon userCoupon = new UserCoupon();
+                if (!ValidCheck.validList(storeCouponOrders)) {
+                    for (StoreCouponOrder storeCouponOrder : storeCouponOrders) {
+                        UserCoupon userCoupon = new UserCoupon();
 
-                    StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeCouponOrder.getSiId());
-                    userCoupon.setStoreName(storeInfo.getName());
+                        StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeCouponOrder.getSiId());
+                        userCoupon.setStoreName(storeInfo.getName());
 
-                    UserCoupon userCoupon1 = userCouponMapper.selectByPrimaryKey(storeCouponOrder.getUcId());
+                        UserCoupon userCoupon1 = userCouponMapper.selectByPrimaryKey(storeCouponOrder.getUcId());
 
-                    userCoupon.setStatus(userCoupon1.getStatus());
 
-                    if(!StringUtils.isEmpty(status)){
-                        if(userCoupon1.getStatus() != status){
-                            del.add(userCoupon);
-                        }
+                        StoreCoupon storeCoupon = storeCouponMapper.selectByPrimaryKey(userCoupon1.getScId());
+                        userCoupon.setEqualMoney(storeCoupon.getEqualMoney());
+                        userCoupon.setIntegral(storeCoupon.getIntegral());
+
+                        userCoupon.setStoreAddress(storeCouponOrder.getTrxCode());
+
+                        userCoupon.setCreateTime(storeCouponOrder.getCreateTime());
+
+                        userCoupons.add(userCoupon);
                     }
-
-                    StoreCoupon storeCoupon = storeCouponMapper.selectByPrimaryKey(userCoupon1.getScId());
-                    userCoupon.setEqualMoney(storeCoupon.getEqualMoney());
-                    userCoupon.setIntegral(storeCoupon.getIntegral());
-
-                    userCoupon.setStoreAddress(storeCouponOrder.getTrxCode());
-
-                    userCoupon.setCreateTime(storeCouponOrder.getCreateTime());
-
-                    userCoupons.add(userCoupon);
                 }
+
+
+
+                map.put("data", userCoupons);
+                map.put("pages", pageInfo.getPages());
+
+                map.put("total", pageInfo.getTotal());
+                //当前页
+                map.put("pageNum", pageInfo.getPageNum());
+
+            }else {
+                System.out.println("b");
+                UserCouponExample userCouponExample = new UserCouponExample();
+                UserCouponExample.Criteria criteria = userCouponExample.or();
+                criteria.andStatusEqualTo(status);
+                criteria.andCreateTimeBetween(begin, end);
+                userCouponExample.setOrderByClause("id desc");
+
+                PageHelper.startPage(page, per_page);
+                List<UserCoupon> userCoupons = userCouponMapper.selectByExample(userCouponExample);
+                PageInfo pageInfo = new PageInfo(userCoupons);
+
+                if(!ValidCheck.validList(userCoupons)){
+                    for (UserCoupon userCoupon : userCoupons){
+                        StoreCouponOrderExample storeCouponOrderExample = new StoreCouponOrderExample();
+                        StoreCouponOrderExample.Criteria criteria1 = storeCouponOrderExample.or();
+                        criteria1.andUcIdEqualTo(userCoupon.getId());
+                        List<StoreCouponOrder> storeCouponOrders = storeCouponOrderMapper.selectByExample(storeCouponOrderExample);
+                        if(!ValidCheck.validList(storeCouponOrders)){
+                            StoreCouponOrder storeCouponOrder = storeCouponOrders.get(0);
+                            userCoupon.setStoreAddress(storeCouponOrder.getTrxCode());
+                            userCoupon.setCreateTime(storeCouponOrder.getCreateTime());
+                        }
+
+                        StoreCoupon storeCoupon = storeCouponMapper.selectByPrimaryKey(userCoupon.getScId());
+                        userCoupon.setEqualMoney(storeCoupon.getEqualMoney());
+                        userCoupon.setIntegral(storeCoupon.getIntegral());
+
+                        StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(userCoupon.getSiId());
+                        userCoupon.setStoreName(storeInfo.getName());
+
+                    }
+                }
+                map.put("data", userCoupons);
+                map.put("pages", pageInfo.getPages());
+
+                map.put("total", pageInfo.getTotal());
+                //当前页
+                map.put("pageNum", pageInfo.getPageNum());
+
             }
 
-            userCoupons.removeAll(del);
 
-            Map map = new HashMap();
-            map.put("data", userCoupons);
-            map.put("pages", pageInfo.getPages());
-
-            map.put("total", pageInfo.getTotal());
-            //当前页
-            map.put("pageNum", pageInfo.getPageNum());
 
             CommonResult.success(jsonResult);
             jsonResult.setItem(map);
         }catch (Exception e){
+            Map map = new HashMap();
+            map.put("data", e.toString());
+            jsonResult.setItem(map);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;

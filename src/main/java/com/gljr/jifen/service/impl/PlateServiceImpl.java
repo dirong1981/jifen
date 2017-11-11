@@ -44,6 +44,9 @@ public class PlateServiceImpl implements PlateService {
     @Autowired
     private SystemVirtualProductMapper systemVirtualProductMapper;
 
+    @Autowired
+    private ModuleAggregationMapper moduleAggregationMapper;
+
     @Override
     public JsonResult selectPlates(JsonResult jsonResult) {
         try {
@@ -129,7 +132,20 @@ public class PlateServiceImpl implements PlateService {
                                     modulePicture.setLinkUrl(result);
                                     modulePicture.setLinkType("4");
                                 }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
-                                    modulePicture.setLinkType("1");
+                                    String[] links = modulePicture.getLinkUrl().split("/");
+                                    ModuleAggregationExample moduleAggregationExample = new ModuleAggregationExample();
+                                    ModuleAggregationExample.Criteria criteria2 = moduleAggregationExample.or();
+                                    criteria2.andLinkCodeEqualTo(links[2]);
+
+                                    List<ModuleAggregation> moduleAggregations = moduleAggregationMapper.selectByExample(moduleAggregationExample);
+                                    if(!ValidCheck.validList(moduleAggregations)){
+                                        if(moduleAggregations.get(0).getType() == 2){
+                                            modulePicture.setLinkType("4");
+                                        }else {
+                                            modulePicture.setLinkType("3");
+                                        }
+                                    }
+
                                 }else {
                                     modulePicture.setLinkType("2");
                                 }
@@ -181,7 +197,19 @@ public class PlateServiceImpl implements PlateService {
                                         modulePicture.setLinkUrl(result);
                                         modulePicture.setLinkType("4");
                                     }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
-                                        modulePicture.setLinkType("1");
+                                        String[] links = modulePicture.getLinkUrl().split("/");
+                                        ModuleAggregationExample moduleAggregationExample = new ModuleAggregationExample();
+                                        ModuleAggregationExample.Criteria criteria2 = moduleAggregationExample.or();
+                                        criteria2.andLinkCodeEqualTo(links[2]);
+
+                                        List<ModuleAggregation> moduleAggregations = moduleAggregationMapper.selectByExample(moduleAggregationExample);
+                                        if(!ValidCheck.validList(moduleAggregations)){
+                                            if(moduleAggregations.get(0).getType() == 2){
+                                                modulePicture.setLinkType("6");
+                                            }else {
+                                                modulePicture.setLinkType("1");
+                                            }
+                                        }
                                     }else {
                                         modulePicture.setLinkType("2");
                                     }
@@ -219,7 +247,19 @@ public class PlateServiceImpl implements PlateService {
                                         modulePicture.setLinkUrl(result);
                                         modulePicture.setLinkType("4");
                                     }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
-                                        modulePicture.setLinkType("1");
+                                        String[] links = modulePicture.getLinkUrl().split("/");
+                                        ModuleAggregationExample moduleAggregationExample = new ModuleAggregationExample();
+                                        ModuleAggregationExample.Criteria criteria2 = moduleAggregationExample.or();
+                                        criteria2.andLinkCodeEqualTo(links[2]);
+
+                                        List<ModuleAggregation> moduleAggregations = moduleAggregationMapper.selectByExample(moduleAggregationExample);
+                                        if(!ValidCheck.validList(moduleAggregations)){
+                                            if(moduleAggregations.get(0).getType() == 2){
+                                                modulePicture.setLinkType("6");
+                                            }else {
+                                                modulePicture.setLinkType("1");
+                                            }
+                                        }
                                     }else {
                                         modulePicture.setLinkType("2");
                                     }
@@ -265,7 +305,19 @@ public class PlateServiceImpl implements PlateService {
                                         modulePicture.setLinkUrl(result);
                                         modulePicture.setLinkType("4");
                                     }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
-                                        modulePicture.setLinkType("1");
+                                        String[] links = modulePicture.getLinkUrl().split("/");
+                                        ModuleAggregationExample moduleAggregationExample = new ModuleAggregationExample();
+                                        ModuleAggregationExample.Criteria criteria2 = moduleAggregationExample.or();
+                                        criteria2.andLinkCodeEqualTo(links[2]);
+
+                                        List<ModuleAggregation> moduleAggregations = moduleAggregationMapper.selectByExample(moduleAggregationExample);
+                                        if(!ValidCheck.validList(moduleAggregations)){
+                                            if(moduleAggregations.get(0).getType() == 2){
+                                                modulePicture.setLinkType("6");
+                                            }else {
+                                                modulePicture.setLinkType("1");
+                                            }
+                                        }
                                     }else {
                                         modulePicture.setLinkType("2");
                                     }
@@ -301,7 +353,19 @@ public class PlateServiceImpl implements PlateService {
                                         modulePicture.setLinkUrl(result);
                                         modulePicture.setLinkType("4");
                                     }else if(modulePicture.getLinkUrl().contains("moduleaggregations")){
-                                        modulePicture.setLinkType("1");
+                                        String[] links = modulePicture.getLinkUrl().split("/");
+                                        ModuleAggregationExample moduleAggregationExample = new ModuleAggregationExample();
+                                        ModuleAggregationExample.Criteria criteria2 = moduleAggregationExample.or();
+                                        criteria2.andLinkCodeEqualTo(links[2]);
+
+                                        List<ModuleAggregation> moduleAggregations = moduleAggregationMapper.selectByExample(moduleAggregationExample);
+                                        if(!ValidCheck.validList(moduleAggregations)){
+                                            if(moduleAggregations.get(0).getType() == 2){
+                                                modulePicture.setLinkType("6");
+                                            }else {
+                                                modulePicture.setLinkType("1");
+                                            }
+                                        }
                                     }else {
                                         modulePicture.setLinkType("2");
                                     }

@@ -369,7 +369,7 @@ public class ProductServiceImpl implements ProductService {
 
             UserCredits userCredits = null;
             if (null != uid && uid > 0L) {
-                userCredits = this.userCreditsService.getUserCredits(Math.toIntExact(uid), DBConstants.OwnerType.CUSTOMER);
+                userCredits = this.userCreditsService.getUserCredits(Math.toIntExact(uid));
             }
 
             PageHelper.startPage(page, per_page);

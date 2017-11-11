@@ -295,7 +295,6 @@ public class APPStoreOfflineOrderController extends BaseController {
             return jsonResult;
         }
 
-
         List<StoreOfflineOrder> storeOfflineOrderList = storeOfflineOrderService
                 .getStoreTotalInfo(NumberUtils.getInt(uid), orderId);
         if (storeOfflineOrderList.isEmpty()) {
@@ -314,6 +313,12 @@ public class APPStoreOfflineOrderController extends BaseController {
         //超过24小时不能执行退款操作
         if (DateUtils.getRallDate(storeOfflineOrder.getCreateTime(), 1).before(new Date())) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.MORE_THAN_REFUND_TIME);
+            return jsonResult;
+        }
+
+        //代金券不可退款
+        if (storeOfflineOrder.getUcId() != null) {
+            jsonResult.setErrorCodeAndMessage(GlobalConstants.COUPON_CAN_NOT_REFUND);
             return jsonResult;
         }
 
@@ -350,21 +355,19 @@ public class APPStoreOfflineOrderController extends BaseController {
             return jsonResult;
         }
 
-
         if (!paymentCode.equals(redisService.get(CACHE_USER_PAYMENT_CODE_KEY + userId))) {
             jsonResult.setMessage("用户数据获取失败！");
             jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
             return jsonResult;
         }
 
-        UserCredits userCredits = this.userCreditsService.getUserCredits(userId, DBConstants.OwnerType.CUSTOMER);
+        UserCredits userCredits = this.userCreditsService.getUserCredits(userId);
         if (null == userCredits) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.CAN_NOT_GET_USER_CREDIT);
             return jsonResult;
         }
 
         //判断用户积分状况
-
         Map<Object, Object> checkResult = new HashMap<>();
         double cash = 0D;
         int pwCheck = GlobalConstants.PwCheck.YES.getCode();
@@ -461,8 +464,8 @@ public class APPStoreOfflineOrderController extends BaseController {
     @GetMapping(value = "/store/cashPay")
     @ResponseBody
     public JsonResult cashPay(@RequestParam(value = "userId") Integer userId,
-                                         @RequestParam(value = "integral") Integer integral,
-                                         @RequestParam(value = "cashPay") int cashPay) {
+                              @RequestParam(value = "integral") Integer integral,
+                              @RequestParam(value = "cashPay") int cashPay) {
         JsonResult jsonResult = new JsonResult();
 
         String cacheKey = GlobalConstants.CHECK_INTEGRAL_RESULT_PREFIX + ":" + userId + ":" + integral;
@@ -474,7 +477,7 @@ public class APPStoreOfflineOrderController extends BaseController {
         JSONObject cacheJsonObj = JSON.parseObject(cacheResult);
 
         //确认现金支付
-        if (cashPay == 1 && NumberUtils.getInt(cacheJsonObj.get("pwCheck") + "") == GlobalConstants.PwCheck.YES.getCode()) {
+        if (cashPay == GlobalConstants.CashPay.YES.getCode() && NumberUtils.getInt(cacheJsonObj.get("pwCheck") + "") == GlobalConstants.PwCheck.YES.getCode()) {
             cacheJsonObj.put("canTrad", GlobalConstants.CanTrad.YES.getCode());
         } else {
             //订单直接取消
@@ -556,7 +559,7 @@ public class APPStoreOfflineOrderController extends BaseController {
             return jsonResult;
         }
 
-        UserCredits userCredits = this.userCreditsService.getUserCredits(userId, DBConstants.OwnerType.CUSTOMER);
+        UserCredits userCredits = this.userCreditsService.getUserCredits(userId);
         if (null == userCredits) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.CAN_NOT_GET_USER_CREDIT);
             return jsonResult;
@@ -663,7 +666,8 @@ public class APPStoreOfflineOrderController extends BaseController {
             jsonResult.setItem(data);
         } catch (ApiServerException e) {
             e.printStackTrace();
-            jsonResult.setErrorCodeAndMessage(GlobalConstants.SYSTEM_EXCEPTION);
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage(GlobalConstants.OPERATION_FAILED_MESSAGE);
             data.put("errorMsg", e.getMessage());
             jsonResult.setItem(data);
             return jsonResult;
