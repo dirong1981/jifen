@@ -141,7 +141,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                             userOrder.setId(onlineOrder.getId());
                             userOrder.setIntegral(transaction.getIntegral());
                             userOrder.setQuantity(onlineOrder.getQuantity());
-                            userOrder.setStatus(onlineOrder.getStatus());
+                            userOrder.setStatus(transaction.getStatus());
                             userOrder.setTrxCode(onlineOrder.getTrxCode());
                             userOrder.setUpdateTime(onlineOrder.getUpdateTime());
                             userOrder.setUserName(userExtInfos.get(0).getCellphone());
@@ -190,7 +190,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                             userOrder.setTrxCode(storeOfflineOrder.getTrxCode());
                             userOrder.setStatus(transaction.getStatus());
                             userOrder.setQuantity(0);
-                            userOrder.setIntegral(DBConstants.TrxStatus.COMPLETED.getCode());
+                            userOrder.setIntegral(transaction.getIntegral());
                             userOrder.setId(storeOfflineOrder.getId());
                             userOrder.setCreateTime(transaction.getCreateTime());
 
@@ -199,7 +199,8 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                             if (storeOfflineOrder.getExtCash() == 0) {
                                 userOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分");
                             } else {
-                                userOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分，现金支付" + storeOfflineOrder.getExtCash() + "元");
+                                userOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分，现金支付"
+                                        + storeOfflineOrder.getExtCash() / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO + "元");
                             }
 
                             userOrders.add(userOrder);
@@ -282,7 +283,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
 
                             userOrder.setTrxType(DBConstants.TrxType.TRANSFER.getCode());
                             userOrder.setTrxCode(integralTransferOrder.getTrxCode());
-                            userOrder.setStatus(DBConstants.TrxStatus.COMPLETED.getCode());
+                            userOrder.setStatus(5);
                             userOrder.setQuantity(0);
                             userOrder.setIntegral(transaction.getIntegral());
                             userOrder.setId(integralTransferOrder.getId());
@@ -555,6 +556,10 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                     onlineOrder.setUserName(userExtInfos.get(0).getCellphone());
                     onlineOrder.setIntegral(-1*onlineOrder.getIntegral());
 
+                    Transaction transaction = transactionMapper.selectByPrimaryKey(onlineOrder.getTrxId());
+
+                    onlineOrder.setStatus(transaction.getStatus());
+
                     if(onlineOrder.getSiId() != 0) {
                         Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());
                         onlineOrder.setName(product.getName());
@@ -632,6 +637,10 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                     }
                     onlineOrder.setUserName(userExtInfos.get(0).getCellphone());
                     onlineOrder.setIntegral(-1*onlineOrder.getIntegral());
+
+                    Transaction transaction = transactionMapper.selectByPrimaryKey(onlineOrder.getTrxId());
+
+                    onlineOrder.setStatus(transaction.getStatus());
 
                     if(onlineOrder.getSiId() != 0) {
                         Product product = productMapper.selectByPrimaryKey(onlineOrder.getPid());

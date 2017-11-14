@@ -51,7 +51,7 @@ public interface ProductService {
      */
     JsonResult insertProduct(Product product, MultipartFile file, Integer random, JsonResult jsonResult);
 
-
+    JsonResult updateProduct(Product product, MultipartFile file, Integer random, JsonResult jsonResult);
     /**
      * 上传图片
      * @param file

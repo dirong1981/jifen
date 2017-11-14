@@ -25,7 +25,7 @@ public class OffilineOrderDTO {
     /**
      * 此订单消费现金
      */
-    private int cash;
+    private double cash;
     /**
      * 订单状态（1：待付款；2：已付款；3：已退款；4：已取消）
      */
@@ -67,11 +67,11 @@ public class OffilineOrderDTO {
         this.integral = integral;
     }
 
-    public int getCash() {
+    public double getCash() {
         return cash;
     }
 
-    public void setCash(int cash) {
+    public void setCash(double cash) {
         this.cash = cash;
     }
 

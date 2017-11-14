@@ -272,7 +272,7 @@ public class APPStoreOfflineOrderController extends BaseController {
         resultMap.put("oderType", oderType);
         resultMap.put("orderStat", storeOfflineOrder.getStatus());
         resultMap.put("integral", storeOfflineOrder.getIntegral());
-        resultMap.put("cash", storeOfflineOrder.getExtCash());
+        resultMap.put("cash", storeOfflineOrder.getExtCash() / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO);
 
         jsonResult.setItem(resultMap);
         jsonResult.setErrorCodeAndMessage(GlobalConstants.STORE_USER_OPERATION_SECCESS);
@@ -378,7 +378,7 @@ public class APPStoreOfflineOrderController extends BaseController {
             actuallyPayIntegral = userCredits.getIntegral();
             canTrad = GlobalConstants.CanTrad.NO.getCode();
         }
-        if (userCredits.getFreePaymentLimit() != null && userCredits.getFreePaymentLimit() < integral) {
+        if (userCredits.getFreePaymentLimit() != null && userCredits.getFreePaymentLimit() <= integral) {
             pwCheck = GlobalConstants.PwCheck.NO.getCode();
             canTrad = GlobalConstants.CanTrad.NO.getCode();
         }
@@ -503,14 +503,14 @@ public class APPStoreOfflineOrderController extends BaseController {
                               @RequestParam(value = "code") String code) {
         JsonResult jsonResult = new JsonResult();
 
-        if(!org.springframework.util.StringUtils.isEmpty(code)){
-            if(!code.equals(redisService.get("USER_CODE"+userId))){
+        if (!org.springframework.util.StringUtils.isEmpty(code)) {
+            if (!code.equals(redisService.get("USER_CODE" + userId))) {
                 jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
                 jsonResult.setMessage("验证码错误！");
                 return jsonResult;
             }
 
-            redisService.evict("USER_CODE"+ userId);
+            redisService.evict("USER_CODE" + userId);
         }
 
 
@@ -647,7 +647,7 @@ public class APPStoreOfflineOrderController extends BaseController {
             return jsonResult;
         }
 
-        if(userCoupon.getStatus() != DBConstants.CouponStatus.VALID.getCode()){
+        if (userCoupon.getStatus() != DBConstants.CouponStatus.VALID.getCode()) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.COUPON_USED_OR_LOSS);
             return jsonResult;
         }
@@ -702,7 +702,7 @@ public class APPStoreOfflineOrderController extends BaseController {
             return jsonResult;
         }
 
-        if(userCoupon.getStatus() != DBConstants.CouponStatus.VALID.getCode()){
+        if (userCoupon.getStatus() != DBConstants.CouponStatus.VALID.getCode()) {
             jsonResult.setErrorCodeAndMessage(GlobalConstants.COUPON_USED_OR_LOSS);
             return jsonResult;
         }
@@ -744,7 +744,7 @@ public class APPStoreOfflineOrderController extends BaseController {
         List<OffilineOrderDTO> offilineOrderDTOList = new ArrayList<>();
         for (StoreOfflineOrder soo : storeOfflineOrderList) {
             OffilineOrderDTO offilineOrderDTO = new OffilineOrderDTO();
-            offilineOrderDTO.setCash(soo.getExtCash());
+            offilineOrderDTO.setCash(soo.getExtCash() / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO);
             offilineOrderDTO.setIntegral(soo.getIntegral());
             offilineOrderDTO.setOrderId(soo.getTrxCode());
             offilineOrderDTO.setOrderStat(soo.getStatus());

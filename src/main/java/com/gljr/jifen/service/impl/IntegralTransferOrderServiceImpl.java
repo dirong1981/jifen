@@ -223,7 +223,7 @@ public class IntegralTransferOrderServiceImpl implements IntegralTransferOrderSe
 
                         userOrder.setTrxType(DBConstants.TrxType.TRANSFER.getCode());
                         userOrder.setTrxCode(integralTransferOrder.getTrxCode());
-                        userOrder.setStatus(integralTransferOrder.getStatus());
+                        userOrder.setStatus(5);
                         userOrder.setQuantity(0);
                         userOrder.setIntegral(transaction.getIntegral());
                         userOrder.setId(integralTransferOrder.getId());

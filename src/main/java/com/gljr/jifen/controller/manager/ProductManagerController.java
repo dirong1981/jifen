@@ -173,48 +173,27 @@ public class ProductManagerController extends BaseController {
     /**
      * 修改商品内容
      * @param product
-     * @param bindingResult
-     * @param uploadfile
      * @param file
-     * @param httpServletRequest
      * @return
      */
-    @PutMapping
+    @PostMapping(value = "/modify")
     @ResponseBody
-    public JsonResult updateProduct(@Valid Product product, BindingResult bindingResult, @RequestParam("uploadfile") String uploadfile,
-                                    @RequestParam(value="pic",required=false) MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
+    public JsonResult updateProduct(Product product, @RequestParam(value="pic",required=false) MultipartFile file,
+                                    @RequestParam(value = "random") Integer random){
         JsonResult jsonResult = new JsonResult();
 
-
-
-        if(bindingResult.hasErrors()){
-            jsonResult.setErrorCode(GlobalConstants.VALIDATION_ERROR_CODE);
+        if(StringUtils.isEmpty(product.getSiId())){
+            jsonResult.setMessage("请选择商户！");
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            return jsonResult;
+        }
+        if(StringUtils.isEmpty(product.getCategoryCode()) || product.getCategoryCode() == -1){
+            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+            jsonResult.setMessage("请选择分类！");
             return jsonResult;
         }
 
-        product.setCreateTime(new Timestamp(System.currentTimeMillis()));
-
-        //上传图片
-
-        if (file != null && !file.isEmpty()) {
-            String _key = storageService.uploadToPublicBucket("product", file);
-            if (StringUtils.isEmpty(_key)) {
-                jsonResult.setErrorCode(GlobalConstants.UPLOAD_PICTURE_FAILED);
-                jsonResult.setMessage(GlobalConstants.UPLOAD_PICTURE_FAILED_MESSAGE);
-                return jsonResult;
-            }
-            product.setLogoKey(_key);
-        } else {
-            product.setLogoKey(uploadfile);
-        }
-
-        try{
-            //productService.updateProduct(product);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_SUCCEED);
-        }catch (Exception e){
-            System.out.println(e);
-            jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-        }
+        jsonResult = productService.updateProduct(product, file, random, jsonResult);
 
         return jsonResult;
     }
@@ -241,6 +220,25 @@ public class ProductManagerController extends BaseController {
         return jsonResult;
     }
 
+    /**
+     * 查询一个具体的商品
+     * @param productId 商品id
+     * @return 商品详细信息和商品大图信息
+     */
+    @GetMapping(value = "/{productId}")
+    @ResponseBody
+    public JsonResult oneProduct(@PathVariable("productId") Integer productId){
+        JsonResult jsonResult = new JsonResult();
 
+
+        if(StringUtils.isEmpty(productId)){
+            CommonResult.noObject(jsonResult);
+            return jsonResult;
+        }
+
+        jsonResult = productService.selectProductById(productId, "0", jsonResult);
+
+        return jsonResult;
+    }
 
 }

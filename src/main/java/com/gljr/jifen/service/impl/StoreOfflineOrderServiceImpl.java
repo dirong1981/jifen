@@ -73,6 +73,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
     @Override
     public JsonResult insertOfflineOrder(StoreOfflineOrder storeOfflineOrder, String uid, JsonResult jsonResult) {
 
+
         try {
             //积分不能小于0
             if (storeOfflineOrder.getIntegral() <= 0) {
@@ -82,11 +83,11 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
             }
 
             //积分和总价是否相符
-            if (storeOfflineOrder.getIntegral() != storeOfflineOrder.getTotalMoney() * 10) {
-                jsonResult.setMessage("积分有误，请重试！");
-                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
-                return jsonResult;
-            }
+//            if (storeOfflineOrder.getIntegral() != storeOfflineOrder.getTotalMoney() * 10) {
+//                jsonResult.setMessage("积分有误，请重试！");
+//                jsonResult.setErrorCode(GlobalConstants.OPERATION_FAILED);
+//                return jsonResult;
+//            }
 
             //商户是否存在
             StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(storeOfflineOrder.getSiId());
@@ -122,7 +123,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                 transaction.setIntegral(-1 * storeOfflineOrder.getIntegral());
                 storeOfflineOrder.setExtCash(0);
             } else {
-                integral = -integral / 10;
+                integral = -integral * 100;
                 transaction.setIntegral(-1 * userCredits.getIntegral());
                 storeOfflineOrder.setExtCash(integral);
                 storeOfflineOrder.setIntegral(userCredits.getIntegral());
@@ -130,7 +131,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
 
             transactionMapper.insert(transaction);
 
-
+            storeOfflineOrder.setTotalMoney(storeOfflineOrder.getTotalMoney()*100);
             storeOfflineOrder.setCreateTime(new Timestamp(System.currentTimeMillis()));
             storeOfflineOrder.setUid(Integer.parseInt(uid));
             storeOfflineOrder.setStatus(DBConstants.OrderStatus.UNPAID.getCode());
@@ -180,7 +181,8 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                     if (storeOfflineOrder.getExtCash() == 0) {
                         storeOfflineOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分");
                     } else {
-                        storeOfflineOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分，现金支付" + storeOfflineOrder.getExtCash() + "元");
+                        storeOfflineOrder.setDescription("抵扣积分" + storeOfflineOrder.getIntegral() + "分，现金支付"
+                                + storeOfflineOrder.getExtCash() / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO + "元");
                     }
                     storeOfflineOrder.setTrxType(1);
 
@@ -534,7 +536,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
 
         double cash = 0L;
         if (userCredits.getIntegral() < integral) {
-            cash = (integral - userCredits.getIntegral()) / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO;
+            cash = integral - userCredits.getIntegral();
             integral = userCredits.getIntegral();
         }
 
@@ -589,7 +591,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
         storeOfflineOrder.setTrxId(storeTransaction.getId());
         storeOfflineOrder.setExtCash((int) cash);
         storeOfflineOrder.setIntegral(integral);
-        storeOfflineOrder.setTotalMoney((int) (integral / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO + cash));
+        storeOfflineOrder.setTotalMoney((int) (integral + cash));
         storeOfflineOrder.setDtchainBlockId(cor.getBlockId());
         storeOfflineOrder.setExtOrderId(cor.getExtOrderId());
         storeOfflineOrderMapper.insert(storeOfflineOrder);
@@ -597,7 +599,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
         Map map = new HashMap();
         map.put("trxCode", trxCode);
         map.put("integral", integral);
-        map.put("extCash", storeOfflineOrder.getExtCash());
+        map.put("extCash", storeOfflineOrder.getExtCash() / GlobalConstants.INTEGRAL_RMB_EXCHANGE_RATIO);
         map.put("storeName", storeInfo.getName());
         jsonResult.setItem(map);
 
@@ -646,7 +648,7 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
         StoreOfflineOrder storeOfflineOrder = new StoreOfflineOrder();
         storeOfflineOrder.setSiId(storeInfo.getId());
         storeOfflineOrder.setUcId(userCoupon.getId());
-        storeOfflineOrder.setUid(uid);
+        storeOfflineOrder.setUid(userCoupon.getUid());
         storeOfflineOrder.setTrxId(transaction.getId());
         storeOfflineOrder.setTrxCode(trxCode);
         storeOfflineOrder.setDtchainBlockId(cor.getBlockId());

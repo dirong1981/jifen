@@ -652,7 +652,7 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
         try{
             Map map = new HashMap();
             System.out.println(status);
-            if(status == 0) {
+            if(status == 0 || status.equals("null") || status == null) {
                 System.out.println("a");
                 StoreCouponOrderExample storeCouponOrderExample = new StoreCouponOrderExample();
                 StoreCouponOrderExample.Criteria criteria = storeCouponOrderExample.or();
@@ -689,6 +689,14 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
                         userCoupon.setStoreAddress(storeCouponOrder.getTrxCode());
 
                         userCoupon.setCreateTime(storeCouponOrder.getCreateTime());
+                        userCoupon.setId(userCoupon1.getId());
+                        userCoupon.setUid(userCoupon1.getUid());
+                        userCoupon.setSiId(userCoupon1.getSiId());
+                        userCoupon.setScId(userCoupon1.getScId());
+                        userCoupon.setMinConsumption(userCoupon1.getMinConsumption());
+                        userCoupon.setStatus(userCoupon1.getStatus());
+                        userCoupon.setValidTo(userCoupon1.getValidTo());
+                        userCoupon.setValidFrom(userCoupon1.getValidFrom());
 
                         userCoupons.add(userCoupon);
                     }

@@ -138,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
 //                }
 //            }
 
-            product.setStatus(DBConstants.ProductStatus.OFF_SALE.getCode());
+            product.setStatus(DBConstants.ProductStatus.DRAFT.getCode());
 
             productMapper.updateByPrimaryKey(product);
 
@@ -231,7 +231,7 @@ public class ProductServiceImpl implements ProductService {
 
         try {
 
-            product.setStatus(DBConstants.ProductStatus.OFF_SALE.getCode());
+            product.setStatus(DBConstants.ProductStatus.DRAFT.getCode());
             product.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
             productMapper.insert(product);
@@ -257,6 +257,52 @@ public class ProductServiceImpl implements ProductService {
         }
         return jsonResult;
     }
+
+
+
+    @Override
+    @Transactional
+    public JsonResult updateProduct(Product product, MultipartFile file, Integer random, JsonResult jsonResult) {
+        //上传图片
+
+        if (file != null && !file.isEmpty()) {
+            String _key = storageService.uploadToPublicBucket("product", file);
+            if (StringUtils.isEmpty(_key)) {
+                CommonResult.uploadFailed(jsonResult);
+                return jsonResult;
+            }
+            product.setLogoKey(_key);
+        }
+
+
+        try {
+
+
+            productMapper.updateByPrimaryKeyWithBLOBs(product);
+            //更新商品图片记录中的商品id
+            ProductPhotoExample productPhotoExample = new ProductPhotoExample();
+            ProductPhotoExample.Criteria criteria = productPhotoExample.or();
+            criteria.andPidEqualTo(random);
+
+            List<ProductPhoto> productPhotos = productPhotoMapper.selectByExample(productPhotoExample);
+
+            if (!ValidCheck.validList(productPhotos)) {
+                for (ProductPhoto productPhoto : productPhotos) {
+                    productPhoto.setPid(product.getId());
+                    productPhotoMapper.updateByPrimaryKey(productPhoto);
+                }
+            }
+
+            CommonResult.success(jsonResult);
+        } catch (Exception e) {
+            System.out.println(e);
+            CommonResult.sqlFailed(jsonResult);
+        }
+        return jsonResult;
+    }
+
+
+
 
     @Override
     @Transactional
@@ -320,6 +366,9 @@ public class ProductServiceImpl implements ProductService {
 
             product.setUserPurchases(userPurchases);
 
+            StoreInfo storeInfo = storeInfoMapper.selectByPrimaryKey(product.getSiId());
+            product.setStoreName(storeInfo.getName());
+
             Map map = new HashMap();
             map.put("data", product);
 
@@ -335,6 +384,7 @@ public class ProductServiceImpl implements ProductService {
             CommonResult.success(jsonResult);
 
         } catch (Exception e) {
+            System.out.println(e);
             CommonResult.sqlFailed(jsonResult);
         }
         return jsonResult;
