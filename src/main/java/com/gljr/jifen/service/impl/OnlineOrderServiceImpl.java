@@ -1343,6 +1343,7 @@ public class OnlineOrderServiceImpl implements OnlineOrderService {
                 map.put("date",onlineOrderDelivery.getDeliveryDate());
                 map.put("expressNo", onlineOrderDelivery.getExpressNo());
                 map.put("seId", onlineOrderDelivery.getSeId());
+                map.put("id", onlineOrderDelivery.getId());
             }
 
             List<SystemExpress> systemExpresses = systemExpressMapper.selectByExample(null);

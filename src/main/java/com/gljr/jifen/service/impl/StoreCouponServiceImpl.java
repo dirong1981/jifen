@@ -653,7 +653,6 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
             Map map = new HashMap();
             System.out.println(status);
             if(status == 0 || status.equals("null") || status == null) {
-                System.out.println("a");
                 StoreCouponOrderExample storeCouponOrderExample = new StoreCouponOrderExample();
                 StoreCouponOrderExample.Criteria criteria = storeCouponOrderExample.or();
 
@@ -712,7 +711,6 @@ public class StoreCouponServiceImpl extends BaseService implements StoreCouponSe
                 map.put("pageNum", pageInfo.getPageNum());
 
             }else {
-                System.out.println("b");
                 UserCouponExample userCouponExample = new UserCouponExample();
                 UserCouponExample.Criteria criteria = userCouponExample.or();
                 criteria.andStatusEqualTo(status);

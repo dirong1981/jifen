@@ -265,6 +265,8 @@ public class StoreOfflineOrderServiceImpl implements StoreOfflineOrderService {
                     } else {
                         storeOfflineOrder.setName(storeInfo.getName());
                     }
+                    storeOfflineOrder.setExtCash(storeOfflineOrder.getExtCash()/10);
+                    storeOfflineOrder.setTotalMoney(storeOfflineOrder.getTotalMoney()/10);
 
                 }
             }
